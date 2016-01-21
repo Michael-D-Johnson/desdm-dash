@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<head>
+<title>Backup Status</title>
+</head>
+<body>
+<h2>Current Status as of 2015-08-26 15:00:10.482742</h2>
+Totals only include files which have passed their release date.<P><table border=1 width=100%>
+<tr><th></th><th># files</th><th>Size (Tb)</th></tr>
+<tr><td>Tars Transferred</td><td>137</td><td>45.7695</td></tr>
+<tr><td>Units Deprecated</td><td>0</td><td>0.0000</td></tr>
+<tr><td>Pipeline Files Transferred</td><td>1742</td><td></td></tr>
+<tr><td>Exposure Files Transferred</td><td>0</td><td></td></tr>
+<tr><td>Tars To Transfer</td><td bgcolor="#00FF00">1</td><td>0.2987</td></tr>
+<tr><td>Pipeline Files To Transfer</td><td bgcolor="#FF0000">689</td><td></td></tr>
+<tr><td>Exposure Files To Transfer</td><td bgcolor="#00FF00">9</td><td></td></tr>
+</table>
+<p><b>Historical Trends Last 7 Days</b><table border=0 width=100%>
+<tr><td><img src={{url_for('static',filename="transfer.png")}}></td><td><img src={{url_for('static',filename="transfer-size.png")}}></td></tr>
+<tr><td><img src={{url_for('static',filename="pprocess-count.png")}}></td><td><img src={{url_for('static',filename="rprocess-count.png")}}></td></tr>
+</table>
+{% endblock %}

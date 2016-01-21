@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="{{
+  url_for('static', filename='jquery-1.11.3.min.js') }}">\x3C/script>')</script>
+<center>
+<img src="{{ url_for('static', filename = plot) }}">
+<h3><u>Min:</u> {{ df['total time'].min()}} <u>Max:</u> {{ df['total time'].max()}} <u>Avg:</u> {{ mean_times}}</h3>
+<h1> Assessment Summary </h1>
+<div class="container">
+{% for name,group in accepted_group %}    
+<table border="1">
+<caption align="top"><strong>{{ name }}</strong></caption>
+<tr>
+<th> Assessement </th>
+<th> Completed </th>
+</tr>
+    <tr>
+    {% for assess,grp in group.groupby(by=['assessment']) %}
+        <td>{{assess}}</td>
+        <td> {{grp.count()[0]}}
+            ({{((grp.count()[0]/group.count()[0])*100).round(1)}}%)</td></tr>
+    {% endfor %}
+    </table><br></br>
+    {% endfor %}
+</div>
+<h1> Processing Attempts </h1>
+<table border="1">
+<tr>
+{% for col in columns %}
+    <th>
+        {{ col }}
+    </th>
+{% endfor %}
+</tr>
+{% for key,row in df.iterrows() %}
+<tr>
+    {% for col in columns %}
+        {% if col == 'status' %}
+            {% if row[col] == 0 %}
+            <td bgcolor="#00FF00"> {{ row[col] }} </td>
+            {% elif  row[col] in [1,5] %}
+            <td bgcolor="#FF0000"> {{ row[col] }} </td>
+            {% else %}
+            <td bgcolor="#FF9900"> {{ row[col] }} </td>
+            {% endif %}
+        {% elif col == 'assessment' %}
+            {% if row[col] == 'True' %}
+            <td bgcolor="#00FF00"> {{ row[col] }} </td>
+            {% elif  row[col] == 'False' %}
+            <td bgcolor="#FF0000"> {{ row[col] }} </td>
+            {% else %}
+            <td bgcolor="#FF9900"> {{ row[col] }} </td>
+            {% endif %}
+        {% else %}
+            <td>  {{ row[col] }} </td>
+        {% endif %}
+    {% endfor %}
+    </tr>
+{% endfor %}
+</table>
+</center>
+{% endblock %}

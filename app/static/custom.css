@@ -1,0 +1,43 @@
+.container {
+    #float:left;
+    display: inline-table;
+}
+
+.toplinks {
+    border-radius:25px;
+    height:25px;
+    #position: fixed;
+    #float: top;
+    margin:10px;
+}
+
+.toplinks ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.toplinks ul li {
+    display: inline;
+    vertical-align: middle;
+    border-style: solid;
+    border-width: medium;
+    background-color:#C8C8C8;
+    border-color: #303030;
+    border-radius: 2px;
+    padding: 5px;
+}
+
+#dash a,
+#dash a:link, 
+#dash a:visited, 
+#dash a:hover, 
+#dash a:active {
+    color:red;
+    text-decoration: none;
+}
+
+.content {
+    #clear: both;
+    #margin: 10px;
+}

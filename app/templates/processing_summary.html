@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="{{
+  url_for('static', filename='jquery-1.11.3.min.js') }}">\x3C/script>')</script>
+<center>
+{% for d in df['operator'].unique() %}
+<h1> {{ d }} </h1>
+<table border="1">
+<tr>
+{% for col in columns %}
+    <th>
+        {{ col }}
+    </th>
+{% endfor %}
+</tr>
+{% for di in dict_list %}
+<tr>
+{% for col in columns %}
+    {% if di['operator'] == d%}
+    {% if col == 'reqnum' %}
+    <td> <a href="{{ url_for('processing_detail',reqnum =di[col]) }}"><strong>{{ di[col] }}</strong></a></td>
+    {% else %}
+    <td> {{ di[col] }} </td> 
+    {% endif %}
+    {% endif %}
+{% endfor %}
+</tr>
+{% endfor %}
+</table>
+{% endfor %}
+</center>
+{% endblock %}
+
