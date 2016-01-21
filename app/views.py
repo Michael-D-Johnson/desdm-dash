@@ -131,8 +131,6 @@ def processing_detail(reqnum):
 
 @app.route('/dts')
 def dts():
-    cp_command = "wget -q --user mjohns44 --password %s https://desar2.cosmology.illinois.edu/DESFiles/desardata/QA/technical/dts/dtsmonitor.html -O /Users/mjohns44/Code/GIT/desdm-dash/app/templates/dtsmonitor.html" % os.getenv('DES_DBPS')
-    os.system(cp_command)
     return render_template('dts_monitor.html')
 
 @app.route('/backups')
