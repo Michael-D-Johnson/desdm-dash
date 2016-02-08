@@ -13,7 +13,6 @@ def processing_summary():
 
 def processing_summary_brief(reqnums):
     query = "select distinct r.project,r.campaign,a.unitname,v.val,a.reqnum,a.attnum,t.status,a.data_state,a.operator,r.pipeline from pfw_job j,pfw_attempt a,pfw_attempt_val v,task t,pfw_request r where t.id =a.task_id and a.reqnum=r.reqnum and a.reqnum=j.reqnum and a.unitname=j.unitname and a.attnum=j.attnum and a.reqnum=v.reqnum and a.unitname=v.unitname and a.attnum=v.attnum and key in ('nite','range') and a.reqnum in (%s)" % reqnums
-    print query
     cur.execute(query)
     return cur.fetchall()
 
