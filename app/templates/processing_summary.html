@@ -4,8 +4,8 @@
 <script>window.jQuery || document.write('<script src="{{
   url_for('static', filename='jquery-1.11.3.min.js') }}">\x3C/script>')</script>
 <center>
-{% for d in df['operator'].unique() %}
-<h1> {{ d }} </h1>
+{% for o in operator_list %}
+<h1> {{ o }} </h1>
 <table border="1">
 <tr>
 {% for col in columns %}
@@ -17,7 +17,7 @@
 {% for di in dict_list %}
 <tr>
 {% for col in columns %}
-    {% if di['operator'] == d%}
+    {% if di['operator'] == o%}
     {% if col == 'reqnum' %}
     <td> <a href="{{ url_for('processing_detail',reqnum =di[col]) }}"><strong>{{ di[col] }}</strong></a></td>
     {% else %}

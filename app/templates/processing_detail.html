@@ -4,26 +4,33 @@
 <script>window.jQuery || document.write('<script src="{{
   url_for('static', filename='jquery-1.11.3.min.js') }}">\x3C/script>')</script>
 <center>
-<img src="{{ url_for('static', filename = plot) }}">
+<h1> Processing Times </h1>
+{{tfigdiv|safe}}
 <h3><u>Min:</u> {{ df['total time'].min()}} <u>Max:</u> {{ df['total time'].max()}} <u>Avg:</u> {{ mean_times}}</h3>
 <h1> Assessment Summary </h1>
-<div class="container">
-{% for name,group in accepted_group %}    
+{{figdiv|safe}}
 <table border="1">
-<caption align="top"><strong>{{ name }}</strong></caption>
 <tr>
-<th> Assessement </th>
-<th> Completed </th>
+<th> Program </th>
+<th> True </th>
+<th> False </th>
+<th> Unknown </th>
+<th> None </th>
 </tr>
+{% for program,group in df.groupby(by=['program']) %}
     <tr>
-    {% for assess,grp in group.groupby(by=['assessment']) %}
-        <td>{{assess}}</td>
-        <td> {{grp.count()[0]}}
-            ({{((grp.count()[0]/group.count()[0])*100).round(1)}}%)</td></tr>
+    <td> {{program}}</td>
+    {% for col in ['True','False','Unknown','None'] %}
+        {% if col in group['assessment'].unique() %}
+         <td> {{group[group['assessment']==col].count()[0]}}
+              ({{((group[group['assessment']==col].count()[0]/group[group['program']==program].count()[0])*100).round(1)}}%)</td>
+        {% else %}
+         <td> - </td>
+        {% endif %}
     {% endfor %}
-    </table><br></br>
-    {% endfor %}
-</div>
+    </tr>
+{% endfor %}
+</table>
 <h1> Processing Attempts </h1>
 <table border="1">
 <tr>
