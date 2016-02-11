@@ -1,0 +1,14 @@
+<VirtualHost *>
+    ServerName https://desar2.cosmology.illinois.edu/DESFiles/desardata/QA/desdm-dash
+
+    WSGIDaemonProcess desdm-dash user=mjohns44 group=apache threads=5
+    WSGIScriptAlias / /home/mjohns44/desdm-dash/desdm-dash.wsgi
+
+    <Directory "/work/devel/mjohns44/git/desdm-dash">
+        WSGIProcessGroup desdm-dash
+        WSGIApplicationGroup %{GLOBAL}
+        WSGIScriptReloading On
+        Order deny,allow
+        Allow from all
+    </Directory>
+</VirtualHost>

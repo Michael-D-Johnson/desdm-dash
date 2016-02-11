@@ -3,7 +3,7 @@ import os
 import pandas
 import query
 
-pandas.options.mode.chained_assignment = None
+#pandas.options.mode.chained_assignment = None
 
 def processing_summary():
     reqnums = [str(r) for r in query.get_reqnums()]
@@ -22,6 +22,10 @@ def processing_summary():
             nitelist = sorted(df[df.reqnum==req].loc[group.index,('nite')].dropna().unique())
             nitelist = ', '.join(nitelist)
             pipeline = df[df.reqnum==req]['pipeline'].unique()[0]
+            if pipeline =='supercal':
+                nites = nitelist.split('t')
+                nite1,nite2 = nites[0],nites[0][:4]+nites[1]
+                nitelist = nite1 + ', ' + nite2
             total_expnums = query.expnum_query(nitelist,req,pipeline)
 
             passed_df =  df[(df.operator == name) & (df.status==0) & (df.reqnum == req)].drop_duplicates(['unitname'])

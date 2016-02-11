@@ -45,7 +45,7 @@ def assess_query(triplet,pipeline):
     if pipeline=='sne':
         camsym,field,band,seq = triplet[0].split('_')
         comment = field.strip('SN-') + band + ' ' + df.loc[index,('nite')]
-        assess_q = "select distinct accepted,t_eff,program from firstcut_eval where analyst_comment='%s'" % (comment)
+        assess_q = "select distinct accepted,t_eff,program from firstcut_eval where analyst='SNQUALITY' and analyst_comment='%s'" % (comment)
     elif pipeline =='finalcut':
         assess_q = "select distinct accepted,t_eff,program from finalcut_eval where unitname='%s' and reqnum='%s' and attnum='%s'" % (triplet[0],triplet[1],triplet[2])
     elif pipeline =='firstcut':
