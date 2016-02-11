@@ -28,6 +28,8 @@ def expnum_query(nitelist,reqnum,pipeline):
         key = 'DESOPS-%s' % reqnum
         summary = jiracmd.Jira('jira-desdm').get_issue(key).fields.summary
         expnum_query = "select count(*) from exposuretag where tag in ('%s')" % summary
+    elif pipeline=='supercal':
+        expnum_query = "select count(distinct expnum) from exposure where obstype in ('zero','dome flat') and nite in (%s)" % nitelist
     else:
         expnum_query = "select count(distinct expnum) from exposure where obstype='object' and object not like '%%pointing%%' and object not like '%%focus%%' and object not like '%%donut%%' and object not like '%%test%%' and object not like '%%junk%%' and nite in (%s)" % nitelist
     cur.execute(expnum_query)

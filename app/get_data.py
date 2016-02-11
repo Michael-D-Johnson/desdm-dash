@@ -22,15 +22,18 @@ def processing_summary():
             nitelist = sorted(df[df.reqnum==req].loc[group.index,('nite')].dropna().unique())
             nitelist = ', '.join(nitelist)
             pipeline = df[df.reqnum==req]['pipeline'].unique()[0]
+            if pipeline =='supercal':
+                nites = nitelist.split('t')
+                nite1,nite2 = nites[0],nites[0][:4]+nites[1]
+                nitelist = nite1 + ', ' + nite2
             total_expnums = query.expnum_query(nitelist,req,pipeline)
-
             passed_df =  df[(df.operator == name) & (df.status==0) & (df.reqnum == req)].drop_duplicates(['unitname'])
             passed = passed_df['status'][(df.operator == name) & (df.status==0) & (df.reqnum == req)].count()
             failed_df = df[(df.operator == name) & (~df.status.isin([0,-99])) & (df.reqnum == req)].drop_duplicates(['unitname'])
             failed = failed_df['status'][(df.operator == name) & (~df.status.isin([0,-99])) & (df.reqnum == req)].count()
             try: unknown = df['status'][(df.operator == name) & (df.status == -99) & (df.reqnum==req)].count()
             except: unknown = 0
-            remaining = int(total_expnums)-int(passed)-int(failed)
+            remaining = int(total_expnums)-int(passed) #-int(failed)
             if remaining < 0:
                 remaining = 0
             if len(nitelist) == 1:

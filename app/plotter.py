@@ -10,7 +10,7 @@ from bokeh.io import vplot
 import get_data
 
 def plot_times(dataframe):
-    dataframe = dataframe.fillna(1)
+    dataframe = dataframe.fillna(-1)
     TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
 
     p = Histogram(dataframe,'total time',bins=24,
