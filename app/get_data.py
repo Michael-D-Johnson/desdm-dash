@@ -3,7 +3,7 @@ import os
 import pandas
 import query
 
-pandas.options.mode.chained_assignment = None
+#pandas.options.mode.chained_assignment = None
 
 def processing_summary():
     reqnums = [str(r) for r in query.get_reqnums()]
