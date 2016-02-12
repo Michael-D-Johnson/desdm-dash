@@ -46,7 +46,7 @@
         {% if col == 'status' %}
             {% if row[col] == 0 %}
             <td bgcolor="#00FF00"> {{ row[col] }} </td>
-            {% elif row[col] in [1,2,5,6,9] %}
+            {% elif row[col] in [-9,1,2,5,6,8,9,127,135,139,247] %}
             <td bgcolor="#FF0000"> {{ row[col] }} </td>
             {% else %}
             <td bgcolor="#FF9900"> {{ row[col] }} </td>
