@@ -11,21 +11,26 @@ def index():
 
 @app.route('/processing_summary')
 def processing_summary():
-    all_dict,operator_list,columns = get_data.processing_summary('OPS')
+    all_dict,operator_list,columns = get_data.processing_summary('db-desoper','OPS')
     return render_template('processing_summary.html',columns=columns,dict_list=all_dict,operator_list=operator_list)
 
 @app.route('/testing_summary')
 def testing_summary():
-    all_dict,operator_list,columns = get_data.processing_summary('TEST')
-    return render_template('processing_summary.html',columns=columns,dict_list=all_dict,operator_list=operator_list)
+    all_dict,operator_list,columns = get_data.processing_summary('db-desoper','TEST')
+    tall_dict,toperator_list,tcolumns = get_data.processing_summary('db-destest','TEST')
+    return render_template('testing_summary.html',columns=columns,dict_list=all_dict,operator_list=operator_list,tdict_list=tall_dict,toperator_list=toperator_list,tcolumns=tcolumns)
 
-@app.route('/processing_detail/<reqnum>')
-def processing_detail(reqnum):
-    df,columns,reqnum,mean_times = get_data.processing_detail(reqnum)
-    tfigscript,tfigdiv=plotter.plot_times(df)
-    figscript,figdiv=plotter.plot_accepted(df)
-
-    return render_template('processing_detail.html',columns=columns,df = df,reqnum=reqnum,figdiv=figdiv,figscript=figscript,mean_times=mean_times,tfigscript=tfigscript,tfigdiv=tfigdiv)
+@app.route('/processing_detail/<db>/<reqnum>')
+def processing_detail(db,reqnum):
+    df,columns,reqnum,mean_times = get_data.processing_detail(db,reqnum)
+    try:
+        tfigscript,tfigdiv=plotter.plot_times(df)
+        figscript,figdiv=plotter.plot_accepted(df)
+    except:
+        tfigscript,tfigdiv=None,None
+        figscript,figdiv=None,None
+    
+    return render_template('processing_detail.html',columns=columns,df = df,reqnum=reqnum,figdiv=figdiv,figscript=figscript,mean_times=mean_times,tfigscript=tfigscript,tfigdiv=tfigdiv,db=db)
 
 @app.route('/dts')
 def dts():

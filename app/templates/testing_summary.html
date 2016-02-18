@@ -4,6 +4,13 @@
 <script>window.jQuery || document.write('<script src="{{
   url_for('static', filename='jquery-1.11.3.min.js') }}">\x3C/script>')</script>
 <center>
+{% for db in ['db-desoper','db-destest'] %}
+<hr>
+<h1> {{ db}} </h1>
+<hr>
+{% if db=='db-destest' %}
+   {% set operator_list = toperator_list %}
+{% endif %}
 {% for o in operator_list %}
 <h1> {{ o }} </h1>
 <table border="1">
@@ -14,12 +21,15 @@
     </th>
 {% endfor %}
 </tr>
+{% if db=='db-destest' %}
+{% set dict_list = tdict_list %}
+{% endif %}
 {% for di in dict_list %}
 <tr>
 {% for col in columns %}
     {% if di['operator'] == o%}
     {% if col == 'reqnum' %}
-    <td> <a href="{{ url_for('processing_detail',db='db-desoper',reqnum =di[col]) }}"><strong>{{ di[col] }}</strong></a></td>
+    <td> <a href="{{ url_for('processing_detail',db=db,reqnum =di[col]) }}"><strong>{{ di[col] }}</strong></a></td>
     {% else %}
     <td> {{ di[col] }} </td> 
     {% endif %}
@@ -28,6 +38,7 @@
 </tr>
 {% endfor %}
 </table>
+{% endfor %}
 {% endfor %}
 </center>
 {% endblock %}

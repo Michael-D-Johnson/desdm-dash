@@ -5,11 +5,11 @@ import query
 
 #pandas.options.mode.chained_assignment = None
 
-def processing_summary(project):
-    reqnums = [str(r) for r in query.get_reqnums()]
+def processing_summary(db,project):
+    reqnums = [str(r) for r in query.get_reqnums(query.cursor(db))]
     reqnum_list = ','.join(reqnums)
 
-    results = query.processing_summary_brief(reqnum_list)
+    results = query.processing_summary_brief(query.cursor(db),reqnum_list)
     df = pandas.DataFrame(results,columns=['project','campaign','unitname','nite','reqnum','attnum','status','data_state','operator','pipeline'])
     df = df.sort(columns=['reqnum','unitname','attnum'],ascending=False)
     df = df.drop_duplicates(subset=['unitname','reqnum','attnum'])
@@ -31,9 +31,9 @@ def processing_summary(project):
                 nite1,nite2 = nites[0],nites[0][:4]+nites[1]
                 nitelist = nite1 + ' - ' + nite2
             if project =='TEST':
-                total_batch_size = query.test_query(req)
+                total_batch_size = query.test_query(query.cursor(db),req)
             else:
-                total_batch_size = query.batch_size_query(nitelist,req,pipeline)
+                total_batch_size = query.batch_size_query(query.cursor(db),nitelist,req,pipeline)
             passed_df =  df[(df.operator == name) & (df.status==0) & (df.reqnum == req)].drop_duplicates(['unitname'])
             passed = passed_df['status'][(df.operator == name) & (df.status==0) & (df.reqnum == req)].count()
             failed_df = df[(df.operator == name) & (~df.status.isin([0,-99])) & (df.reqnum == req)].drop_duplicates(['unitname'])
@@ -55,38 +55,44 @@ def processing_summary(project):
     operator_list =  list(set( dic['operator'] for dic in all_dict ))
     return (all_dict,operator_list,columns)
 
-def processing_detail(reqnum):
-    results = query.processing_detail(reqnum) 
-
-    df = pandas.DataFrame(results,columns=['project','campaign','unitname','nite','reqnum','attnum','status','data_state','operator','pipeline','start_time','end_time'])
-    df.insert(len(df.columns),'assessment', None)
-    df.insert(len(df.columns),'program', None)
-    df.insert(len(df.columns),'t_eff', None)
-    df.insert(12,'total time', None)
-
-    df = df.sort(columns=['reqnum','unitname','attnum','start_time'],ascending=False)
-    df_attempt = df.groupby(by=['unitname','reqnum','attnum'])
-    for name,group in df_attempt:
-        df = df.drop_duplicates(subset=['unitname','reqnum','attnum'])
+def processing_detail(db,reqnum):
+    results = query.processing_detail(query.cursor(db),reqnum) 
+    if not results:
+        results = query.processing_basic(query.cursor(db),reqnum)
+        df = pandas.DataFrame(results,columns=['project','campaign','unitname','reqnum','attnum','status','data_state','operator','pipeline'])
+        df.sort(columns=['unitname','attnum'],ascending=False)
         columns = df.columns
-        index = df[(df['unitname']==name[0]) & (df['reqnum']==name[1]) & (df['attnum']==name[2])].index[0]
-        df.loc[index,('start_time','end_time')] = group['start_time'].min(),group['end_time'].max()
-        total_time = (group['end_time'].max() - group['start_time'].min())/pandas.Timedelta(hours=1)
-        try:
-            df.loc[index,('total time')] = round(total_time,3)
-        except:
-            pass
-        pipeline = group.pipeline.unique()
-        assess_query_results = query.assess_query(name,pipeline)
+        return (df,columns,reqnum,None)
+    else:
+        df = pandas.DataFrame(results,columns=['project','campaign','unitname','nite','reqnum','attnum','status','data_state','operator','pipeline','start_time','end_time'])
+        df.insert(len(df.columns),'assessment', None)
+        df.insert(len(df.columns),'program', None)
+        df.insert(len(df.columns),'t_eff', None)
+        df.insert(12,'total time', None)
 
-        try:
-            assess,t_eff,program = assess_query_results[0][0],assess_query_results[0][1],assess_query_results[0][2]
-        except:
-            assess,t_eff,program = 'None','None','None'
+        df = df.sort(columns=['reqnum','unitname','attnum','start_time'],ascending=False)
+        df_attempt = df.groupby(by=['unitname','reqnum','attnum'])
+        for name,group in df_attempt:
+            df = df.drop_duplicates(subset=['unitname','reqnum','attnum'])
+            columns = df.columns
+            index = df[(df['unitname']==name[0]) & (df['reqnum']==name[1]) & (df['attnum']==name[2])].index[0]
+            df.loc[index,('start_time','end_time')] = group['start_time'].min(),group['end_time'].max()
+            total_time = (group['end_time'].max() - group['start_time'].min())/pandas.Timedelta(hours=1)
+            try:
+                df.loc[index,('total time')] = round(total_time,3)
+            except:
+                pass
+            pipeline = group.pipeline.unique()
+            assess_query_results = query.assess_query(query.cursor(db),name,pipeline)
 
-        df.loc[index,('assessment')] = assess
-        df.loc[index,('t_eff')] = t_eff
-        df.loc[index,('program')] = program
+            try:
+                assess,t_eff,program = assess_query_results[0][0],assess_query_results[0][1],assess_query_results[0][2]
+            except:
+                assess,t_eff,program = 'None','None','None'
 
-    mean_times =round(df['total time'].mean(skipna=True),3)
-    return (df,columns,reqnum,mean_times)
+            df.loc[index,('assessment')] = assess
+            df.loc[index,('t_eff')] = t_eff
+            df.loc[index,('program')] = program
+
+        mean_times =round(df['total time'].mean(skipna=True),3)
+        return (df,columns,reqnum,mean_times)
