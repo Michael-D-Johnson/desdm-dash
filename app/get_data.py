@@ -83,7 +83,7 @@ def processing_detail(db,reqnum):
             except:
                 pass
             pipeline = group.pipeline.unique()
-            assess_query_results = query.assess_query(query.cursor(db),name,pipeline)
+            assess_query_results = query.assess_query(query.cursor(db),df,index,name,pipeline)
 
             try:
                 assess,t_eff,program = assess_query_results[0][0],assess_query_results[0][1],assess_query_results[0][2]

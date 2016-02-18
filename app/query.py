@@ -61,7 +61,7 @@ def processing_basic(cur,reqnum):
 def failed_detail(cur,reqnum):
     pass
 
-def assess_query(cur,triplet,pipeline):
+def assess_query(cur,df,index,triplet,pipeline):
     if pipeline=='sne':
         camsym,field,band,seq = triplet[0].split('_')
         comment = field.strip('SN-') + band + ' ' + df.loc[index,('nite')]
