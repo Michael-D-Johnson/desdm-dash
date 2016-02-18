@@ -77,8 +77,9 @@ def processing_detail(db,reqnum):
             columns = df.columns
             index = df[(df['unitname']==name[0]) & (df['reqnum']==name[1]) & (df['attnum']==name[2])].index[0]
             df.loc[index,('start_time','end_time')] = group['start_time'].min(),group['end_time'].max()
-            total_time = (group['end_time'].max() - group['start_time'].min())/pandas.Timedelta(hours=1)
             try:
+                total_time = (group['end_time'].max() - group['start_time'].min())/pandas.Timedelta(hours=1)
+
                 df.loc[index,('total time')] = round(total_time,3)
             except:
                 pass
