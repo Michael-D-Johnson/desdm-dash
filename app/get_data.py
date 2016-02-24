@@ -8,51 +8,55 @@ import query
 def processing_summary(db,project):
     reqnums = [str(r) for r in query.get_reqnums(query.cursor(db))]
     reqnum_list = ','.join(reqnums)
-
-    results = query.processing_summary_brief(query.cursor(db),reqnum_list)
-    df = pandas.DataFrame(results,columns=['project','campaign','unitname','nite','reqnum','attnum','status','data_state','operator','pipeline'])
-    df = df.sort(columns=['reqnum','unitname','attnum'],ascending=False)
-    df = df.drop_duplicates(subset=['unitname','reqnum','attnum'])
-    df = df.fillna(-99)
-    if project =='TEST':
-        df = df[df.project != 'OPS']
-    else:
-        df = df[df.project == project]
-    columns = ['operator','project','campaign','pipeline','reqnum','nite','batch size','passed','failed','unknown','remaining']
-    df_op = df.groupby(by=['operator'])
-    all_dict = []
-    for name,group in df_op:
-        for req in sorted(group['reqnum'].unique(),reverse = True):
-            nitelist = sorted(df[df.reqnum==req].loc[group.index,('nite')].dropna().unique())
-            nitelist = ', '.join(nitelist)
-            pipeline = df[df.reqnum==req]['pipeline'].unique()[0]
-            if pipeline =='supercal':
-                nites = nitelist.split('t')
-                nite1,nite2 = nites[0],nites[0][:4]+nites[1]
-                nitelist = nite1 + ' - ' + nite2
-            if project =='TEST':
-                total_batch_size = query.test_query(query.cursor(db),req)
-            else:
-                total_batch_size = query.batch_size_query(query.cursor(db),nitelist,req,pipeline)
-            passed_df =  df[(df.operator == name) & (df.status==0) & (df.reqnum == req)].drop_duplicates(['unitname'])
-            passed = passed_df['status'][(df.operator == name) & (df.status==0) & (df.reqnum == req)].count()
-            failed_df = df[(df.operator == name) & (~df.status.isin([0,-99])) & (df.reqnum == req)].drop_duplicates(['unitname'])
-            failed = failed_df['status'][(df.operator == name) & (~df.status.isin([0,-99])) & (df.reqnum == req)].count()
-            try: unknown = df['status'][(df.operator == name) & (df.status == -99) & (df.reqnum==req)].count()
-            except: unknown = 0
-            remaining = int(total_batch_size)-int(passed) #-int(failed)
-            if remaining < 0:
-                remaining = 0
-            if len(nitelist) == 1:
-                nitelist = nitelist[0]
-            req_dict = {'remaining':remaining,'operator':name,'batch size':total_batch_size,
-                        'reqnum':req,'passed':passed,'failed':failed,'unknown':unknown,
-                        'nite':nitelist,
-                        'campaign':df[df.reqnum==req].loc[group.index,('campaign')].dropna().unique()[0],
-                        'project':df[df.reqnum==req].loc[group.index,('project')].dropna().unique()[0],
-                        'pipeline':df[df.reqnum==req].loc[group.index,('pipeline')].dropna().unique()[0]}
-            all_dict.append(req_dict)
-    operator_list =  list(set( dic['operator'] for dic in all_dict ))
+    if reqnums:
+        results = query.processing_summary_brief(query.cursor(db),reqnum_list)
+        df = pandas.DataFrame(results,columns=['project','campaign','unitname','nite','reqnum','attnum','status','data_state','operator','pipeline'])
+        df = df.sort(columns=['reqnum','unitname','attnum'],ascending=False)
+        df = df.drop_duplicates(subset=['unitname','reqnum','attnum'])
+        df = df.fillna(-99)
+        if project =='TEST':
+            df = df[df.project != 'OPS']
+        else:
+            df = df[df.project == project]
+        columns = ['operator','project','campaign','pipeline','reqnum','nite','batch size','passed','failed','unknown','remaining']
+        df_op = df.groupby(by=['operator'])
+        all_dict = []
+        for name,group in df_op:
+            for req in sorted(group['reqnum'].unique(),reverse = True):
+                nitelist = sorted(df[df.reqnum==req].loc[group.index,('nite')].dropna().unique())
+                nitelist = ', '.join(nitelist)
+                pipeline = df[df.reqnum==req]['pipeline'].unique()[0]
+                if pipeline =='supercal':
+                    nites = nitelist.split('t')
+                    nite1,nite2 = nites[0],nites[0][:4]+nites[1]
+                    nitelist = nite1 + ' - ' + nite2
+                if project =='TEST':
+                    total_batch_size = query.test_query(query.cursor(db),req)
+                else:
+                    total_batch_size = query.batch_size_query(query.cursor(db),nitelist,req,pipeline)
+                passed_df =  df[(df.operator == name) & (df.status==0) & (df.reqnum == req)].drop_duplicates(['unitname'])
+                passed = passed_df['status'][(df.operator == name) & (df.status==0) & (df.reqnum == req)].count()
+                failed_df = df[(df.operator == name) & (~df.status.isin([0,-99])) & (df.reqnum == req)].drop_duplicates(['unitname'])
+                failed = failed_df['status'][(df.operator == name) & (~df.status.isin([0,-99])) & (df.reqnum == req)].count()
+                try: unknown = df['status'][(df.operator == name) & (df.status == -99) & (df.reqnum==req)].count()
+                except: unknown = 0
+                remaining = int(total_batch_size)-int(passed) #-int(failed)
+                if remaining < 0:
+                    remaining = 0
+                if len(nitelist) == 1:
+                    nitelist = nitelist[0]
+                req_dict = {'remaining':remaining,'operator':name,'batch size':total_batch_size,
+                            'reqnum':req,'passed':passed,'failed':failed,'unknown':unknown,
+                            'nite':nitelist,
+                            'campaign':df[df.reqnum==req].loc[group.index,('campaign')].dropna().unique()[0],
+                            'project':df[df.reqnum==req].loc[group.index,('project')].dropna().unique()[0],
+                            'pipeline':df[df.reqnum==req].loc[group.index,('pipeline')].dropna().unique()[0]}
+                all_dict.append(req_dict)
+    try: operator_list =  list(set( dic['operator'] for dic in all_dict ))
+    except: 
+        operator_list = ''
+        all_dict = {}
+        columns = '' 
     return (all_dict,operator_list,columns)
 
 def processing_detail(db,reqnum):
@@ -60,7 +64,7 @@ def processing_detail(db,reqnum):
     if not results:
         results = query.processing_basic(query.cursor(db),reqnum)
         df = pandas.DataFrame(results,columns=['project','campaign','unitname','reqnum','attnum','status','data_state','operator','pipeline'])
-        df.sort(columns=['unitname','attnum'],ascending=False)
+        df = df.sort(columns=['unitname','attnum'],ascending=False)
         columns = df.columns
         return (df,columns,reqnum,None)
     else:
