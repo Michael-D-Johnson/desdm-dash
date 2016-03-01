@@ -59,12 +59,13 @@ def processing_summary(db,project):
         columns = '' 
     return (all_dict,operator_list,columns)
 
-def processing_detail(db,reqnum):
+def processing_detail(db,operator,reqnum):
     results = query.processing_detail(query.cursor(db),reqnum) 
     if not results:
         results = query.processing_basic(query.cursor(db),reqnum)
         df = pandas.DataFrame(results,columns=['project','campaign','unitname','reqnum','attnum','status','data_state','operator','pipeline'])
         df = df.sort(columns=['unitname','attnum'],ascending=False)
+        df = df[df.operator==operator]
         columns = df.columns
         return (df,columns,reqnum,None)
     else:
@@ -75,6 +76,7 @@ def processing_detail(db,reqnum):
         df.insert(12,'total time', None)
 
         df = df.sort(columns=['reqnum','unitname','attnum','start_time'],ascending=False)
+        df = df[df.operator==operator]
         df_attempt = df.groupby(by=['unitname','reqnum','attnum'])
         for name,group in df_attempt:
             df = df.drop_duplicates(subset=['unitname','reqnum','attnum'])

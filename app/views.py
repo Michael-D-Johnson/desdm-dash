@@ -20,9 +20,9 @@ def testing_summary():
     tall_dict,toperator_list,tcolumns = get_data.processing_summary('db-destest','TEST')
     return render_template('testing_summary.html',columns=columns,dict_list=all_dict,operator_list=operator_list,tdict_list=tall_dict,toperator_list=toperator_list,tcolumns=tcolumns)
 
-@app.route('/processing_detail/<db>/<reqnum>')
-def processing_detail(db,reqnum):
-    df,columns,reqnum,mean_times = get_data.processing_detail(db,reqnum)
+@app.route('/processing_detail/<db>/<operator>/<reqnum>')
+def processing_detail(db,operator,reqnum):
+    df,columns,reqnum,mean_times = get_data.processing_detail(db,operator,reqnum)
     try:
         tfigscript,tfigdiv=plotter.plot_times(df)
         figscript,figdiv=plotter.plot_accepted(df)
@@ -30,7 +30,7 @@ def processing_detail(db,reqnum):
         tfigscript,tfigdiv=None,None
         figscript,figdiv=None,None
     
-    return render_template('processing_detail.html',columns=columns,df = df,reqnum=reqnum,figdiv=figdiv,figscript=figscript,mean_times=mean_times,tfigscript=tfigscript,tfigdiv=tfigdiv,db=db)
+    return render_template('processing_detail.html',columns=columns,df = df,reqnum=reqnum,figdiv=figdiv,figscript=figscript,mean_times=mean_times,tfigscript=tfigscript,tfigdiv=tfigdiv,db=db,operator=operator)
 
 @app.route('/dts')
 def dts():

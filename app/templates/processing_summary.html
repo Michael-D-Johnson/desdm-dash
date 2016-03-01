@@ -19,7 +19,7 @@
 {% for col in columns %}
     {% if di['operator'] == o%}
     {% if col == 'reqnum' %}
-    <td> <a href="{{ url_for('processing_detail',db='db-desoper',reqnum =di[col]) }}"><strong>{{ di[col] }}</strong></a></td>
+    <td> <a href="{{ url_for('processing_detail',db='db-desoper',reqnum =di[col], operator=di['operator'])}}"><strong>{{ di[col] }}</strong></a></td>
     {% else %}
     <td> {{ di[col] }} </td> 
     {% endif %}

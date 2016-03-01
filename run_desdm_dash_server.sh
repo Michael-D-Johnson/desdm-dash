@@ -1,3 +1,3 @@
 #!/bin/bash
 setup -r .
-python run.py
+python start_server.py

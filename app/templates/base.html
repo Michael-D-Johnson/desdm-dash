@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+    <link rel="icon" href="{{url_for('static',filename='des_logo.png')}}">
     <meta charset="utf-8">
     <title> 
         {% if title %}
             {{ title }}
         {% else %}
-            Welcome to the DESDM-Dash!
+            Dashboard
         {% endif %}
     </title>
     <link href="http://cdn.pydata.org/bokeh/release/bokeh-0.10.0.min.css" rel="stylesheet" type="text/css" >
