@@ -4,6 +4,10 @@
 <script>window.jQuery || document.write('<script src="{{
   url_for('static', filename='jquery-1.11.3.min.js') }}">\x3C/script>')</script>
 <center>
+{% if efigdiv %}
+<h1> Processing Times per Exec Host</h1>
+{{efigdiv|safe}}
+{% endif %}
 {% if tfigdiv %}
 <h1> Processing Times </h1>
 {{tfigdiv|safe}}

@@ -19,6 +19,10 @@
         {% if tfigscript %}
         {{ tfigscript|safe}}
         {% endif %}
+        {% if efigscript %}
+        {{ efigscript|safe}}
+        {% endif %}
+
     <link href="{{ url_for('static',filename='custom.css')}}" rel="stylesheet" type="text/css" /> 
     </head>
 <body>

@@ -23,14 +23,17 @@ def testing_summary():
 @app.route('/processing_detail/<db>/<operator>/<reqnum>')
 def processing_detail(db,operator,reqnum):
     df,columns,reqnum,mean_times = get_data.processing_detail(db,operator,reqnum)
+    
     try:
         tfigscript,tfigdiv=plotter.plot_times(df)
         figscript,figdiv=plotter.plot_accepted(df)
+        #efigscript,efigdiv=plotter.plot_times_per_host(df)
     except:
         tfigscript,tfigdiv=None,None
         figscript,figdiv=None,None
+    efigscript,efigdiv=None,None
     
-    return render_template('processing_detail.html',columns=columns,df = df,reqnum=reqnum,figdiv=figdiv,figscript=figscript,mean_times=mean_times,tfigscript=tfigscript,tfigdiv=tfigdiv,db=db,operator=operator)
+    return render_template('processing_detail.html',columns=columns,df = df,reqnum=reqnum,figdiv=figdiv,figscript=figscript,mean_times=mean_times,tfigscript=tfigscript,tfigdiv=tfigdiv,db=db,operator=operator,efigscript=efigscript,efigdiv=efigdiv)
 
 @app.route('/dts')
 def dts():
