@@ -10,7 +10,7 @@ def processing_summary(db,project):
     reqnum_list = ','.join(reqnums)
     if reqnums:
         results = query.processing_summary_brief(query.cursor(db),reqnum_list)
-        df = pandas.DataFrame(results,columns=['created date','project','campaign','unitname','nite','reqnum','attnum','status','data_state','operator','pipeline','target_site'])
+        df = pandas.DataFrame(results,columns=['created date','project','campaign','unitname','nite','reqnum','attnum','status','data_state','operator','pipeline','target_site','submit_site'])
         df = df.sort(columns=['reqnum','unitname','attnum'],ascending=False)
         df = df.drop_duplicates(subset=['unitname','reqnum','attnum'])
         df = df.fillna(-99)
@@ -18,7 +18,7 @@ def processing_summary(db,project):
             df = df[df.project != 'OPS']
         else:
             df = df[df.project == project]
-        columns = ['operator','project','campaign','pipeline','target_site','reqnum','nite','batch size','passed','failed','unknown','remaining']
+        columns = ['operator','project','campaign','pipeline','submit_site','target_site','reqnum','nite','batch size','passed','failed','unknown','remaining']
         df_op = df.groupby(by=['operator'])
         all_dict = []
         for name,group in df_op:
@@ -42,7 +42,12 @@ def processing_summary(db,project):
                 failed = failed_df['status'][(df.operator == name) & (~df.status.isin([0,-99])) & (df.reqnum == req)].count()
                 try: unknown = df['status'][(df.operator == name) & (df.status == -99) & (df.reqnum==req)].count()
                 except: unknown = 0
-                target_site = ', '.join(df[df.reqnum==req].sort(columns=['created date'])['target_site'].unique())
+                #target_site = ', '.join(df[df.reqnum==req].sort(columns=['created date'])['target_site'].unique())
+                target_site =df[df.reqnum==req].sort(columns=['created date'])['target_site'].unique()[-1]
+
+                #submit_site = ', '.join([site.split('.')[0] for site in df[df.reqnum==req].sort(columns=['created date'])['submit_site'].unique()])
+                submit_site = [site.split('.')[0] for site in df[df.reqnum==req].sort(columns=['created date'])['submit_site'].unique()][-1]
+
                 remaining = int(total_batch_size)-int(passed) #-int(failed)
                 if remaining < 0:
                     remaining = 0
@@ -51,6 +56,7 @@ def processing_summary(db,project):
                 req_dict = {'remaining':remaining,'operator':name,'batch size':total_batch_size,
                             'reqnum':req,'passed':passed,'failed':failed,'unknown':unknown,
                             'nite':nitelist,
+                            'submit_site':submit_site,
                             'target_site':target_site,
                             'campaign':df[df.reqnum==req].loc[group.index,('campaign')].dropna().unique()[0],
                             'project':df[df.reqnum==req].loc[group.index,('project')].dropna().unique()[0],
@@ -67,18 +73,22 @@ def processing_detail(db,operator,reqnum):
     results = query.processing_detail(query.cursor(db),reqnum) 
     if not results:
         results = query.processing_basic(query.cursor(db),reqnum)
-        df = pandas.DataFrame(results,columns=['project','campaign','unitname','reqnum','attnum','status','data_state','operator','pipeline','target_site'])
+        df = pandas.DataFrame(results,columns=['project','campaign','unitname','reqnum','attnum','status','data_state','operator','pipeline','target_site','submit_host','exec_host'])
         df = df.sort(columns=['unitname','attnum'],ascending=False)
         df = df[df.operator==operator]
         columns = df.columns
         return (df,columns,reqnum,None)
     else:
-        df = pandas.DataFrame(results,columns=['project','campaign','unitname','nite','reqnum','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site'])
+        df = pandas.DataFrame(results,columns=['project','campaign','unitname','nite','reqnum','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_host','exec_host'])
         df.insert(len(df.columns),'assessment', None)
         df.insert(len(df.columns),'program', None)
         df.insert(len(df.columns),'t_eff', None)
         df.insert(12,'total time', None)
+        def rename(row):
+            row['submit_host'] = row['submit_host'].split('.')[0]
+            return row['submit_host']
 
+        df['submit_host'] = df.apply(rename,axis=1)
         df = df.sort(columns=['reqnum','unitname','attnum','start_time'],ascending=False)
         df = df[df.operator==operator]
         df_attempt = df.groupby(by=['unitname','reqnum','attnum'])

@@ -4,8 +4,27 @@ from bokeh.models import (HoverTool, BoxSelectTool, BoxZoomTool,
                           PanTool, ResetTool,WheelZoomTool,
                           glyphs,Legend)
 from bokeh.palettes import Spectral6
-from bokeh.charts import Bar,Histogram
+from bokeh.charts import Scatter,Bar,Histogram
 from bokeh.io import vplot
+
+
+def plot_times_per_host(dataframe):
+    dataframe = dataframe.fillna('NA')
+    dataframe = dataframe[dataframe.exec_host != 'NA']
+    def create_data_source(data_frame):
+        return ColumnDataSource(
+            data=dict(
+            expnum=data_frame['expnum'],
+            exec_host=data_frame['exec_host'],
+            ))
+    source = create_data_source(dataframe)
+    TOOLS=[HoverTool(tooltips = [('expnum', '@expnum'),('exec_host','@exec_host')]),BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
+    p = figure(title="Processing time per exec_host", x_axis_label='exec_host',
+               y_axis_label='total time',tools=TOOLS)
+
+    p.scatter('exec_host','total time', source = source)
+    figscript,figdiv = components(p)
+    return (figscript,figdiv)
 
 def plot_times(dataframe):
     dataframe = dataframe.fillna(-1)
