@@ -9,12 +9,12 @@ def cursor(section):
     return cur
 
 def processing_summary(cur):
-    query = "select distinct r.project,r.campaign,a.unitname,v.val,a.reqnum,a.attnum,t.status,a.data_state,a.operator,r.pipeline from pfw_job j,pfw_attempt a,pfw_attempt_val v,task t,pfw_request r where a.created_date >= sysdate-4 and t.id =a.task_id and a.reqnum=r.reqnum and a.reqnum=j.reqnum and a.unitname=j.unitname and a.attnum=j.attnum and a.reqnum=v.reqnum and a.unitname=v.unitname and a.attnum=v.attnum and key in ('nite','range')"
+    query = "select distinct r.project,r.campaign,a.unitname,v.val,a.reqnum,a.attnum,t.status,a.data_state,a.operator,r.pipeline,b.target_site from pfw_job j,pfw_attempt a,pfw_attempt_val v,task t,pfw_request r,pfw_block b where a.created_date >= sysdate-4 and t.id =a.task_id and a.reqnum=r.reqnum and a.reqnum=j.reqnum and a.unitname=j.unitname and a.attnum=j.attnum and a.reqnum=v.reqnum and a.unitname=v.unitname and a.attnum=v.attnum and key in ('nite','range') and b.reqnum=a.reqnum and b.unitname=a.unitname and b.attnum=a.attnum"
     cur.execute(query)
     return cur.fetchall()
 
 def processing_summary_brief(cur,reqnums):
-    query = "select distinct r.project,r.campaign,a.unitname,v.val,a.reqnum,a.attnum,t.status,a.data_state,a.operator,r.pipeline from pfw_job j,pfw_attempt a,pfw_attempt_val v,task t,pfw_request r where t.id =a.task_id and a.reqnum=r.reqnum and a.reqnum=j.reqnum and a.unitname=j.unitname and a.attnum=j.attnum and a.reqnum=v.reqnum and a.unitname=v.unitname and a.attnum=v.attnum and key in ('nite','range') and a.reqnum in (%s)" % reqnums
+    query = "select distinct a.created_date,r.project,r.campaign,a.unitname,v.val,a.reqnum,a.attnum,t.status,a.data_state,a.operator,r.pipeline,b.target_site from pfw_job j,pfw_attempt a,pfw_attempt_val v,task t,pfw_request r, pfw_block b where t.id =a.task_id and a.reqnum=r.reqnum and a.reqnum=j.reqnum and a.unitname=j.unitname and a.attnum=j.attnum and a.reqnum=v.reqnum and a.unitname=v.unitname and a.attnum=v.attnum and key in ('nite','range') and a.reqnum in (%s) and b.unitname=a.unitname and b.reqnum=a.reqnum and b.attnum=a.attnum" % reqnums
     cur.execute(query)
     return cur.fetchall()
 
@@ -49,12 +49,12 @@ def batch_size_query(cur,nitelist,reqnum,pipeline):
     return results
 
 def processing_detail(cur,reqnum):
-    query = "select distinct r.project,r.campaign,a.unitname,v.val,a.reqnum,a.attnum,t.status,a.data_state,a.operator,r.pipeline,j.condor_start_time,condor_end_time from pfw_job j,pfw_attempt a,pfw_attempt_val v,task t,pfw_request r where a.created_date >= sysdate-4 and t.id =a.task_id and a.reqnum=r.reqnum and a.reqnum=j.reqnum and a.unitname=j.unitname and a.attnum=j.attnum and a.reqnum=v.reqnum and a.unitname=v.unitname and a.attnum=v.attnum and key in ('nite','range') and a.reqnum=%s" % reqnum
+    query = "select distinct r.project,r.campaign,a.unitname,v.val,a.reqnum,a.attnum,t.status,a.data_state,a.operator,r.pipeline,j.condor_start_time,condor_end_time,b.target_site from pfw_job j,pfw_attempt a,pfw_attempt_val v,task t,pfw_request r,pfw_block b where a.created_date >= sysdate-4 and t.id =a.task_id and a.reqnum=r.reqnum and a.reqnum=j.reqnum and a.unitname=j.unitname and a.attnum=j.attnum and a.reqnum=v.reqnum and a.unitname=v.unitname and a.attnum=v.attnum and key in ('nite','range') and a.reqnum=%s and b.unitname=a.unitname and b.reqnum=a.reqnum and b.attnum=a.attnum" % reqnum
     cur.execute(query)
     return cur.fetchall()
 
 def processing_basic(cur,reqnum):
-    query = "select distinct r.project,r.campaign,a.unitname,a.reqnum,a.attnum,t.status,a.data_state,a.operator,r.pipeline from pfw_attempt a, task t,pfw_request r where a.created_date >= sysdate-4 and t.id =a.task_id and a.reqnum=r.reqnum and a.reqnum=%s" % reqnum
+    query = "select distinct r.project,r.campaign,a.unitname,a.reqnum,a.attnum,t.status,a.data_state,a.operator,r.pipeline,b.target_site from pfw_attempt a, task t,pfw_request r,pfw_block b where a.created_date >= sysdate-4 and t.id =a.task_id and a.reqnum=r.reqnum and a.reqnum=%s and b.unitname=a.unitname and a.reqnum=b.reqnum and a.attnum=b.attnum" % reqnum
     cur.execute(query)
     return cur.fetchall()
 
