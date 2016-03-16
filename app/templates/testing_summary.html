@@ -10,38 +10,45 @@
 <h1> {{ db}} </h1>
 <hr>
 </div>
-{% if db=='db-destest' %}
-   {% set operator_list = toperator_list %}
+{% if db=='db-desoper' %}
+{% set dict_list = [current_dict,rest_dict] %}
+{% else %}
+{% set dict_list = [tcurrent_dict,trest_dict] %}
 {% endif %}
-{% for o in operator_list %}
-<h2> {{ o }} </h2>
+{% set n=1 %}
+{% for dict in dict_list %}
+{% if n==1 %}
+<h2> Currently running: </h2>
+{% else %}
+<h2> Runs in the last four days: </h2>
+{% endif %}
+{% set n=2 %}
+{% if not dict %}
+<h5> ---NA--- </h5>
+{% else %}
 <table border="1">
 <tr>
+
 {% for col in columns %}
     <th>
         {{ col }}
     </th>
 {% endfor %}
 </tr>
-{% if db=='db-destest' %}
-{% set dict_list = tdict_list %}
-{% endif %}
-{% for di in dict_list %}
+{% for di in dict %}
 <tr>
 {% for col in columns %}
-    {% if di['operator'] == o%}
     {% if col == 'reqnum' %}
     <td> <a href="{{ url_for('processing_detail',db=db,reqnum =di[col],operator=di['operator']) }}"><strong>{{ di[col] }}</strong></a></td>
     {% else %}
     <td> {{ di[col] }} </td> 
     {% endif %}
-    {% endif %}
 {% endfor %}
 </tr>
 {% endfor %}
 </table>
+{% endif %}
 {% endfor %}
 {% endfor %}
 </center>
 {% endblock %}
-

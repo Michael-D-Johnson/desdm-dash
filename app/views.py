@@ -11,14 +11,14 @@ def index():
 
 @app.route('/processing_summary')
 def processing_summary():
-    all_dict,operator_list,columns = get_data.processing_summary('db-desoper','OPS')
-    return render_template('processing_summary.html',columns=columns,dict_list=all_dict,operator_list=operator_list)
+    current_dict,rest_dict,columns = get_data.processing_summary('db-desoper','OPS')
+    return render_template('processing_summary.html',columns=columns,current_dict=current_dict,rest_dict=rest_dict)
 
 @app.route('/testing_summary')
 def testing_summary():
-    all_dict,operator_list,columns = get_data.processing_summary('db-desoper','TEST')
-    tall_dict,toperator_list,tcolumns = get_data.processing_summary('db-destest','TEST')
-    return render_template('testing_summary.html',columns=columns,dict_list=all_dict,operator_list=operator_list,tdict_list=tall_dict,toperator_list=toperator_list,tcolumns=tcolumns)
+    current_dict,rest_dict,columns = get_data.processing_summary('db-desoper','TEST')
+    tcurrent_dict,trest_dict,tcolumns = get_data.processing_summary('db-destest','TEST')
+    return render_template('testing_summary.html',columns=columns,current_dict=current_dict,rest_dict=rest_dict,tcurrent_dict=tcurrent_dict,trest_dict=trest_dict,tcolumns=tcolumns)
 
 @app.route('/processing_detail/<db>/<operator>/<reqnum>')
 def processing_detail(db,operator,reqnum):

@@ -20,7 +20,7 @@ def processing_summary(db,project):
             df = df[df.project == project]
         columns = ['operator','project','campaign','pipeline','submit_site','target_site','reqnum','nite','batch size','passed','failed','unknown','remaining']
         df_op = df.groupby(by=['operator'])
-        all_dict = []
+        current_dict,rest_dict = [],[]
         for name,group in df_op:
             for req in sorted(group['reqnum'].unique(),reverse = True):
                 nitelist = sorted(df[df.reqnum==req].loc[group.index,('nite')].dropna().unique())
@@ -61,13 +61,9 @@ def processing_summary(db,project):
                             'campaign':df[df.reqnum==req].loc[group.index,('campaign')].dropna().unique()[0],
                             'project':df[df.reqnum==req].loc[group.index,('project')].dropna().unique()[0],
                             'pipeline':df[df.reqnum==req].loc[group.index,('pipeline')].dropna().unique()[0]}
-                all_dict.append(req_dict)
-    try: operator_list =  list(set( dic['operator'] for dic in all_dict ))
-    except: 
-        operator_list = ''
-        all_dict = {}
-        columns = '' 
-    return (all_dict,operator_list,columns)
+                if unknown: current_dict.append(req_dict)
+                else: rest_dict.append(req_dict)
+    return (current_dict,rest_dict,columns)
 
 def processing_detail(db,operator,reqnum):
     results = query.processing_detail(query.cursor(db),reqnum) 
