@@ -29,7 +29,7 @@ def processing_summary(db,project):
                 if len(nitelist) > 1:
                     nitelist = nitelist[0] + ' - ' + nitelist[-1]
                 if pipeline =='supercal':
-                    nites = nitelist.split('t')
+                    nites = nitelist[0].split('t')
                     nite1,nite2 = nites[0],nites[0][:4]+nites[1]
                     nitelist = nite1 + ' - ' + nite2
                 if project =='TEST':
