@@ -8,10 +8,35 @@ def cursor(section):
     cur = dbh.cursor()
     return cur
 
+def prod_processing_summary_brief(cur,reqnums):
+    query = "select distinct a.created_date,r.project,r.campaign,a.unitname,v.val,a.reqnum,a.attnum,t.status,a.data_state,a.operator,r.pipeline,b.target_site,t.exec_host from pfw_attempt a,pfw_attempt_val v,task t,pfw_request r, pfw_block b where t.id =a.task_id and a.reqnum=r.reqnum and a.reqnum=v.reqnum and a.unitname=v.unitname and a.attnum=v.attnum and key in ('nite','range') and a.reqnum in (%s) and b.unitname=a.unitname and b.reqnum=a.reqnum and b.attnum=a.attnum and r.project='OPS'" % reqnums
+    cur.execute(query)
+    return cur.fetchall()
+
+def prod_testing_summary_brief(cur,reqnums):
+    query = "select distinct a.created_date,r.project,r.campaign,a.unitname,v.val,a.reqnum,a.attnum,t.status,a.data_state,a.operator,r.pipeline,b.target_site,t.exec_host from pfw_attempt a,pfw_attempt_val v,task t,pfw_request r, pfw_block b where t.id =a.task_id and a.reqnum=r.reqnum and a.reqnum=v.reqnum and a.unitname=v.unitname and a.attnum=v.attnum and key in ('nite','range') and a.reqnum in (%s) and b.unitname=a.unitname and b.reqnum=a.reqnum and b.attnum=a.attnum and r.project not in ('OPS')" % reqnums
+    cur.execute(query)
+    return cur.fetchall()
+
+def hostname_summary_brief(cur,reqnums):
+    query = "select distinct a.created_date,r.project,r.campaign,a.unitname,a.reqnum,a.attnum,t.status,a.data_state,a.operator,r.pipeline,b.target_site,t.exec_host from pfw_attempt a,pfw_attempt_val v,task t,pfw_request r, pfw_block b where t.id =a.task_id and a.reqnum=r.reqnum and a.reqnum in (%s) and b.unitname=a.unitname and b.reqnum=a.reqnum and b.attnum=a.attnum" % reqnums
+    cur.execute(query)
+    return cur.fetchall()
+
 def processing_summary_brief(cur,reqnums):
     query = "select distinct a.created_date,r.project,r.campaign,a.unitname,v.val,a.reqnum,a.attnum,t.status,a.data_state,a.operator,r.pipeline,b.target_site,t.exec_host from pfw_attempt a,pfw_attempt_val v,task t,pfw_request r, pfw_block b where t.id =a.task_id and a.reqnum=r.reqnum and a.reqnum=v.reqnum and a.unitname=v.unitname and a.attnum=v.attnum and key in ('nite','range') and a.reqnum in (%s) and b.unitname=a.unitname and b.reqnum=a.reqnum and b.attnum=a.attnum" % reqnums
     cur.execute(query)
     return cur.fetchall()
+
+def get_test_reqnums(cur):
+    query = "select distinct a.reqnum from pfw_attempt a,task t,pfw_request r,pfw_job j where a.created_date >= sysdate-4 and t.id =a.task_id and a.reqnum=r.reqnum and a.reqnum=j.reqnum and r.project not in ('OPS')"
+    cur.execute(query)
+    return [req[0] for req in cur.fetchall()]
+
+def get_prod_reqnums(cur):
+    query = "select distinct a.reqnum from pfw_attempt a,task t,pfw_request r,pfw_job j where a.created_date >= sysdate-4 and t.id =a.task_id and a.reqnum=r.reqnum and a.reqnum=j.reqnum and r.project='OPS'"
+    cur.execute(query)
+    return [req[0] for req in cur.fetchall()]
 
 def get_reqnums(cur):
     query = "select distinct a.reqnum from pfw_attempt a,task t,pfw_request r,pfw_job j where a.created_date >= sysdate-4 and t.id =a.task_id and a.reqnum=r.reqnum and a.reqnum=j.reqnum"

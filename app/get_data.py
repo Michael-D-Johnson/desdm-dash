@@ -6,11 +6,23 @@ import query
 #pandas.options.mode.chained_assignment = None
 
 def processing_summary(db,project):
-    reqnums = [str(r) for r in query.get_reqnums(query.cursor(db))]
+    if project=='TEST':
+        reqnums = [str(r) for r in query.get_test_reqnums(query.cursor(db))]
+    else:
+        reqnums = [str(r) for r in query.get_prod_reqnums(query.cursor(db))]
     reqnum_list = ','.join(reqnums)
     if reqnums:
-        results = query.processing_summary_brief(query.cursor(db),reqnum_list)
-        df = pandas.DataFrame(results,columns=['created date','project','campaign','unitname','nite','reqnum','attnum','status','data_state','operator','pipeline','target_site','submit_site'])
+        if project=='TEST':
+            results = query.prod_testing_summary_brief(query.cursor(db),reqnum_list)
+        else:
+            results = query.prod_processing_summary_brief(query.cursor(db),reqnum_list)
+        if not results:
+            results = query.hostname_summary_brief(query.cursor(db),reqnum_list)
+        try:
+            df = pandas.DataFrame(results,columns=['created date','project','campaign','unitname','nite','reqnum','attnum','status','data_state','operator','pipeline','target_site','submit_site'])
+        except:
+            df = pandas.DataFrame(results,columns=['created date','project','campaign','unitname','reqnum','attnum','status','data_state','operator','pipeline','target_site','submit_site'])
+            df.insert(len(df.columns),'nite', None)
         df = df.sort(columns=['reqnum','unitname','attnum'],ascending=False)
         df = df.drop_duplicates(subset=['unitname','reqnum','attnum'])
         df = df.fillna(-99)
@@ -53,6 +65,7 @@ def processing_summary(db,project):
                     remaining = 0
                 if len(nitelist) == 1:
                     nitelist = nitelist[0]
+                    if nitelist == -99: nitelist = 'NA'
                 req_dict = {'remaining':remaining,'operator':name,'batch size':total_batch_size,
                             'reqnum':req,'passed':passed,'failed':failed,'unknown':unknown,
                             'nite':nitelist,

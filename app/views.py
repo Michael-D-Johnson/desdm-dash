@@ -25,13 +25,13 @@ def processing_detail(db,operator,reqnum):
     df,columns,reqnum,mean_times = get_data.processing_detail(db,operator,reqnum)
     
     try:
-        tfigscript,tfigdiv=plotter.plot_times(df)
-        figscript,figdiv=plotter.plot_accepted(df)
-        #efigscript,efigdiv=plotter.plot_times_per_host(df)
+        times_figscript,times_figdiv=plotter.plot_times(df)
+        assess_figscript,assess_figdiv=plotter.plot_accepted(df)
+        #exechost_figscript,exechost_figdiv=plotter.plot_times_per_host(df)
     except:
-        tfigscript,tfigdiv=None,None
-        figscript,figdiv=None,None
-    efigscript,efigdiv=None,None
+        times_figscript,times_figdiv=None,None
+        assess_figscript,assess_figdiv=None,None
+        exechost_figscript,exechost_figdiv=None,None
     
     return render_template('processing_detail.html',columns=columns,df = df,reqnum=reqnum,figdiv=figdiv,figscript=figscript,mean_times=mean_times,tfigscript=tfigscript,tfigdiv=tfigdiv,db=db,operator=operator,efigscript=efigscript,efigdiv=efigdiv)
 
