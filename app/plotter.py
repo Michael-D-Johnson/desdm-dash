@@ -10,21 +10,6 @@ from bokeh.io import vplot
 
 def plot_times_per_host(dataframe):
     """Starting point to create scatter plot for total run times per exec host"""
-    dataframe = dataframe.fillna('NA')
-    dataframe = dataframe[dataframe.exec_host != 'NA']
-    def create_data_source(data_frame):
-        return ColumnDataSource(
-            data=dict(
-            expnum=data_frame['total time'],
-            exec_host=data_frame['exec_host'],
-            ))
-    source = create_data_source(dataframe)
-    TOOLS=[HoverTool(tooltips = [('total time', '@total_time'),('exec_host','@exec_host')]),BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
-    p = figure(title="Processing time per exec_host", x_axis_label='exec_host',
-               y_axis_label='total time',tools=TOOLS)
-
-    p.scatter('exec_host','total time', source = source)
-    figscript,figdiv = components(p)
     return (figscript,figdiv)
 
 def plot_times(dataframe):
