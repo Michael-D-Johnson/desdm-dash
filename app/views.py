@@ -23,12 +23,12 @@ def testing_summary():
 @app.route('/processing_detail/<db>/<operator>/<reqnum>')
 def processing_detail(db,operator,reqnum):
     df,columns,reqnum,mean_times = get_data.processing_detail(db,operator,reqnum)
-    
+    df2 = df.dropna()
     try:
         times_figscript,times_figdiv=plotter.plot_times(df)
         assess_figscript,assess_figdiv=plotter.plot_accepted(df)
-        exechost_figscript,exechost_figdiv= plotter.plot_exec_time(df)
-    except:
+        exechost_figscript,exechost_figdiv= plotter.plot_exec_time(df2)
+    except: 
         times_figscript,times_figdiv=None,None
         assess_figscript,assess_figdiv=None,None
         exechost_figscript,exechost_figdiv=None,None

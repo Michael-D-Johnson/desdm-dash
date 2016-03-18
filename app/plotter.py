@@ -10,7 +10,7 @@ from bokeh.io import vplot
 def plot_times(dataframe):
     dataframe = dataframe.fillna(-1)
     TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
-    p = Histogram(dataframe,'total time',bins=24,
+    p = Histogram(dataframe,'total time',bins=24, color = 'green',
         title="Processing Times")
     figscript,figdiv = components(p)
 
@@ -26,7 +26,7 @@ def plot_accepted(dataframe):
 
 def plot_exec_time(dataframe):
     TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
-    p = Bar(data=dataframe, values='total time', label='exec host', agg='mean', 
+    p = Bar(dataframe, values='total time', label='exec_host', agg='mean', color='blue',
         title='Mean Processing Time for Each Exec Host')
     figscript,figdiv = components(p)
     return (figscript,figdiv)
