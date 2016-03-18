@@ -27,13 +27,13 @@ def processing_detail(db,operator,reqnum):
     try:
         times_figscript,times_figdiv=plotter.plot_times(df)
         assess_figscript,assess_figdiv=plotter.plot_accepted(df)
-        #exechost_figscript,exechost_figdiv=plotter.plot_times_per_host(df)
+        exechost_figscript,exechost_figdiv= None,None# plotter.plot_times_per_host(df)
     except:
         times_figscript,times_figdiv=None,None
         assess_figscript,assess_figdiv=None,None
         exechost_figscript,exechost_figdiv=None,None
     
-    return render_template('processing_detail.html',columns=columns,df = df,reqnum=reqnum,figdiv=figdiv,figscript=figscript,mean_times=mean_times,tfigscript=tfigscript,tfigdiv=tfigdiv,db=db,operator=operator,efigscript=efigscript,efigdiv=efigdiv)
+    return render_template('processing_detail.html',columns=columns,df = df,reqnum=reqnum,assess_figdiv=assess_figdiv,assess_figscript=assess_figscript,mean_times=mean_times,times_figscript=times_figscript,times_figdiv=times_figdiv,db=db,operator=operator,exechost_figscript=exechost_figscript,exechost_figdiv=exechost_figdiv)
 
 @app.route('/dts')
 def dts():
