@@ -4,13 +4,13 @@
 <script>window.jQuery || document.write('<script src="{{
   url_for('static', filename='jquery-1.11.3.min.js') }}">\x3C/script>')</script>
 <center>
+{% if times_figdiv %}
+<h1> Processing Times </h1>
+{{times_figdiv|safe}}
 {% if exechost_figdiv %}
 <h1> Processing Times per Exec Host</h1>
 {{exechost_figdiv|safe}}
 {% endif %}
-{% if times_figdiv %}
-<h1> Processing Times </h1>
-{{times_figdiv|safe}}
 <h3><u>Min:</u> {{ df['total time'].min()}} <u>Max:</u> {{ df['total time'].max()}} <u>Avg:</u> {{ mean_times}}</h3>
 <h1> Assessment Summary </h1>
 {{assess_figdiv|safe}}

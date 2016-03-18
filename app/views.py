@@ -27,7 +27,7 @@ def processing_detail(db,operator,reqnum):
     try:
         times_figscript,times_figdiv=plotter.plot_times(df)
         assess_figscript,assess_figdiv=plotter.plot_accepted(df)
-        exechost_figscript,exechost_figdiv= None,None# plotter.plot_times_per_host(df)
+        exechost_figscript,exechost_figdiv= plotter.plot_exec_time(df)
     except:
         times_figscript,times_figdiv=None,None
         assess_figscript,assess_figdiv=None,None
