@@ -76,6 +76,12 @@ def processing_summary(db,project):
                             'pipeline':df[df.reqnum==req].loc[group.index,('pipeline')].dropna().unique()[0]}
                 if unknown: current_dict.append(req_dict)
                 else: rest_dict.append(req_dict)
+    try: current_dict
+    except: current_dict = []
+    try: rest_dict
+    except: rest_dict = []
+    try: columns
+    except: columns = []
     return (current_dict,rest_dict,columns)
 
 def processing_detail(db,operator,reqnum):

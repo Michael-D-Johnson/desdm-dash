@@ -14,6 +14,7 @@
 {% set dict_list = [current_dict,rest_dict] %}
 {% else %}
 {% set dict_list = [tcurrent_dict,trest_dict] %}
+{% set columns = tcolumns %}
 {% endif %}
 {% set n=1 %}
 {% for dict in dict_list %}
@@ -28,7 +29,6 @@
 {% else %}
 <table border="1">
 <tr>
-
 {% for col in columns %}
     <th>
         {{ col }}
