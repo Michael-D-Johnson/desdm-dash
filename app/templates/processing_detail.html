@@ -12,6 +12,11 @@
 {{exechost_figdiv|safe}}
 {% endif %}
 <h3><u>Min:</u> {{ df['total time'].min()}} <u>Max:</u> {{ df['total time'].max()}} <u>Avg:</u> {{ mean_times}}</h3>
+{% if fails_figdiv %}
+<h1> Status per Exec Host</h1>
+{{fails_figdiv|safe}}
+{% endif %}
+
 <h1> Assessment Summary </h1>
 {{assess_figdiv|safe}}
 <table border="1">

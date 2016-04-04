@@ -30,3 +30,11 @@ def plot_exec_time(dataframe):
         title='Mean Processing Time for Each Exec Host')
     figscript,figdiv = components(p)
     return (figscript,figdiv)
+
+def plot_status_per_host(dataframe):
+    TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
+    p = Bar(dataframe, label='exec_host',values='status', agg='count', group='status',
+        title="Failures per Exec Host", legend='top_right')
+
+    figscript,figdiv = components(p)
+    return (figscript,figdiv)
