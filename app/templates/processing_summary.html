@@ -10,6 +10,9 @@
 {% else %}
 <h2> Runs in the last four days: </h2>
 {% endif %}
+{% if not dict %}
+<h5>--NA--</h5>
+{% else %}
 <table border="1">
 <tr>
 {% for col in columns %}
@@ -30,6 +33,7 @@
 </tr>
 {% endfor %}
 </table>
+{% endif %}
 {% endfor %}
 </center>
 {% endblock %}
