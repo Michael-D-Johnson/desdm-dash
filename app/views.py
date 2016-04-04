@@ -24,8 +24,9 @@ def testing_summary():
 def processing_detail(db,operator,reqnum):
     df,columns,reqnum,mean_times = get_data.processing_detail(db,operator,reqnum)
     df2 = df.dropna()
+    df_pass = df[df.status==0].dropna()
     try:
-        times_figscript,times_figdiv=plotter.plot_times(df)
+        times_figscript,times_figdiv=plotter.plot_times(df_pass)
         assess_figscript,assess_figdiv=plotter.plot_accepted(df)
         exechost_figscript,exechost_figdiv= plotter.plot_exec_time(df2)
         fails_figscript,fails_figdiv = plotter.plot_status_per_host(df2)
