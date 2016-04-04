@@ -13,7 +13,7 @@
     <link href="http://cdn.pydata.org/bokeh/release/bokeh-0.10.0.min.css" rel="stylesheet" type="text/css" >
 
     <script type="text/javascript" src="http://cdn.pydata.org/bokeh/release/bokeh-0.10.0.min.js"></script>
-        {% for f in assess_figscript,times_figscript,exechost_figscript %}
+        {% for f in assess_figscript,times_figscript,exechost_figscript,fails_figscript %}
         {% if f %}
         {{ f|safe}}
         {% endif %}

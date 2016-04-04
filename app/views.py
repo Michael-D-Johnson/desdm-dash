@@ -28,12 +28,13 @@ def processing_detail(db,operator,reqnum):
         times_figscript,times_figdiv=plotter.plot_times(df)
         assess_figscript,assess_figdiv=plotter.plot_accepted(df)
         exechost_figscript,exechost_figdiv= plotter.plot_exec_time(df2)
+        fails_figscript,fails_figdiv = plotter.plot_status_per_host(df2)
     except: 
         times_figscript,times_figdiv=None,None
         assess_figscript,assess_figdiv=None,None
         exechost_figscript,exechost_figdiv=None,None
-    
-    return render_template('processing_detail.html',columns=columns,df = df,reqnum=reqnum,assess_figdiv=assess_figdiv,assess_figscript=assess_figscript,mean_times=mean_times,times_figscript=times_figscript,times_figdiv=times_figdiv,db=db,operator=operator,exechost_figscript=exechost_figscript,exechost_figdiv=exechost_figdiv)
+        fails_figscript,fails_figdiv=None,None 
+    return render_template('processing_detail.html',columns=columns,df = df,reqnum=reqnum,assess_figdiv=assess_figdiv,assess_figscript=assess_figscript,mean_times=mean_times,times_figscript=times_figscript,times_figdiv=times_figdiv,db=db,operator=operator,exechost_figscript=exechost_figscript,exechost_figdiv=exechost_figdiv,fails_figscript=fails_figscript,fails_figdiv=fails_figdiv)
 
 @app.route('/dts')
 def dts():
