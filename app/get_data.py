@@ -130,5 +130,5 @@ def processing_detail(db,operator,reqnum):
             df.loc[index,('t_eff')] = t_eff
             df.loc[index,('program')] = program
 
-        mean_times =round(df['total time'].mean(skipna=True),3)
+        mean_times =round(df[df.status==0]['total time'].mean(skipna=True),3)
         return (df,columns,reqnum,mean_times)

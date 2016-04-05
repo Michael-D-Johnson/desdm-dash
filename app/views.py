@@ -27,8 +27,8 @@ def processing_detail(db,operator,reqnum):
     df_pass = df[df.status==0].dropna()
     try:
         times_figscript,times_figdiv=plotter.plot_times(df_pass)
-        assess_figscript,assess_figdiv=plotter.plot_accepted(df)
-        exechost_figscript,exechost_figdiv= plotter.plot_exec_time(df2)
+        assess_figscript,assess_figdiv=plotter.plot_accepted(df_pass)
+        exechost_figscript,exechost_figdiv= plotter.plot_exec_time(df_pass)
         fails_figscript,fails_figdiv = plotter.plot_status_per_host(df2)
     except: 
         times_figscript,times_figdiv=None,None
