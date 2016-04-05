@@ -55,7 +55,12 @@ def processing_summary(db,project):
                 try: unknown = df['status'][(df.operator == name) & (df.status == -99) & (df.reqnum==req)].count()
                 except: unknown = 0
                 #target_site = ', '.join(df[df.reqnum==req].sort(columns=['created date'])['target_site'].unique())
-                target_site =df[df.reqnum==req].sort(columns=['created date'])['target_site'].unique()[-1]
+                try:
+                    target_site = ', '.join(df[(df.reqnum==req) & (df.status.isin([-99]))].sort(columns=['created date'])['target_site'].unique())
+                    if not target_site:
+                        target_site =df[df.reqnum==req].sort(columns=['created date'])['target_site'].unique()[-1]
+                except:
+                    target_site =df[df.reqnum==req].sort(columns=['created date'])['target_site'].unique()[-1]
 
                 #submit_site = ', '.join([site.split('.')[0] for site in df[df.reqnum==req].sort(columns=['created date'])['submit_site'].unique()])
                 submit_site = [site.split('.')[0] for site in df[df.reqnum==req].sort(columns=['created date'])['submit_site'].unique()][-1]
