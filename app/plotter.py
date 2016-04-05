@@ -4,7 +4,7 @@ from bokeh.models import (HoverTool, BoxSelectTool, BoxZoomTool,
                           PanTool, ResetTool,WheelZoomTool,
                           glyphs,Legend)
 from bokeh.palettes import Spectral6
-from bokeh.charts import Scatter,Bar,Histogram
+from bokeh.charts import Scatter,Bar,Histogram,color
 from bokeh.io import vplot
 
 def plot_times(dataframe):
@@ -34,7 +34,7 @@ def plot_exec_time(dataframe):
 def plot_status_per_host(dataframe):
     TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
     p = Bar(dataframe, label='exec_host',values='exec_host', agg='count', group='status',
-        title="Status per Exec Host", legend='top_right')
+        title="Status per Exec Host", legend='top_right',color=color('status', palette=['green', 'red', 'blue']))
 
     figscript,figdiv = components(p)
     return (figscript,figdiv)
