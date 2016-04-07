@@ -3,7 +3,7 @@ from bokeh.plotting import figure,ColumnDataSource
 from bokeh.models import (HoverTool, BoxSelectTool, BoxZoomTool,
                           PanTool, ResetTool,WheelZoomTool,
                           glyphs,Legend)
-from bokeh.palettes import Spectral6
+from bokeh.palettes import Spectral6,PuOr9
 from bokeh.charts import Scatter,Bar,Histogram,color
 from bokeh.io import vplot
 
@@ -32,9 +32,11 @@ def plot_exec_time(dataframe):
     return (figscript,figdiv)
 
 def plot_status_per_host(dataframe):
+    from collections import OrderedDict
     TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
+    mycolors = ['green','red','blue','orange','yellow','purple','black']
     p = Bar(dataframe, label='exec_host',values='exec_host', agg='count', group='status',
-        title="Status per Exec Host", legend='top_right',color=color('status', palette=['green', 'red', 'blue']))
+        title="Status per Exec Host", legend='top_right',color=color('status', palette=mycolors))
 
     figscript,figdiv = components(p)
     return (figscript,figdiv)
