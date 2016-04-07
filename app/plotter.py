@@ -32,7 +32,6 @@ def plot_exec_time(dataframe):
     return (figscript,figdiv)
 
 def plot_status_per_host(dataframe):
-    from collections import OrderedDict
     TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
     mycolors = ['green','red','blue','orange','yellow','purple','black']
     p = Bar(dataframe, label='exec_host',values='exec_host', agg='count', group='status',
@@ -40,3 +39,29 @@ def plot_status_per_host(dataframe):
 
     figscript,figdiv = components(p)
     return (figscript,figdiv)
+
+def plot_t_eff(dataframe):
+    bands = ['u','g','r','i','z','Y','VR']
+    dfs = [dataframe[dataframe['band']==n] for n in bands]
+    dfs = [d for d in dfs if len(d)>0]
+    def create_data_source(df):
+        return ColumnDataSource(data=dict(t_eff=df['t_eff'],expnum=df['expnum'],program=df['program'],accepted=df['accepted']))
+    ps = []
+    for i in range(0,len(dfs)):
+        df_false = dfs[i][dfs[i]['accepted']=='False']
+        df_true = dfs[i][dfs[i]['accepted']=='True']
+        p = figure(tools = [HoverTool(tooltips = [('program', '@program'),('accepted','@accepted')]),BoxZoomTool(),ResetTool(),WheelZoomTool()], x_axis_label = "t_eff", y_axis_label = "expnum", title = dfs[i]['band'].iloc[0],width=500,height=500)
+        p.scatter('t_eff','expnum',source=create_data_source(df_false),radius=0.01,fill_color='red',line_color='white',alpha=0.5)
+        p.scatter('t_eff','expnum',source=create_data_source(df_true),radius=0.01,fill_color='green',line_color='white',alpha=0.5)
+        ps.append(p)
+    ph = []
+    for i in range(0,len(dfs)):
+        p =  Histogram(dfs[i]['t_eff'], color='skyblue', bins=50, width=500, height=500)
+        ph.append(p)
+    gs = []
+    for i in range(0,len(dfs)):
+        gs.append(hplot(*[ps[i],ph[i]]))
+        gs = vplot(*gs)
+    figscript,figdiv = components(gs)
+    return (figscript,figdiv)
+
