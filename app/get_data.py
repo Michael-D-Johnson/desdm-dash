@@ -55,7 +55,12 @@ def processing_summary(db,project):
                 try: unknown = df['status'][(df.operator == name) & (df.status == -99) & (df.reqnum==req)].count()
                 except: unknown = 0
                 #target_site = ', '.join(df[df.reqnum==req].sort(columns=['created date'])['target_site'].unique())
-                target_site =df[df.reqnum==req].sort(columns=['created date'])['target_site'].unique()[-1]
+                try:
+                    target_site = ', '.join(df[(df.reqnum==req) & (df.status.isin([-99]))].sort(columns=['created date'])['target_site'].unique())
+                    if not target_site:
+                        target_site =df[df.reqnum==req].sort(columns=['created date'])['target_site'].unique()[-1]
+                except:
+                    target_site =df[df.reqnum==req].sort(columns=['created date'])['target_site'].unique()[-1]
 
                 #submit_site = ', '.join([site.split('.')[0] for site in df[df.reqnum==req].sort(columns=['created date'])['submit_site'].unique()])
                 submit_site = [site.split('.')[0] for site in df[df.reqnum==req].sort(columns=['created date'])['submit_site'].unique()][-1]
@@ -76,6 +81,12 @@ def processing_summary(db,project):
                             'pipeline':df[df.reqnum==req].loc[group.index,('pipeline')].dropna().unique()[0]}
                 if unknown: current_dict.append(req_dict)
                 else: rest_dict.append(req_dict)
+    try: current_dict
+    except: current_dict = []
+    try: rest_dict
+    except: rest_dict = []
+    try: columns
+    except: columns = []
     return (current_dict,rest_dict,columns)
 
 def processing_detail(db,operator,reqnum):
@@ -124,5 +135,5 @@ def processing_detail(db,operator,reqnum):
             df.loc[index,('t_eff')] = t_eff
             df.loc[index,('program')] = program
 
-        mean_times =round(df['total time'].mean(skipna=True),3)
+        mean_times =round(df[df.status==0]['total time'].mean(skipna=True),3)
         return (df,columns,reqnum,mean_times)
