@@ -8,7 +8,7 @@ import query
 
 def processing_summary(db,df=None):
     if not df:
-        try: df = pandas.read_csv('./static/processing.csv')
+        try: df = pandas.read_csv('./static/processing.csv',skiprows=1)
         except IOError: sys.exit() 
     
     df = df.sort(columns=['reqnum','unitname','attnum'],ascending=False)
@@ -19,9 +19,8 @@ def processing_summary(db,df=None):
     else:
         df = df[df.project == 'OPS']
     columns = ['operator','project','campaign','pipeline','submit_site','target_site','reqnum','nite','batch size','passed','failed','unknown','remaining']
-    df_op = df.groupby(by=['operator'])
     current_dict,rest_dict = [],[]
-    for name,group in df_op.iterrows():
+    for name,req in df.groupby(by=['reqnum']).iterrows():
         for req in sorted(group['reqnum'].unique(),reverse = True):
             nitelist = sorted(df[df.reqnum==req].loc[group.index,('nite')].dropna().unique())
             pipeline = df[df.reqnum==req]['pipeline'].unique()[0]
@@ -142,7 +141,10 @@ if __name__ =='__main__':
     df_oper['db'] ='db-desoper'
     df_master = df_oper.copy()
     df_master.update(df_test)
-    df_master.to_csv('./static/processing.csv')
+    with open('./static/processing.csv','w') as csv:
+        csv.write('#%s\n' % datetime.datetime.now())
+    df_master.to_csv('./static/processing.csv',index=False,mode='a')
+
     date2 = datetime.datetime.now()
-    print date2-date1
+    total_time = date2-date1
  
