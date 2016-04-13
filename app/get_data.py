@@ -1,77 +1,62 @@
 #! /usr/bin/env python
 import os
+import sys
 import pandas
 import query
 
 #pandas.options.mode.chained_assignment = None
 
-def processing_summary(db,project):
-    if project=='TEST':
-        reqnums = [str(r) for r in query.get_test_reqnums(query.cursor(db))]
+def processing_summary(db,df=None):
+    if not df:
+        try: df = pandas.read_csv('./static/processing.csv')
+        except IOError: sys.exit() 
+    
+    df = df.sort(columns=['reqnum','unitname','attnum'],ascending=False)
+    df = df.drop_duplicates(subset=['unitname','reqnum','attnum'])
+    df = df.fillna(-99)
+    if project =='TEST':
+        df = df[df.project != 'OPS']
     else:
-        reqnums = [str(r) for r in query.get_prod_reqnums(query.cursor(db))]
-    reqnum_list = ','.join(reqnums)
-    if reqnums:
-        if project=='TEST':
-            results = query.prod_testing_summary_brief(query.cursor(db),reqnum_list)
-        else:
-            results = query.prod_processing_summary_brief(query.cursor(db),reqnum_list)
-        if not results:
-            results = query.hostname_summary_brief(query.cursor(db),reqnum_list)
-        try:
-            df = pandas.DataFrame(results,columns=['created date','project','campaign','unitname','nite','reqnum','attnum','status','data_state','operator','pipeline','target_site','submit_site'])
-        except:
-            df = pandas.DataFrame(results,columns=['created date','project','campaign','unitname','reqnum','attnum','status','data_state','operator','pipeline','target_site','submit_site'])
-            df.insert(len(df.columns),'nite', None)
-        df = df.sort(columns=['reqnum','unitname','attnum'],ascending=False)
-        df = df.drop_duplicates(subset=['unitname','reqnum','attnum'])
-        df = df.fillna(-99)
-        if project =='TEST':
-            df = df[df.project != 'OPS']
-        else:
-            df = df[df.project == project]
-        columns = ['operator','project','campaign','pipeline','submit_site','target_site','reqnum','nite','batch size','passed','failed','unknown','remaining']
-        df_op = df.groupby(by=['operator'])
-        current_dict,rest_dict = [],[]
-        for name,group in df_op:
-            for req in sorted(group['reqnum'].unique(),reverse = True):
-                nitelist = sorted(df[df.reqnum==req].loc[group.index,('nite')].dropna().unique())
-                #nitelist = ', '.join(nitelist)
-                pipeline = df[df.reqnum==req]['pipeline'].unique()[0]
-                if len(nitelist) > 1:
-                    nitelist = nitelist[0] + ' - ' + nitelist[-1]
-                if pipeline =='supercal':
-                    nites = nitelist[0].split('t')
-                    nite1,nite2 = nites[0],nites[0][:4]+nites[1]
-                    nitelist = nite1 + ' - ' + nite2
-                if project =='TEST':
-                    total_batch_size = query.test_query(query.cursor(db),req)
-                else:
-                    total_batch_size = query.batch_size_query(query.cursor(db),nitelist,req,pipeline)
-                passed_df =  df[(df.operator == name) & (df.status==0) & (df.reqnum == req)].drop_duplicates(['unitname'])
-                passed = passed_df['status'][(df.operator == name) & (df.status==0) & (df.reqnum == req)].count()
-                failed_df = df[(df.operator == name) & (~df.status.isin([0,-99])) & (df.reqnum == req)].drop_duplicates(['unitname'])
-                failed = failed_df['status'][(df.operator == name) & (~df.status.isin([0,-99])) & (df.reqnum == req)].count()
-                try: unknown = df['status'][(df.operator == name) & (df.status == -99) & (df.reqnum==req)].count()
-                except: unknown = 0
-                #target_site = ', '.join(df[df.reqnum==req].sort(columns=['created date'])['target_site'].unique())
-                try:
-                    target_site = ', '.join(df[(df.reqnum==req) & (df.status.isin([-99]))].sort(columns=['created date'])['target_site'].unique())
-                    if not target_site:
-                        target_site =df[df.reqnum==req].sort(columns=['created date'])['target_site'].unique()[-1]
-                except:
+        df = df[df.project == 'OPS']
+    columns = ['operator','project','campaign','pipeline','submit_site','target_site','reqnum','nite','batch size','passed','failed','unknown','remaining']
+    df_op = df.groupby(by=['operator'])
+    current_dict,rest_dict = [],[]
+    for name,group in df_op.iterrows():
+        for req in sorted(group['reqnum'].unique(),reverse = True):
+            nitelist = sorted(df[df.reqnum==req].loc[group.index,('nite')].dropna().unique())
+            pipeline = df[df.reqnum==req]['pipeline'].unique()[0]
+            if len(nitelist) > 1:
+                nitelist = nitelist[0] + ' - ' + nitelist[-1]
+            if pipeline =='supercal':
+                nites = nitelist[0].split('t')
+                nite1,nite2 = nites[0],nites[0][:4]+nites[1]
+                nitelist = nite1 + ' - ' + nite2
+            if project =='TEST':
+                total_batch_size = query.test_query(query.cursor(db),req)
+            else:
+                total_batch_size = query.batch_size_query(query.cursor(db),nitelist,req,pipeline)
+            passed_df =  df[(df.operator == name) & (df.status==0) & (df.reqnum == req)].drop_duplicates(['unitname'])
+            passed = passed_df['status'][(df.operator == name) & (df.status==0) & (df.reqnum == req)].count()
+            failed_df = df[(df.operator == name) & (~df.status.isin([0,-99])) & (df.reqnum == req)].drop_duplicates(['unitname'])
+            failed = failed_df['status'][(df.operator == name) & (~df.status.isin([0,-99])) & (df.reqnum == req)].count()
+            try: unknown = df['status'][(df.operator == name) & (df.status == -99) & (df.reqnum==req)].count()
+            except: unknown = 0
+            try:
+                target_site = ', '.join(df[(df.reqnum==req) & (df.status.isin([-99]))].sort(columns=['created date'])['target_site'].unique())
+                if not target_site:
                     target_site =df[df.reqnum==req].sort(columns=['created date'])['target_site'].unique()[-1]
+            except:
+                target_site =df[df.reqnum==req].sort(columns=['created date'])['target_site'].unique()[-1]
 
-                #submit_site = ', '.join([site.split('.')[0] for site in df[df.reqnum==req].sort(columns=['created date'])['submit_site'].unique()])
-                submit_site = [site.split('.')[0] for site in df[df.reqnum==req].sort(columns=['created date'])['submit_site'].unique()][-1]
+            submit_site = [site.split('.')[0] for site in df[df.reqnum==req].sort(columns=['created date'])['submit_site'].unique()][-1]
 
-                remaining = int(total_batch_size)-int(passed) #-int(failed)
-                if remaining < 0:
-                    remaining = 0
-                if len(nitelist) == 1:
-                    nitelist = nitelist[0]
-                    if nitelist == -99: nitelist = 'NA'
-                req_dict = {'remaining':remaining,'operator':name,'batch size':total_batch_size,
+            remaining = int(total_batch_size)-int(passed) 
+            if remaining < 0:
+                remaining = 0
+            if len(nitelist) == 1:
+                nitelist = nitelist[0]
+                if nitelist == -99: nitelist = 'NA'
+            req_dict = {'remaining':remaining,'operator':name,'batch size':total_batch_size,
                             'reqnum':req,'passed':passed,'failed':failed,'unknown':unknown,
                             'nite':nitelist,
                             'submit_site':submit_site,
@@ -79,8 +64,8 @@ def processing_summary(db,project):
                             'campaign':df[df.reqnum==req].loc[group.index,('campaign')].dropna().unique()[0],
                             'project':df[df.reqnum==req].loc[group.index,('project')].dropna().unique()[0],
                             'pipeline':df[df.reqnum==req].loc[group.index,('pipeline')].dropna().unique()[0]}
-                if unknown: current_dict.append(req_dict)
-                else: rest_dict.append(req_dict)
+            if unknown: current_dict.append(req_dict)
+            else: rest_dict.append(req_dict)
     try: current_dict
     except: current_dict = []
     try: rest_dict
@@ -137,3 +122,27 @@ def processing_detail(db,operator,reqnum):
 
         mean_times =round(df[df.status==0]['total time'].mean(skipna=True),3)
         return (df,columns,reqnum,mean_times)
+
+if __name__ =='__main__':
+    #1. get reqnums from last four days
+    #2. create dataframe for all reqnums in both databases
+    import datetime
+    date1 = datetime.datetime.now()
+    test_reqnums = [str(r) for r in query.get_prod_reqnums(query.cursor('db-destest'))]
+    oper_reqnums = [str(r) for r in query.get_prod_reqnums(query.cursor('db-desoper'))]
+
+    df_test = pandas.DataFrame(
+                query.processing_detail(query.cursor('db-destest'),','.join(test_reqnums)),
+                columns = ['created_date','project','campaign','unitname','nite','reqnum','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_machine','exec_host'])
+    df_test['db'] = 'db-destest'
+    df_oper = pandas.DataFrame(
+                query.processing_detail(query.cursor('db-desoper'),','.join(oper_reqnums)),
+                columns = ['created_date','project','campaign','unitname','nite','reqnum','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_machine','exec_host'])
+
+    df_oper['db'] ='db-desoper'
+    df_master = df_oper.copy()
+    df_master.update(df_test)
+    df_master.to_csv('./static/processing.csv')
+    date2 = datetime.datetime.now()
+    print date2-date1
+ 
