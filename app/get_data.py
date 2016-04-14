@@ -63,7 +63,10 @@ def processing_summary(db,project):
                     target_site =df[df.reqnum==req].sort(columns=['created date'])['target_site'].unique()[-1]
 
                 #submit_site = ', '.join([site.split('.')[0] for site in df[df.reqnum==req].sort(columns=['created date'])['submit_site'].unique()])
-                submit_site = [site.split('.')[0] for site in df[df.reqnum==req].sort(columns=['created date'])['submit_site'].unique()][-1]
+                try:
+                    submit_site = ', '.join([site.split('.')[0] for site in df[(df.reqnum==req) & (df.status.isin([-99]))].sort(columns=['created date'])['submit_site'].unique()])
+                except:
+                    submit_site = [site.split('.')[0] for site in df[(df.reqnum==req)].sort(columns=['created date'])['submit_site'].unique()][-1]
 
                 remaining = int(total_batch_size)-int(passed) #-int(failed)
                 if remaining < 0:
@@ -93,13 +96,13 @@ def processing_detail(db,operator,reqnum):
     results = query.processing_detail(query.cursor(db),reqnum) 
     if not results:
         results = query.processing_basic(query.cursor(db),reqnum)
-        df = pandas.DataFrame(results,columns=['project','campaign','unitname','reqnum','attnum','status','data_state','operator','pipeline','target_site','submit_host','exec_host'])
+        df = pandas.DataFrame(results,columns=['project','campaign','unitname','reqnum','attnum','expnum','band','status','data_state','operator','pipeline','target_site','submit_host','exec_host'])
         df = df.sort(columns=['unitname','attnum'],ascending=False)
         df = df[df.operator==operator]
         columns = df.columns
         return (df,columns,reqnum,None)
     else:
-        df = pandas.DataFrame(results,columns=['project','campaign','unitname','nite','reqnum','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_host','exec_host'])
+        df = pandas.DataFrame(results,columns=['project','campaign','unitname','nite','reqnum','attnum','expnum','band','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_host','exec_host'])
         df.insert(len(df.columns),'assessment', None)
         df.insert(len(df.columns),'program', None)
         df.insert(len(df.columns),'t_eff', None)
