@@ -38,7 +38,6 @@ def processing_detail(db,reqnum):
         assess_figscript,assess_figdiv=None,None
         exechost_figscript,exechost_figdiv=None,None
         fails_figscript,fails_figdiv=None,None 
-        teff_figscript, teff_figdiv = None, None
     try:
         teff = True
         plotter.plot_t_eff(df[(df.t_eff !='None')])
@@ -55,9 +54,6 @@ def processing_detail(db,reqnum):
 @app.route('/teff')
 def teff():
     return render_template('teff.html')
-        fails_figscript,fails_figdiv=None,None
-
-    return render_template('processing_detail.html',columns=columns,df = df,reqnum=reqnum,assess_figdiv=assess_figdiv,assess_figscript=assess_figscript,mean_times=mean_times,times_figscript=times_figscript,times_figdiv=times_figdiv,db=db,exechost_figscript=exechost_figscript,exechost_figdiv=exechost_figdiv,fails_figscript=fails_figscript,fails_figdiv=fails_figdiv)
 
 @app.route('/dts')
 def dts():
