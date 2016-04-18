@@ -7,7 +7,11 @@ import query
 
 def processing_summary(db,project,df=None):
     if not df:
+<<<<<<< HEAD
         try: df = pandas.read_csv('/Users/mjohns44/GIT_DESDM/desdm-dash-mjohns44/desdm-dash/app/static/processing.csv',skiprows=1)
+=======
+        try: df = pandas.read_csv('./static/processing.csv',skiprows=1)
+>>>>>>> ec798910f1fa2ad7ee6ce90185d7b1a20daf6cc3
         except IOError: sys.exit() 
 
     df = df.sort(columns=['reqnum','unitname','attnum'],ascending=False)
@@ -17,6 +21,36 @@ def processing_summary(db,project,df=None):
     else:
         df = df[(df.project == 'OPS') & (df.db =='db-desoper')]
     columns = ['operator','project','campaign','pipeline','submit_site','target_site','reqnum','nite','batch size','passed','failed','unknown','remaining']
+<<<<<<< HEAD
+=======
+    current_dict,rest_dict = [],[]
+    for name,req in df.groupby(by=['reqnum']).iterrows():
+        for req in sorted(group['reqnum'].unique(),reverse = True):
+            nitelist = sorted(df[df.reqnum==req].loc[group.index,('nite')].dropna().unique())
+            pipeline = df[df.reqnum==req]['pipeline'].unique()[0]
+            if len(nitelist) > 1:
+                nitelist = nitelist[0] + ' - ' + nitelist[-1]
+            if pipeline =='supercal':
+                nites = nitelist[0].split('t')
+                nite1,nite2 = nites[0],nites[0][:4]+nites[1]
+                nitelist = nite1 + ' - ' + nite2
+            if project =='TEST':
+                total_batch_size = query.test_query(query.cursor(db),req)
+            else:
+                total_batch_size = query.batch_size_query(query.cursor(db),nitelist,req,pipeline)
+            passed_df =  df[(df.operator == name) & (df.status==0) & (df.reqnum == req)].drop_duplicates(['unitname'])
+            passed = passed_df['status'][(df.operator == name) & (df.status==0) & (df.reqnum == req)].count()
+            failed_df = df[(df.operator == name) & (~df.status.isin([0,-99])) & (df.reqnum == req)].drop_duplicates(['unitname'])
+            failed = failed_df['status'][(df.operator == name) & (~df.status.isin([0,-99])) & (df.reqnum == req)].count()
+            try: unknown = df['status'][(df.operator == name) & (df.status == -99) & (df.reqnum==req)].count()
+            except: unknown = 0
+            try:
+                target_site = ', '.join(df[(df.reqnum==req) & (df.status.isin([-99]))].sort(columns=['created date'])['target_site'].unique())
+                if not target_site:
+                    target_site =df[df.reqnum==req].sort(columns=['created date'])['target_site'].unique()[-1]
+            except:
+                target_site =df[df.reqnum==req].sort(columns=['created date'])['target_site'].unique()[-1]
+>>>>>>> ec798910f1fa2ad7ee6ce90185d7b1a20daf6cc3
 
     df_op = df.groupby(by=['reqnum'])
     current_dict,rest_dict = [],[]
