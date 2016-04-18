@@ -20,9 +20,9 @@ def testing_summary():
     tcurrent_dict,trest_dict,tcolumns = get_data.processing_summary('db-destest','TEST')
     return render_template('testing_summary.html',columns=columns,current_dict=current_dict,rest_dict=rest_dict,tcurrent_dict=tcurrent_dict,trest_dict=trest_dict,tcolumns=tcolumns)
 
-@app.route('/processing_detail/<db>/<operator>/<reqnum>')
-def processing_detail(db,operator,reqnum):
-    df,columns,reqnum,mean_times = get_data.processing_detail(db,operator,reqnum)
+@app.route('/processing_detail/<db>/<reqnum>')
+def processing_detail(db,reqnum):
+    df,columns,reqnum,mean_times = get_data.processing_detail(db,reqnum)
     df2 = df.dropna()
     df_pass = df[df.status==0].dropna()
     try:
@@ -36,7 +36,7 @@ def processing_detail(db,operator,reqnum):
         exechost_figscript,exechost_figdiv=None,None
         fails_figscript,fails_figdiv=None,None
 
-    return render_template('processing_detail.html',columns=columns,df = df,reqnum=reqnum,assess_figdiv=assess_figdiv,assess_figscript=assess_figscript,mean_times=mean_times,times_figscript=times_figscript,times_figdiv=times_figdiv,db=db,operator=operator,exechost_figscript=exechost_figscript,exechost_figdiv=exechost_figdiv,fails_figscript=fails_figscript,fails_figdiv=fails_figdiv)
+    return render_template('processing_detail.html',columns=columns,df = df,reqnum=reqnum,assess_figdiv=assess_figdiv,assess_figscript=assess_figscript,mean_times=mean_times,times_figscript=times_figscript,times_figdiv=times_figdiv,db=db,exechost_figscript=exechost_figscript,exechost_figdiv=exechost_figdiv,fails_figscript=fails_figscript,fails_figdiv=fails_figdiv)
 
 @app.route('/dts')
 def dts():

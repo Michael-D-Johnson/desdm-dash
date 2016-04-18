@@ -64,5 +64,3 @@ def plot_t_eff(dataframe):
         gs = vplot(*gs)
     figscript,figdiv = components(gs)
     return (figscript,figdiv)
-
->>>>>>> master

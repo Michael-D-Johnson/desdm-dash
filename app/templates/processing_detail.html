@@ -18,28 +18,6 @@
 {% endif %}
 <h1> Assessment Summary </h1>
 {{assess_figdiv|safe}}
-<table border="1">
-<tr>
-<th> Program </th>
-<th> True </th>
-<th> False </th>
-<th> Unknown </th>
-<th> None </th>
-</tr>
-{% for program,group in df.groupby(by=['program']) %}
-    <tr>
-    <td> {{program}}</td>
-    {% for col in ['True','False','Unknown','None'] %}
-        {% if col in group['assessment'].unique() %}
-         <td> {{group[group['assessment']==col].count()[0]}}
-              ({{((group[group['assessment']==col].count()[0]/group[group['program']==program].count()[0])*100).round(1)}}%)</td>
-        {% else %}
-         <td> - </td>
-        {% endif %}
-    {% endfor %}
-    </tr>
-{% endfor %}
-</table>
 {% endif %}
 <h1> Processing Attempts </h1>
 <table border="1">
