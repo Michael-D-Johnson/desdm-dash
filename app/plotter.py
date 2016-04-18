@@ -1,3 +1,5 @@
+import os
+from bokeh.resources import CDN
 from bokeh.embed import components,file_html
 from bokeh.plotting import figure,ColumnDataSource
 from bokeh.models import (HoverTool, BoxSelectTool, BoxZoomTool,
@@ -5,7 +7,7 @@ from bokeh.models import (HoverTool, BoxSelectTool, BoxZoomTool,
                           glyphs,Legend)
 from bokeh.palettes import Spectral6,PuOr9
 from bokeh.charts import Scatter,Bar,Histogram,color
-from bokeh.io import vplot
+from bokeh.io import vplot,hplot,gridplot
 
 def plot_times(dataframe):
     dataframe = dataframe.fillna(-1)
@@ -45,23 +47,20 @@ def plot_t_eff(dataframe):
     dfs = [dataframe[dataframe['band']==n] for n in bands]
     dfs = [d for d in dfs if len(d)>0]
     def create_data_source(df):
-        return ColumnDataSource(data=dict(t_eff=df['t_eff'],expnum=df['expnum'],program=df['program'],accepted=df['accepted']))
-    ps = []
+        return ColumnDataSource(data=dict(t_eff=df['t_eff'],expnum=df['expnum'],program=df['program'],accepted=df['assessment']))
+    plots = []
     for i in range(0,len(dfs)):
-        df_false = dfs[i][dfs[i]['accepted']=='False']
-        df_true = dfs[i][dfs[i]['accepted']=='True']
-        p = figure(tools = [HoverTool(tooltips = [('program', '@program'),('accepted','@accepted')]),BoxZoomTool(),ResetTool(),WheelZoomTool()], x_axis_label = "t_eff", y_axis_label = "expnum", title = dfs[i]['band'].iloc[0],width=500,height=500)
-        p.scatter('t_eff','expnum',source=create_data_source(df_false),radius=0.01,fill_color='red',line_color='white',alpha=0.5)
-        p.scatter('t_eff','expnum',source=create_data_source(df_true),radius=0.01,fill_color='green',line_color='white',alpha=0.5)
-        ps.append(p)
-    ph = []
-    for i in range(0,len(dfs)):
-        p =  Histogram(dfs[i]['t_eff'], color='skyblue', bins=50, width=500, height=500)
-        ph.append(p)
-    gs = []
-    for i in range(0,len(dfs)):
-        gs.append(hplot(*[ps[i],ph[i]]))
-        gs = vplot(*gs)
-    figscript,figdiv = components(gs)
-    return (figscript,figdiv)
+        df_false = dfs[i][dfs[i]['assessment']=='False']
+        df_true = dfs[i][dfs[i]['assessment']=='True']
+        p = figure(tools = [HoverTool(tooltips = [('expnum','@expnum'),('program', '@program')]),BoxZoomTool(),ResetTool(),WheelZoomTool()], x_axis_label = "t_eff", y_axis_label = "expnum", title = dfs[i]['band'].iloc[0],width=500,height=500)
+        p.scatter('t_eff','expnum',source=create_data_source(df_false),fill_color='red',line_color='white',alpha=0.5)
+        p.scatter('t_eff','expnum',source=create_data_source(df_true),fill_color='green',line_color='white',alpha=0.5)
+        h =  Histogram(dfs[i]['t_eff'], bins= 50, color='skyblue', width=500, height=500)
+        plots.append(hplot(p,h))
 
+    gs = vplot(*plots)
+    html = file_html(gs,CDN,"t_eff")
+    with open('/work/devel/mjohns44/git/desdm-dash/app/templates/t_eff.html','w') as myfile:
+        myfile.write(html)
+    #figscript,figdiv = components(gs)
+    #return (figscript,figdiv)

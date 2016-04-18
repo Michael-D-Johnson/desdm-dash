@@ -23,19 +23,37 @@ def testing_summary():
 @app.route('/processing_detail/<db>/<operator>/<reqnum>')
 def processing_detail(db,operator,reqnum):
     df,columns,reqnum,mean_times = get_data.processing_detail(db,operator,reqnum)
-    df2 = df.dropna()
-    df_pass = df[df.status==0].dropna()
+    df2 = df.copy().dropna()
+    df_pass = df2[df2.status==0]
+    df_teff = df_pass.t_eff.replace(0,-.00001)
+    df.t_eff = df_teff
     try:
         times_figscript,times_figdiv=plotter.plot_times(df_pass)
         assess_figscript,assess_figdiv=plotter.plot_accepted(df_pass)
         exechost_figscript,exechost_figdiv= plotter.plot_exec_time(df_pass)
         fails_figscript,fails_figdiv = plotter.plot_status_per_host(df2)
-    except: 
+    except:
         times_figscript,times_figdiv=None,None
         assess_figscript,assess_figdiv=None,None
         exechost_figscript,exechost_figdiv=None,None
         fails_figscript,fails_figdiv=None,None 
-    return render_template('processing_detail.html',columns=columns,df = df,reqnum=reqnum,assess_figdiv=assess_figdiv,assess_figscript=assess_figscript,mean_times=mean_times,times_figscript=times_figscript,times_figdiv=times_figdiv,db=db,operator=operator,exechost_figscript=exechost_figscript,exechost_figdiv=exechost_figdiv,fails_figscript=fails_figscript,fails_figdiv=fails_figdiv)
+        teff_figscript, teff_figdiv = None, None
+    try:
+        teff = True
+        plotter.plot_t_eff(df[(df.t_eff !='None')])
+    except:
+        teff = False
+   
+    return render_template('processing_detail.html',columns=columns,df = df,reqnum=reqnum, 
+           mean_times=mean_times,db=db,operator=operator,
+           assess_figdiv=assess_figdiv,assess_figscript=assess_figscript,
+           times_figscript=times_figscript,times_figdiv=times_figdiv,
+           exechost_figscript=exechost_figscript,exechost_figdiv=exechost_figdiv,
+           fails_figscript=fails_figscript,fails_figdiv=fails_figdiv,teff=teff)
+
+@app.route('/teff')
+def teff():
+    return render_template('teff.html')
 
 @app.route('/dts')
 def dts():

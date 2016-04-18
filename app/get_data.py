@@ -54,7 +54,6 @@ def processing_summary(db,project):
                 failed = failed_df['status'][(df.operator == name) & (~df.status.isin([0,-99])) & (df.reqnum == req)].count()
                 try: unknown = df['status'][(df.operator == name) & (df.status == -99) & (df.reqnum==req)].count()
                 except: unknown = 0
-                #target_site = ', '.join(df[df.reqnum==req].sort(columns=['created date'])['target_site'].unique())
                 try:
                     target_site = ', '.join(df[(df.reqnum==req) & (df.status.isin([-99]))].sort(columns=['created date'])['target_site'].unique())
                     if not target_site:
@@ -62,9 +61,10 @@ def processing_summary(db,project):
                 except:
                     target_site =df[df.reqnum==req].sort(columns=['created date'])['target_site'].unique()[-1]
 
-                #submit_site = ', '.join([site.split('.')[0] for site in df[df.reqnum==req].sort(columns=['created date'])['submit_site'].unique()])
                 try:
                     submit_site = ', '.join([site.split('.')[0] for site in df[(df.reqnum==req) & (df.status.isin([-99]))].sort(columns=['created date'])['submit_site'].unique()])
+                    if not submit_site:
+                        submit_site = [site.split('.')[0] for site in df[(df.reqnum==req)].sort(columns=['created date'])['submit_site'].unique()][-1]
                 except:
                     submit_site = [site.split('.')[0] for site in df[(df.reqnum==req)].sort(columns=['created date'])['submit_site'].unique()][-1]
 
