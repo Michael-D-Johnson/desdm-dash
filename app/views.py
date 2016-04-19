@@ -44,8 +44,8 @@ def processing_detail(db,reqnum):
     except:
         teff = False
    
-    return render_template('processing_detail.html',columns=columns,df = df,reqnum=reqnum, 
-           mean_times=mean_times,db=db,operator=operator,
+    return render_template('processing_detail.html',columns=columns,df = df,
+           reqnum=reqnum, mean_times=mean_times,db=db,
            assess_figdiv=assess_figdiv,assess_figscript=assess_figscript,
            times_figscript=times_figscript,times_figdiv=times_figdiv,
            exechost_figscript=exechost_figscript,exechost_figdiv=exechost_figdiv,
