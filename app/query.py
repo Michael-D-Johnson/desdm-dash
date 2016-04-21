@@ -17,6 +17,7 @@ def get_nites(cur,reqnum,unitname,attnum):
     query = "select distinct v.val from pfw_attempt a,pfw_attempt_val v where key in ('nite','range') and a.attnum=v.attnum and a.unitname=v.unitname and a.reqnum=v.reqnum and a.reqnum=%s and a.unitname='%s' and a.attnum=%s" % (reqnum,unitname,attnum)
     cur.execute(query)
     return cur.fetchall()
+
 def processing_basic(cur,reqnum):
     query = "select distinct r.project,r.campaign,a.unitname,a.reqnum,a.attnum,t1.status,a.data_state,a.operator,r.pipeline,b.target_site,t1.exec_host,t2.exec_host from pfw_attempt a, pfw_job j, task t1,task t2, pfw_request r,pfw_block b where a.created_date >= sysdate-4 and t1.id =a.task_id and a.reqnum=r.reqnum and a.reqnum=%s and b.unitname=a.unitname and a.reqnum=b.reqnum and a.attnum=b.attnum and j.task_id=t2.id and j.unitname=a.unitname and j.attnum=a.attnum and j.reqnum=a.reqnum" % reqnum
     cur.execute(query)

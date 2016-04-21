@@ -148,12 +148,12 @@ if __name__ =='__main__':
     test_reqnums = [str(r) for r in query.get_reqnums(query.cursor('db-destest'))]
     oper_reqnums = [str(r) for r in query.get_reqnums(query.cursor('db-desoper'))]
     df_test = pandas.DataFrame(
-                query.processing_summary(query.cursor('db-destest'),','.join(test_reqnums)),
-                columns = ['created_date','project','campaign','unitname','reqnum','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_site','exec_host'])
+                query.processing_detail(query.cursor('db-destest'),','.join(test_reqnums)),
+                columns = ['created_date','project','campaign','unitname','nite','reqnum','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_site','exec_host'])
     df_test['db'] = 'db-destest'
     df_oper = pandas.DataFrame(
-                query.processing_summary(query.cursor('db-desoper'),','.join(oper_reqnums)),
-                columns = ['created_date','project','campaign','unitname','reqnum','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_site','exec_host'])
+                query.processing_detail(query.cursor('db-desoper'),','.join(oper_reqnums)),
+                columns = ['created_date','project','campaign','unitname','nite','reqnum','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_site','exec_host'])
 
     df_oper['db'] ='db-desoper'
     dfs = [df_oper,df_test]
@@ -184,5 +184,4 @@ if __name__ =='__main__':
     df_master.to_csv(csv_path,index=False,mode='a')
     date2 = datetime.datetime.now()
     total_time = date2-date1
-    print total_time
  
