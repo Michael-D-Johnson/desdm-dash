@@ -11,18 +11,18 @@ def index():
 
 @app.route('/processing_summary')
 def processing_summary():
-    current_dict,rest_dict,columns = get_data.processing_summary('db-desoper','OPS')
-    return render_template('processing_summary.html',columns=columns,current_dict=current_dict,rest_dict=rest_dict)
+    current_dict,rest_dict,columns,updated = get_data.processing_summary('db-desoper','OPS')
+    return render_template('processing_summary.html',columns=columns,current_dict=current_dict,rest_dict=rest_dict,updated=updated)
 
 @app.route('/testing_summary')
 def testing_summary():
-    current_dict,rest_dict,columns = get_data.processing_summary('db-desoper','TEST')
-    tcurrent_dict,trest_dict,tcolumns = get_data.processing_summary('db-destest','TEST')
-    return render_template('testing_summary.html',columns=columns,current_dict=current_dict,rest_dict=rest_dict,tcurrent_dict=tcurrent_dict,trest_dict=trest_dict,tcolumns=tcolumns)
+    current_dict,rest_dict,columns,updated = get_data.processing_summary('db-desoper','TEST')
+    tcurrent_dict,trest_dict,tcolumns,tupdated = get_data.processing_summary('db-destest','TEST')
+    return render_template('testing_summary.html',columns=columns,current_dict=current_dict,rest_dict=rest_dict,tcurrent_dict=tcurrent_dict,trest_dict=trest_dict,tcolumns=tcolumns,updated=updated)
 
 @app.route('/processing_detail/<db>/<reqnum>')
 def processing_detail(db,reqnum):
-    df,columns,reqnum,mean_times = get_data.processing_detail(db,reqnum)
+    df,columns,reqnum,mean_times,updated = get_data.processing_detail(db,reqnum)
     df2 = df.dropna()
     df_pass = df[df.status==0].dropna()
     df_teff = df_pass.t_eff.replace(0,-.00001)
@@ -45,7 +45,7 @@ def processing_detail(db,reqnum):
         teff = False
    
     return render_template('processing_detail.html',columns=columns,df = df,
-           reqnum=reqnum, mean_times=mean_times,db=db,
+           reqnum=reqnum, mean_times=mean_times,db=db,updated = updated,
            assess_figdiv=assess_figdiv,assess_figscript=assess_figscript,
            times_figscript=times_figscript,times_figdiv=times_figdiv,
            exechost_figscript=exechost_figscript,exechost_figdiv=exechost_figdiv,

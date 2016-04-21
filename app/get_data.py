@@ -8,13 +8,18 @@ csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
 
 def processing_summary(db,project,df=None):
     if not df:
-        try: df = pandas.read_csv(csv_path,skiprows=1)
+        try: 
+            df = pandas.read_csv(csv_path,skiprows=1)
+            with open(csv_path,'r') as csvfile:
+                updated = csvfile.readlines()[0]
         except IOError: sys.exit() 
 
     df = df.sort(columns=['reqnum','unitname','attnum'],ascending=False)
     df = df.fillna(-99)
     if project =='TEST':
-        df = df[(df.project != 'OPS') | (df.db=='db-destest')]
+        df_oper = df[(df.project != 'OPS') & (df.db=='db-desoper')] 
+        df_test = df[(df.db=='db-destest')]
+        df = pandas.concat([df_test,df_oper])
     else:
         df = df[(df.project == 'OPS') & (df.db =='db-desoper')]
     columns = ['operator','project','campaign','pipeline','submit_site','target_site','reqnum','nite','batch size','passed','failed','unknown','remaining']
@@ -25,15 +30,15 @@ def processing_summary(db,project,df=None):
         orig_nitelist = sorted(group['nite'].unique())
         pipeline = group['pipeline'].unique()[0]
         if len(orig_nitelist) > 1:
-            nitelist = str(orig_nitelist[0]) + ' - ' + str(orig_nitelist[-1])
+            nitelist = str(int(orig_nitelist[0])) + ' - ' + str(int(orig_nitelist[-1]))
         else:
-            nitelist = orig_nitelist[0]
+            nitelist = int(orig_nitelist[0])
         if pipeline =='supercal':
             nites = orig_nitelist[0].split('t')
             nite1,nite2 = nites[0],nites[0][:4]+nites[1]
-            nitelist = str(nite1) + ' - ' + str(nite2)
+            nitelist = str(int(nite1)) + ' - ' + str(int(nite2))
         if project =='TEST':
-            total_batch_size = query.test_query(query.cursor(db),int(req))
+            total_batch_size = query.basic_batch_query(query.cursor(db),int(req))
         else:
             total_batch_size = query.batch_size_query(query.cursor(db),nitelist,int(req),pipeline)
         passed_df =  group[group.status==0].drop_duplicates(['unitname'])
@@ -59,7 +64,7 @@ def processing_summary(db,project,df=None):
         if remaining < 0:
             remaining = 0
         if len(orig_nitelist) == 1:
-            nitelist = orig_nitelist[0]
+            nitelist = int(orig_nitelist[0])
             if nitelist == -99: nitelist = 'NA'
         req_dict = {'remaining':remaining,'operator':group.operator.unique()[0],
                     'batch size':total_batch_size,
@@ -78,11 +83,15 @@ def processing_summary(db,project,df=None):
     except: rest_dict = []
     try: columns
     except: columns = []
-    return (current_dict,rest_dict,columns)
+    return (current_dict,rest_dict,columns,updated)
 
 def processing_detail(db,reqnum):
-    try: df = pandas.read_csv(csv_path,skiprows=1)
-    except IOError: sys.exit()
+    try: 
+        df = pandas.read_csv(csv_path,skiprows=1)
+        with open(csv_path,'r') as csvfile:
+            updated = csvfile.readlines()[0]
+    except IOError: 
+        sys.exit()
     df = df[df.reqnum==int(reqnum)]
     if not len(df):
         results = query.processing_basic(query.cursor(db),reqnum)
@@ -91,6 +100,8 @@ def processing_detail(db,reqnum):
         columns = df.columns
         return (df,columns,reqnum,None)
     else:
+        columns = ['project','campaign','pipeline','reqnum','unitname','attnum','status','data_state','operator','target_site','submit_site','exec_host','start_time','end_time','total time','assessment','t_eff']
+
         df.insert(len(df.columns),'assessment', None)
         df.insert(len(df.columns),'program', None)
         df.insert(len(df.columns),'t_eff', None)
@@ -104,7 +115,6 @@ def processing_detail(db,reqnum):
         df_attempt = df.groupby(by=['unitname','reqnum','attnum'])
         for name,group in df_attempt:
             df = df.drop_duplicates(subset=['unitname','reqnum','attnum'])
-            columns = df.columns
             index = df[(df['unitname']==name[0]) & (df['reqnum']==name[1]) & (df['attnum']==name[2])].index[0]
             df.loc[index,('start_time','end_time')] = group['start_time'].min(),group['end_time'].max()
             try:
@@ -128,7 +138,7 @@ def processing_detail(db,reqnum):
             df.loc[index,('program')] = program
 
         mean_times =round(df[df.status==0]['total time'].mean(skipna=True),3)
-        return (df,columns,reqnum,mean_times)
+        return (df,columns,reqnum,mean_times,updated)
 
 if __name__ =='__main__':
     #1. get reqnums from last four days
@@ -138,20 +148,41 @@ if __name__ =='__main__':
     test_reqnums = [str(r) for r in query.get_reqnums(query.cursor('db-destest'))]
     oper_reqnums = [str(r) for r in query.get_reqnums(query.cursor('db-desoper'))]
     df_test = pandas.DataFrame(
-                query.processing_detail(query.cursor('db-destest'),','.join(test_reqnums)),
-                columns = ['created_date','project','campaign','unitname','nite','reqnum','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_site','exec_host'])
+                query.processing_summary(query.cursor('db-destest'),','.join(test_reqnums)),
+                columns = ['created_date','project','campaign','unitname','reqnum','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_site','exec_host'])
     df_test['db'] = 'db-destest'
     df_oper = pandas.DataFrame(
-                query.processing_detail(query.cursor('db-desoper'),','.join(oper_reqnums)),
-                columns = ['created_date','project','campaign','unitname','nite','reqnum','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_site','exec_host'])
+                query.processing_summary(query.cursor('db-desoper'),','.join(oper_reqnums)),
+                columns = ['created_date','project','campaign','unitname','reqnum','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_site','exec_host'])
 
     df_oper['db'] ='db-desoper'
     dfs = [df_oper,df_test]
     df_master = pandas.concat(dfs)
-    
+    """
+    df_master.insert(len(df_master.columns),'expnum',None)
+    df_master.insert(len(df_master.columns),'band',None)
+    def update_row(row):
+        print row['db'],row['reqnum'],row['unitname'],row['attnum']
+        status = query.get_status(query.cursor(row['db']),row['reqnum'],row['unitname'],
+                                                      row['attnum'])
+        expnum,band = query.get_expnum_info(query.cursor(row['db']),row['reqnum'],row['unitname'],
+                                                      row['attnum'])
+        nites = query.get_nites(query.cursor(row['db']),row['reqnum'],row['unitname'],row['attnum'])
+        print status,expnum,band
+        if status: row['status'] = status[0]
+        else: pass
+        if expnum: row['expnum'],row['band'] = expnum,band
+        else: pass
+        if nites: row['nite'] = nites
+        else: pass
+        return row.loc['expnum','band','status']
+        
+    df_master.loc['expnum','band','status'].apply(update_row,axis=1)
+    """
     with open(csv_path,'w') as csv:
         csv.write('#%s\n' % datetime.datetime.now())
     df_master.to_csv(csv_path,index=False,mode='a')
     date2 = datetime.datetime.now()
     total_time = date2-date1
+    print total_time
  
