@@ -13,10 +13,6 @@ def processing_detail(cur,reqnums):
     cur.execute(query)
     return cur.fetchall()
 
-def get_nites(cur,reqnum,unitname,attnum):
-    query = "select distinct v.val from pfw_attempt a,pfw_attempt_val v where key in ('nite','range') and a.attnum=v.attnum and a.unitname=v.unitname and a.reqnum=v.reqnum and a.reqnum=%s and a.unitname='%s' and a.attnum=%s" % (reqnum,unitname,attnum)
-    cur.execute(query)
-    return cur.fetchall()
 def processing_basic(cur,reqnum):
     query = "select distinct r.project,r.campaign,a.unitname,a.reqnum,a.attnum,t1.status,a.data_state,a.operator,r.pipeline,b.target_site,t1.exec_host,t2.exec_host from pfw_attempt a, pfw_job j, task t1,task t2, pfw_request r,pfw_block b where a.created_date >= sysdate-4 and t1.id =a.task_id and a.reqnum=r.reqnum and a.reqnum=%s and b.unitname=a.unitname and a.reqnum=b.reqnum and a.attnum=b.attnum and j.task_id=t2.id and j.unitname=a.unitname and j.attnum=a.attnum and j.reqnum=a.reqnum" % reqnum
     cur.execute(query)
@@ -72,12 +68,20 @@ def assess_query(cur,df,index,triplet,pipeline):
     cur.execute(assess_q)
     return cur.fetchall()
 
-def get_status(cur,reqnum,unitname,attnum):
-    query = "select status from exposure e, pfw_attempt a,task t where t.id=a.task_id and reqnum=%s and e.expnum= substr(a.unitname,4) and a.unitname='%s' and a.attnum='%s'" % (reqnum,unitname,attnum)
+def get_status(cur,reqnums):
+    query = "select unitname,reqnum,attnum,status from pfw_attempt a,task t where t.id=a.task_id and reqnum in (%s)" % (reqnums)
     cur.execute(query)
-    return cur.fetchall()    
+    return cur.fetchall()
 
-def get_expnum_info(cur,reqnum,unitname,attnum):
-    query = "select expnum,band from exposure e, pfw_attempt a where reqnum=%s and e.expnum= substr(a.unitname,4) and a.unitname='%s' and a.attnum='%s'" % (reqnum,unitname,attnum)
+def get_expnum_info(cur,reqnums):
+    query = "select distinct a.unitname,a.reqnum,a.attnum,e.expnum,e.band from pfw_request r,exposure e, pfw_attempt a where a.reqnum in (%s) and e.expnum= substr(a.unitname,4) and r.reqnum=a.reqnum and r.pipeline in ('firstcut','finalcut')" % (reqnums)
+    try: 
+        cur.execute(query)
+        return cur.fetchall()
+    except:
+        return None
+
+def get_nites(cur,reqnums):
+    query = "select distinct a.unitname,a.reqnum,a.attnum, v.val from pfw_attempt a,pfw_attempt_val v where key in ('nite','range') and a.attnum=v.attnum and a.unitname=v.unitname and a.reqnum=v.reqnum and a.reqnum in (%s)" % (reqnums)
     cur.execute(query)
     return cur.fetchall()

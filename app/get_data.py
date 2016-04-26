@@ -2,9 +2,11 @@
 import os
 import sys
 import pandas
+import time
 from datetime import datetime
 import query
-csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
+#csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
+csv_path = '/Users/mjohns44/GIT_DESDM/desdm-dash-mjohns44/desdm-dash/app/static/processing.csv'
 
 def processing_summary(db,project,df=None):
     if not df:
@@ -150,35 +152,36 @@ if __name__ =='__main__':
     df_test = pandas.DataFrame(
                 query.processing_summary(query.cursor('db-destest'),','.join(test_reqnums)),
                 columns = ['created_date','project','campaign','unitname','reqnum','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_site','exec_host'])
+    df_test_status = pandas.DataFrame(
+                query.get_status(query.cursor('db-destest'),','.join(test_reqnums)),
+                columns = ['unitname','reqnum','attnum','status'])
+    df_test_nites = pandas.DataFrame(
+                query.get_nites(query.cursor('db-destest'),','.join(test_reqnums)),
+                columns = ['unitname','reqnum','attnum','nite'])
+    df_test_expnum = pandas.DataFrame(
+                query.get_expnum_info(query.cursor('db-destest'),','.join(test_reqnums)),
+                columns = ['unitname','reqnum','attnum','expnum','band'])
     df_test['db'] = 'db-destest'
     df_oper = pandas.DataFrame(
                 query.processing_summary(query.cursor('db-desoper'),','.join(oper_reqnums)),
                 columns = ['created_date','project','campaign','unitname','reqnum','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_site','exec_host'])
-
+    df_oper_status = pandas.DataFrame(
+                query.get_status(query.cursor('db-desoper'),','.join(oper_reqnums)),
+                columns = ['unitname','reqnum','attnum','status'])
+    df_oper_nites = pandas.DataFrame(
+                query.get_nites(query.cursor('db-desoper'),','.join(oper_reqnums)),
+                columns = ['unitname','reqnum','attnum','nite'])
+    df_oper_expnum = pandas.DataFrame(
+                query.get_expnum_info(query.cursor('db-desoper'),','.join(oper_reqnums)),
+                columns = ['unitname','reqnum','attnum','expnum','band'])
+    for df in [df_oper_status,df_oper_expnum,df_oper_nites]:
+        df_oper = pandas.merge(df_oper,df,on=['unitname','reqnum','attnum'],how='left',suffixes=('_orig',''))
+    for df in [df_test_status,df_test_expnum,df_test_nites]:
+        df_test = pandas.merge(df_test,df,on=['unitname','reqnum','attnum'],how='left',suffixes=('_orig',''))
     df_oper['db'] ='db-desoper'
     dfs = [df_oper,df_test]
     df_master = pandas.concat(dfs)
-    """
-    df_master.insert(len(df_master.columns),'expnum',None)
-    df_master.insert(len(df_master.columns),'band',None)
-    def update_row(row):
-        print row['db'],row['reqnum'],row['unitname'],row['attnum']
-        status = query.get_status(query.cursor(row['db']),row['reqnum'],row['unitname'],
-                                                      row['attnum'])
-        expnum,band = query.get_expnum_info(query.cursor(row['db']),row['reqnum'],row['unitname'],
-                                                      row['attnum'])
-        nites = query.get_nites(query.cursor(row['db']),row['reqnum'],row['unitname'],row['attnum'])
-        print status,expnum,band
-        if status: row['status'] = status[0]
-        else: pass
-        if expnum: row['expnum'],row['band'] = expnum,band
-        else: pass
-        if nites: row['nite'] = nites
-        else: pass
-        return row.loc['expnum','band','status']
         
-    df_master.loc['expnum','band','status'].apply(update_row,axis=1)
-    """
     with open(csv_path,'w') as csv:
         csv.write('#%s\n' % datetime.datetime.now())
     df_master.to_csv(csv_path,index=False,mode='a')
