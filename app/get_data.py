@@ -5,8 +5,7 @@ import pandas
 import time
 from datetime import datetime
 import query
-#csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
-csv_path = '/Users/mjohns44/GIT_DESDM/desdm-dash-mjohns44/desdm-dash/app/static/processing.csv'
+csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
 
 def processing_summary(db,project,df=None):
     if not df:
@@ -187,5 +186,4 @@ if __name__ =='__main__':
     df_master.to_csv(csv_path,index=False,mode='a')
     date2 = datetime.datetime.now()
     total_time = date2-date1
-    print total_time
  
