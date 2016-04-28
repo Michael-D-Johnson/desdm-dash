@@ -57,7 +57,7 @@ def batch_size_query(cur,nitelist,reqnum,pipeline):
 def assess_query(cur,df,index,triplet,pipeline):
     if pipeline=='sne':
         camsym,field,band,seq = triplet[0].split('_')
-        comment = field.strip('SN-') + band + ' ' + df.loc[index,('nite')]
+        comment = field.strip('SN-') + band + ' ' + str(df.loc[index,('nite')])
         assess_q = "select distinct accepted,t_eff,program from firstcut_eval where analyst='SNQUALITY' and analyst_comment='%s'" % (comment)
     elif pipeline =='finalcut':
         assess_q = "select distinct accepted,t_eff,program from finalcut_eval where unitname='%s' and reqnum='%s' and attnum='%s'" % (triplet[0],triplet[1],triplet[2])

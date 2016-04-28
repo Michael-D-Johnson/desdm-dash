@@ -20,7 +20,10 @@
 {{assess_figdiv|safe}}
 {% endif %}
 {% if teff %}
+{% if df.t_eff.fillna(-99).unique() == -99%}
+{% else %}
 <a href="{{url_for('teff') }}"> T_eff Summary</a>
+{% endif %}
 {% endif %}
 <h1> Processing Attempts </h1>
 <table border="1">
