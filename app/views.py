@@ -30,20 +30,27 @@ def processing_detail(db,reqnum):
 
     try:
         times_figscript,times_figdiv=plotter.plot_times(df_pass)
-        assess_figscript,assess_figdiv=plotter.plot_accepted(df_pass)
-        exechost_figscript,exechost_figdiv= plotter.plot_exec_time(df_pass)
-        fails_figscript,fails_figdiv = plotter.plot_status_per_host(df2)
     except:
         times_figscript,times_figdiv=None,None
+    try:
+        assess_figscript,assess_figdiv=plotter.plot_accepted(df_pass)
+    except:
         assess_figscript,assess_figdiv=None,None
+    try:
+        exechost_figscript,exechost_figdiv= plotter.plot_exec_time(df_pass)
+    except:
         exechost_figscript,exechost_figdiv=None,None
+    try:
+        fails_figscript,fails_figdiv = plotter.plot_status_per_host(df2)
+    except:
         fails_figscript,fails_figdiv=None,None 
     try:
-        teff = True
-        plotter.plot_t_eff(df[(df.t_eff !='None')])
+        if df_teff.t_eff.fillna(-99).unique() == -99:
+            teff = True
+            plotter.plot_t_eff(df_teff[(df_teff.t_eff !='None')])
+        else: teff = False
     except:
         teff = False
-   
     return render_template('processing_detail.html',columns=columns,df = df,
            reqnum=reqnum, mean_times=mean_times,db=db,updated = updated,
            assess_figdiv=assess_figdiv,assess_figscript=assess_figscript,
