@@ -157,9 +157,16 @@ if __name__ =='__main__':
     df_test_nites = pandas.DataFrame(
                 query.get_nites(query.cursor('db-destest'),','.join(test_reqnums)),
                 columns = ['unitname','reqnum','attnum','nite'])
-    df_test_expnum = pandas.DataFrame(
+    try:
+        df_test_expnum = pandas.DataFrame(
                 query.get_expnum_info(query.cursor('db-destest'),','.join(test_reqnums)),
                 columns = ['unitname','reqnum','attnum','expnum','band'])
+    except: 
+        df_test_expnum = pandas.DataFrame()
+        df_test_expnum.insert(len(df_test_expnum.columns),'unitname',None)
+        df_test_expnum.insert(len(df_test_expnum.columns),'reqnum',None)
+        df_test_expnum.insert(len(df_test_expnum.columns),'attnum',None)
+ 
     df_test['db'] = 'db-destest'
     df_oper = pandas.DataFrame(
                 query.processing_summary(query.cursor('db-desoper'),','.join(oper_reqnums)),
