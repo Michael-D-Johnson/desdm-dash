@@ -11,45 +11,71 @@ def index():
 
 @app.route('/processing_summary')
 def processing_summary():
-    current_dict,rest_dict,columns,updated = get_data.processing_summary('db-desoper','OPS')
+    summary = get_data.processing_summary.delay('db-desoper','OPS')
+    summary.wait()
+    current_dict,rest_dict,columns,updated = summary.get()
     return render_template('processing_summary.html',columns=columns,current_dict=current_dict,rest_dict=rest_dict,updated=updated)
 
 @app.route('/testing_summary')
 def testing_summary():
-    current_dict,rest_dict,columns,updated = get_data.processing_summary('db-desoper','TEST')
-    tcurrent_dict,trest_dict,tcolumns,tupdated = get_data.processing_summary('db-destest','TEST')
+    csum = get_data.processing_summary.delay('db-desoper','TEST')
+    csum.wait()
+    current_dict,rest_dict,columns,updated = csum.get()
+
+    tsum = get_data.processing_summary.delay('db-destest','TEST')
+    tsum.wait()
+    tcurrent_dict,trest_dict,tcolumns,tupdated = tsum.get()
+
     return render_template('testing_summary.html',columns=columns,current_dict=current_dict,rest_dict=rest_dict,tcurrent_dict=tcurrent_dict,trest_dict=trest_dict,tcolumns=tcolumns,updated=updated)
 
 @app.route('/processing_detail/<db>/<reqnum>')
 def processing_detail(db,reqnum):
-    df,columns,reqnum,mean_times,updated = get_data.processing_detail(db,reqnum)
+    detail = get_data.processing_detail.delay(db,reqnum)
+    detail.wait()
+    df,columns,reqnum,mean_times,updated = detail.get()
     df2 = df.dropna()
     df_pass = df[df.status==0].dropna()
-    df_teff = df_pass.t_eff.replace(0,-.00001)
-    df.t_eff = df_teff
+    #df_teff = df_pass
+    #df_teff = df_pass.t_eff.replace(0,-.00001)
+    #df.t_eff = df_teff
 
     try:
-        times_figscript,times_figdiv=plotter.plot_times(df_pass)
-        assess_figscript,assess_figdiv=plotter.plot_accepted(df_pass)
-        exechost_figscript,exechost_figdiv= plotter.plot_exec_time(df_pass)
-        fails_figscript,fails_figdiv = plotter.plot_status_per_host(df2)
+        times = plotter.plot_times.delay(df_pass)
+        times.wait()
+        times_figscript,times_figdiv= times.get()
     except:
-        times_figscript,times_figdiv=None,None
-        assess_figscript,assess_figdiv=None,None
-        exechost_figscript,exechost_figdiv=None,None
-        fails_figscript,fails_figdiv=None,None 
+        times_figscript,times_figdiv=(None,None)
     try:
-        teff = True
-        plotter.plot_t_eff(df[(df.t_eff !='None')])
+        assess = plotter.plot_accepted.delay(df_pass)
+        assess.wait()
+        assess_figscript,assess_figdiv = assess.get() 
     except:
-        teff = False
-   
+        assess_figscript,assess_figdiv=(None,None)
+    try:
+        exechost = plotter.plot_exec_time.delay(df_pass)
+        exechost.wait()
+        exechost_figscript,exechost_figdiv = exechost.get()
+    except:
+        exechost_figscript,exechost_figdiv = (None,None)
+    try:
+        fails = plotter.plot_status_per_host.delay(df2)
+        fails.wait()
+        fails_figscript,fails_figdiv = list(fails.collect())
+    except:
+        fails_figscript,fails_figdiv=(None,None) 
+    try:
+        teff =plotter.plot_t_eff.delay(df_pass[(df_pass.t_eff !='None')])
+        teff.wait()
+        teff_figscript,teff_figdiv = teff.get()
+    except:
+        teff_figscript,teff_figdiv = (None,None)
     return render_template('processing_detail.html',columns=columns,df = df,
            reqnum=reqnum, mean_times=mean_times,db=db,updated = updated,
-           assess_figdiv=assess_figdiv,assess_figscript=assess_figscript,
+           assess_figscript=assess_figscript,assess_figdiv=assess_figdiv,
            times_figscript=times_figscript,times_figdiv=times_figdiv,
            exechost_figscript=exechost_figscript,exechost_figdiv=exechost_figdiv,
-           fails_figscript=fails_figscript,fails_figdiv=fails_figdiv,teff=teff)
+           fails_figscript=fails_figscript,fails_figdiv=fails_figdiv,
+           teff_figscript=teff_figscript,teff_figdiv=teff_figdiv)
 
 @app.route('/teff')
 def teff():

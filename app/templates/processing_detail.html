@@ -19,11 +19,10 @@
 <h1> Assessment Summary </h1>
 {{assess_figdiv|safe}}
 {% endif %}
-{% if teff %}
-<a href="{{url_for('teff') }}"> T_eff Summary</a>
-{% endif %}
+{#{{teff_figdiv|safe}}#}
+{#<a href="{{url_for('teff') }}"> T_eff Summary</a> #}
 <h1> Processing Attempts </h1>
-<table border="1">
+<table class="normal" border="1">
 <tr>
 {% for col in columns %}
     <th>
