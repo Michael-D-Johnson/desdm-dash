@@ -4,3 +4,4 @@
 /app/static/processing.csv
 celery.out
 redis.out
+dump.rdb

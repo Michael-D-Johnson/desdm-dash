@@ -6,8 +6,7 @@ import time
 from datetime import datetime
 import query
 from app import celery
-#csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
-csv_path = '/Users/mjohns44/GIT_DESDM/desdm-dash-mjohns44/desdm-dash/app/static/processing.csv'
+csv_path = os.path.join(os.getenv('DESDM_DASH_DIR'),'app/static/processing.csv')
 
 @celery.task()
 def processing_summary(db,project,df=None):
