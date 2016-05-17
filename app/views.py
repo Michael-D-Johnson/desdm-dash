@@ -44,19 +44,18 @@ def processing_detail(db,reqnum):
         fails_figscript,fails_figdiv = plotter.plot_status_per_host(df2)
     except:
         fails_figscript,fails_figdiv=None,None 
+
     try:
-        if df_teff.t_eff.fillna(-99).unique() == -99:
-            teff = True
-            plotter.plot_t_eff(df_teff[(df_teff.t_eff !='None')])
-        else: teff = False
+        teff_figscript,teff_figdiv = plotter.plot_t_eff(df_pass[(df_pass.t_eff !='None')])
     except:
-        teff = False
+        teff_figscript,teff_figdiv = (None,None)
     return render_template('processing_detail.html',columns=columns,df = df,
            reqnum=reqnum, mean_times=mean_times,db=db,updated = updated,
            assess_figdiv=assess_figdiv,assess_figscript=assess_figscript,
            times_figscript=times_figscript,times_figdiv=times_figdiv,
            exechost_figscript=exechost_figscript,exechost_figdiv=exechost_figdiv,
-           fails_figscript=fails_figscript,fails_figdiv=fails_figdiv,teff=teff)
+           fails_figscript=fails_figscript,fails_figdiv=fails_figdiv,
+           teff_figscript=teff_figscript,teff_figdiv=teff_figdiv)
 
 @app.route('/teff')
 def teff():
