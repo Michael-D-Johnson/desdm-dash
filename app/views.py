@@ -3,7 +3,8 @@ from flask import render_template
 import get_data
 import plotter
 from app import app
-
+from bokeh.embed import components
+from bokeh.io import vplot
 @app.route('/')
 @app.route('/index')
 def index():
@@ -35,47 +36,60 @@ def processing_detail(db,reqnum):
     df,columns,reqnum,mean_times,updated = detail.get()
     df2 = df.dropna()
     df_pass = df[df.status==0].dropna()
-    #df_teff = df_pass
-    #df_teff = df_pass.t_eff.replace(0,-.00001)
-    #df.t_eff = df_teff
-
+    df_teff = df_pass
+    df_teff = df_teff.t_eff.replace(0,'None')
+    plots = []
     try:
         times = plotter.plot_times.delay(df_pass)
         times.wait()
-        times_figscript,times_figdiv= times.get()
+        #times_figscript,times_figdiv= times.get()
+        plots.append(times.get())
     except:
-        times_figscript,times_figdiv=(None,None)
+        #times_figscript,times_figdiv=(None,None)
+        pass
     try:
         assess = plotter.plot_accepted.delay(df_pass)
         assess.wait()
-        assess_figscript,assess_figdiv = assess.get() 
+        #assess_figscript,assess_figdiv = assess.get() 
+        plots.append(assess.get())
     except:
-        assess_figscript,assess_figdiv=(None,None)
+        #assess_figscript,assess_figdiv=(None,None)
+        pass
     try:
         exechost = plotter.plot_exec_time.delay(df_pass)
         exechost.wait()
-        exechost_figscript,exechost_figdiv = exechost.get()
+        #exechost_figscript,exechost_figdiv = exechost.get()
+        plots.append(exechost.get())
     except:
-        exechost_figscript,exechost_figdiv = (None,None)
+        #exechost_figscript,exechost_figdiv = (None,None)
+        pass
     try:
         fails = plotter.plot_status_per_host.delay(df2)
         fails.wait()
-        fails_figscript,fails_figdiv = list(fails.collect())
+        #fails_figscript,fails_figdiv = list(fails.collect())
+        plots.append(fails.get())
     except:
-        fails_figscript,fails_figdiv=(None,None) 
+        pass
+        #fails_figscript,fails_figdiv=(None,None) 
     try:
-        teff =plotter.plot_t_eff.delay(df_pass[(df_pass.t_eff !='None')])
+        teff =plotter.plot_t_eff.delay(df_teff[(df_teff.t_eff !='None')])
         teff.wait()
-        teff_figscript,teff_figdiv = teff.get()
+        plots.append(teff.get())
+        #teff_figscript,teff_figdiv = teff.get()
     except:
-        teff_figscript,teff_figdiv = (None,None)
+        pass
+        #teff_figscript,teff_figdiv = (None,None)
+    figscript,figdiv = components(vplot(*plots))
     return render_template('processing_detail.html',columns=columns,df = df,
            reqnum=reqnum, mean_times=mean_times,db=db,updated = updated,
+           figscript=figscript,figdiv=figdiv)
+"""
            assess_figscript=assess_figscript,assess_figdiv=assess_figdiv,
            times_figscript=times_figscript,times_figdiv=times_figdiv,
            exechost_figscript=exechost_figscript,exechost_figdiv=exechost_figdiv,
            fails_figscript=fails_figscript,fails_figdiv=fails_figdiv,
-           teff_figscript=teff_figscript,teff_figdiv=teff_figdiv)
+           teff_figscript=teff_figscript,teff_figdiv=teff_figdiv
+"""
 
 @app.route('/teff')
 def teff():

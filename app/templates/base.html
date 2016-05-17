@@ -17,13 +17,8 @@
     <link rel="stylesheet" href="{{url_for('static',filename='darkula.css')}}">
     <link rel="stylesheet" href="{{url_for('static',filename='main.css')}}">
     <script type="text/javascript" src="http://cdn.pydata.org/bokeh/release/bokeh-0.10.0.min.js"></script>
-        {% for f in assess_figscript,times_figscript,exechost_figscript,fails_figscript %}
-        {% if f %}
-        {{ f|safe }}
-        {% endif %}
-        {% endfor %}
-        {% if teff_figscript %}
-        {#{{teff_figscript|safe}}#}
+        {% if figscript %}
+        {{ figscript|safe }}
         {% endif %}
         
 

@@ -71,11 +71,16 @@ def plot_t_eff(dataframe):
     gs = gridplot(*plots)
 
     """
-    gs =  Histogram(dataframe,'t_eff', bins= 25, color='skyblue')
+    #new_df = dataframe[(dataframe.band=='g')]['t_eff']+10
+    new_df = dataframe[(dataframe.band=='g')]
+    print new_df
+    gs =  Histogram(new_df,'t_eff', bins=50,color='skyblue',
+          title='Distribution of t_eff')
 
     #html = file_html(gs,CDN,"t_eff")
     #with open('/Users/mjohns44/GIT_DESDM/desdm-dash-mjohns44/desdm-dash/app/templates/t_eff.html','w') as myfile:
         # /work/devel/mjohns44/git/desdm-dash/app/templates/t_eff.html','w') as myfile:
      #   myfile.write(html)
-    figscript,figdiv = components(gs)
-    return (figscript,figdiv)
+    #figscript,figdiv = components(gs)
+    #return (figscript,figdiv)
+    return gs
