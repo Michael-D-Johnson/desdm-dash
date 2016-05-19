@@ -11,3 +11,5 @@ setup bokeh 0.10.0+0 --nolocks
 setup flask 0.10.1+0 --nolocks
 
 /work/devel/mjohns44/git/desdm-dash/app/get_data.py
+
+/work/devel/mjohns44/git/desdm-dash/app/plotter.py

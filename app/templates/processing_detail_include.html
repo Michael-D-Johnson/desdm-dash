@@ -2,12 +2,7 @@
 {% block content %}
 <h5> Last updated on: {{updated.split('#')[1]}}</h5>
 <center>
-{% if figdiv %}
-{{figdiv|safe }}
-{% endif %}
-{% if figscript %}
-{{figscript|safe }}
-{% endif %}
+{% include 'plots.html' %}
 
 <h1> Processing Attempts </h1>
 <table class="normal" border="1">

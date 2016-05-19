@@ -1,7 +1,7 @@
 import os
 from bokeh.resources import CDN
 from bokeh.embed import components,file_html
-from bokeh.plotting import figure,ColumnDataSource
+from bokeh.plotting import figure,ColumnDataSource,output_file
 from bokeh.models import (HoverTool, BoxSelectTool, BoxZoomTool,
                           PanTool, ResetTool,WheelZoomTool,
                           glyphs,Legend)
@@ -53,34 +53,59 @@ def plot_status_per_host(dataframe):
 
 @celery.task()
 def plot_t_eff(dataframe):
-    """
     bands = ['u','g','r','i','z','Y','VR']
     dfs = [dataframe[dataframe['band']==n] for n in bands]
     dfs = [d for d in dfs if len(d)>0]
     def create_data_source(df):
-        return ColumnDataSource(data=dict(t_eff=df['t_eff'],expnum=df['expnum'],program=df['program'],accepted=df['assessment']))
+        return ColumnDataSource(data=dict(t_eff=df['t_eff'],expnum=df['expnum'],program=df['program'],accepted=df['assessment'],attnum=df['attnum']))
     plots = []
     for i in range(0,len(dfs)):
         df_false = dfs[i][dfs[i]['assessment']=='False']
         df_true = dfs[i][dfs[i]['assessment']=='True']
-        p = figure(tools = [HoverTool(tooltips = [('expnum','@expnum'),('program', '@program')]),BoxZoomTool(),ResetTool(),WheelZoomTool()], x_axis_label = "t_eff", y_axis_label = "expnum", title = dfs[i]['band'].iloc[0],width=500,height=500)
+        p = figure(tools = [HoverTool(tooltips = [('expnum','@expnum'),('program', '@program'),('teff','@t_eff'),('accepted','@assessment'),('attempt','@attnum')]),BoxZoomTool(),ResetTool(),WheelZoomTool()], x_axis_label = "t_eff", y_axis_label = "expnum", title = dfs[i]['band'].iloc[0],width=500,height=500)
         p.scatter('t_eff','expnum',source=create_data_source(df_false),fill_color='red',line_color='white',alpha=0.5)
         p.scatter('t_eff','expnum',source=create_data_source(df_true),fill_color='green',line_color='white',alpha=0.5)
         h =  Histogram(dfs[i]['t_eff'], bins= 50, color='skyblue', width=500, height=500,title=dfs[i]['band'].iloc[0])
-        plots.append([hplot(p,h)])
-    gs = gridplot(*plots)
+        plots.append(hplot(p,h))
+    return plots
 
-    """
-    #new_df = dataframe[(dataframe.band=='g')]['t_eff']+10
-    new_df = dataframe[(dataframe.band=='g')]
-    print new_df
-    gs =  Histogram(new_df,'t_eff', bins=50,color='skyblue',
-          title='Distribution of t_eff')
-
-    #html = file_html(gs,CDN,"t_eff")
-    #with open('/Users/mjohns44/GIT_DESDM/desdm-dash-mjohns44/desdm-dash/app/templates/t_eff.html','w') as myfile:
-        # /work/devel/mjohns44/git/desdm-dash/app/templates/t_eff.html','w') as myfile:
-     #   myfile.write(html)
-    #figscript,figdiv = components(gs)
-    #return (figscript,figdiv)
-    return gs
+if __name__=='__main__':
+    import get_data
+    df,columns,reqnum,mean_times,updated = get_data.processing_detail(db,reqnum)
+    df2 = df.dropna()
+    df_pass = df[df.status==0].dropna()
+    df_teff = df_pass
+    df_teff.t_eff.replace(0,'None')
+    plots = []
+    try: 
+        times = plotter.plot_times(df_pass)
+        plots.append(times)
+    except:
+        pass
+    try:
+        assess = plotter.plot_accepted(df_pass)
+        plots.append(assess)
+    except:
+        pass
+    try:
+        exechost = plotter.plot_exec_time(df_pass)
+        plots.append(exechost)
+    except:
+        pass
+    try:
+        fails = plotter.plot_status_per_host(df2)
+        plots.append(fails)
+    except:
+        pass
+    try:
+        teff =plotter.plot_t_eff(df_teff[(df_teff.t_eff !='None')])
+    except:
+        pass
+    html = file_html(vplot(*plots),CDN,'plots')
+    path = '/Users/mjohns44/GIT_DESDM/desdm-dash-celery-redis/app/templates/reports'
+    filename = 'plots_{reqnum}'.format(reqnum=reqnum)
+    filepath = os.path.join(path,filename)
+    with open(filepath,'w') as h:
+        h.write('<center>\n')
+        h.write(html)
+        h.write('</center>\n')
