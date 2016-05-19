@@ -5,11 +5,8 @@ import pandas
 import time
 from datetime import datetime
 import query
-from app import celery
-#csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
-csv_path = '/Users/mjohns44/GIT_DESDM/desdm-dash-mjohns44/desdm-dash/app/static/processing.csv'
+csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
 
-@celery.task()
 def processing_summary(db,project,df=None):
     if not df:
         try: 
@@ -89,7 +86,6 @@ def processing_summary(db,project,df=None):
     except: columns = []
     return (current_dict,rest_dict,columns,updated)
 
-@celery.task()
 def processing_detail(db,reqnum):
     try: 
         df = pandas.read_csv(csv_path,skiprows=1)
