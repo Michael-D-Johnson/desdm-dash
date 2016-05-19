@@ -1,8 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="{{
-  url_for('static', filename='jquery-1.11.3.min.js') }}">\x3C/script>')</script>
 <h5> Last updated on: {{updated.split('#')[1] }}</h5>
 <center>
 {% for dict in [current_dict,rest_dict] %}

@@ -2,15 +2,8 @@
 {% block content %}
 <h5> Last updated on: {{updated.split('#')[1]}}</h5>
 <center>
-<h1> Processing Times </h1>
-<h3><u>Min:</u> {{ df[df.status==0]['total time'].min()}} <u>Max:</u> {{ df[df.status==0]['total time'].max()}} <u>Avg:</u> {{ mean_times}}</h3>
+{% include filename %}
 
-{% if figdiv %}
-{{figdiv|safe }}
-{% endif %}
-{% if figscript %}
-{{figscript|safe }}
-{% endif %}
 <h1> Processing Attempts </h1>
 <table class="normal" border="1">
 <tr>
