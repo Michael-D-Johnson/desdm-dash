@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 from bokeh.resources import CDN
 from bokeh.embed import components,file_html
