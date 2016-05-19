@@ -41,10 +41,10 @@ plots.append(p4)
 #    p.write(html1)
 
 def create_data_source(df):
-    return ColumnDataSource(data=dict(t_eff=df['t_eff'],expnum=df['expnum'],program=df['program'],accepted=df['assessment'],attnum=df['attnum']))
+    return ColumnDataSource(data=dict(t_eff=df['t_eff'],expnum=df['expnum'],program=df['program'],accepted=df['assessment'],attnum=df['attnum'],band=df['band']))
 df_false = dataframe[dataframe['assessment']=='False']
 df_true = dataframe[dataframe['assessment']=='True']
-p = figure(tools = [HoverTool(tooltips = [('expnum','@expnum'),('program', '@program'),('teff','@t_eff'),('attempt','@attnum')]),BoxZoomTool(),ResetTool(),WheelZoomTool()], x_axis_label = "expnum", y_axis_label = "t_eff", title = 't_eff',width=1000,height=500)
+p = figure(tools = [HoverTool(tooltips = [('expnum','@expnum'),('band','@band'),('program', '@program'),('teff','@t_eff'),('attempt','@attnum')]),BoxZoomTool(),ResetTool(),WheelZoomTool()], x_axis_label = "expnum", y_axis_label = "t_eff", title = 't_eff',width=1000,height=500)
 p.scatter('expnum','t_eff',source=create_data_source(df_false),fill_color='red',line_color='white',alpha=0.5)
 p.scatter('expnum','t_eff',source=create_data_source(df_true),fill_color='green',line_color='white',alpha=0.5)
 p.xaxis[0].formatter = NumeralTickFormatter(format="000000")

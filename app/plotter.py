@@ -53,20 +53,17 @@ def plot_status_per_host(dataframe):
 
 @celery.task()
 def plot_t_eff(dataframe):
-    bands = ['u','g','r','i','z','Y','VR']
-    dfs = [dataframe[dataframe['band']==n] for n in bands]
-    dfs = [d for d in dfs if len(d)>0]
     def create_data_source(df):
-        return ColumnDataSource(data=dict(t_eff=df['t_eff'],expnum=df['expnum'],program=df['program'],accepted=df['assessment'],attnum=df['attnum']))
+        return ColumnDataSource(data=dict(t_eff=df['t_eff'],expnum=df['expnum'],program=df['program'],accepted=df['assessment'],attnum=df['attnum'],band=df['band']))
     plots = []
-    for i in range(0,len(dfs)):
-        df_false = dfs[i][dfs[i]['assessment']=='False']
-        df_true = dfs[i][dfs[i]['assessment']=='True']
-        p = figure(tools = [HoverTool(tooltips = [('expnum','@expnum'),('program', '@program'),('teff','@t_eff'),('accepted','@assessment'),('attempt','@attnum')]),BoxZoomTool(),ResetTool(),WheelZoomTool()], x_axis_label = "t_eff", y_axis_label = "expnum", title = dfs[i]['band'].iloc[0],width=500,height=500)
-        p.scatter('t_eff','expnum',source=create_data_source(df_false),fill_color='red',line_color='white',alpha=0.5)
-        p.scatter('t_eff','expnum',source=create_data_source(df_true),fill_color='green',line_color='white',alpha=0.5)
-        h =  Histogram(dfs[i]['t_eff'], bins= 50, color='skyblue', width=500, height=500,title=dfs[i]['band'].iloc[0])
-        plots.append(hplot(p,h))
+    df_false = dataframe[dataframe['assessment']=='False']
+    df_true = dataframe[dataframe['assessment']=='True']
+    p = figure(tools = [HoverTool(tooltips = [('expnum','@expnum'),('band','@band'),('program', '@program'),('teff','@t_eff'),('accepted','@assessment'),('attempt','@attnum')]),BoxZoomTool(),ResetTool(),WheelZoomTool()], x_axis_label = "t_eff", y_axis_label = "expnum", title = 't_eff',width=1000,height=500)
+    p.scatter('t_eff','expnum',source=create_data_source(df_false),fill_color='red',line_color='white',alpha=0.5)
+    p.scatter('t_eff','expnum',source=create_data_source(df_true),fill_color='green',line_color='white',alpha=0.5)
+    h =  Histogram(dataframe['t_eff'], bins= 50, color='skyblue', width=1000, height=500)
+    plots.append(p)
+    plots.append(h)
     return plots
 
 if __name__=='__main__':
@@ -99,6 +96,7 @@ if __name__=='__main__':
         pass
     try:
         teff =plotter.plot_t_eff(df_teff[(df_teff.t_eff !='None')])
+        for p in teff: plots.append(p)
     except:
         pass
     html = file_html(vplot(*plots),CDN,'plots')

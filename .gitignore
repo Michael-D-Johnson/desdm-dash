@@ -5,3 +5,4 @@
 celery.out
 redis.out
 dump.rdb
+/app/templates/reports/*

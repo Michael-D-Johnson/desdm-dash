@@ -35,8 +35,9 @@ def processing_detail(db,reqnum):
     detail = get_data.processing_detail.delay(db,reqnum)
     detail.wait()
     df,columns,reqnum,mean_times,updated = detail.get()
+    filename = 'reports/plots_{reqnum}.html'.format(reqnum=reqnum)
     return render_template('processing_detail_include.html',columns=columns,df = df,
-           reqnum=reqnum, mean_times=mean_times,db=db,updated = updated)
+           reqnum=reqnum, mean_times=mean_times,db=db,updated = updated,filename=filename)
 
 @app.route('/teff')
 def teff():
