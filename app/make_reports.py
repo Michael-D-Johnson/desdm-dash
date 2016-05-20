@@ -36,7 +36,7 @@ if __name__ =='__main__':
             df_test_expnum.insert(len(df_test_expnum.columns),'unitname',None)
             df_test_expnum.insert(len(df_test_expnum.columns),'reqnum',None)
             df_test_expnum.insert(len(df_test_expnum.columns),'attnum',None)
-        for df in [df_test_status,df_test_expnum,df_test_nites]:
+        for df in [df_test_status,df_test_expnum,df_test_nites,df_test_teffs]:
             df_test = pandas.merge(df_test,df,on=['unitname','reqnum','attnum'],how='left',suffixes=('_orig',''))
         df_test['db'] = 'db-destest'
     else:
@@ -60,7 +60,7 @@ if __name__ =='__main__':
                 columns = ['unitname','reqnum','attnum','expnum','t_eff'])
         except:
             df_oper['t_eff'] = None
-        for df in [df_oper_status,df_oper_expnum,df_oper_nites]:
+        for df in [df_oper_status,df_oper_expnum,df_oper_nites,df_oper_teffs]:
             df_oper = pandas.merge(df_oper,df,on=['unitname','reqnum','attnum'],how='left',suffixes=('_orig',''))
         df_oper['db'] ='db-desoper'
     else:
