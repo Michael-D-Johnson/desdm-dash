@@ -111,7 +111,7 @@ if __name__ =='__main__':
             pass
         html = file_html(vplot(*plots),CDN,'plots')
         path = '/work/devel/mjohns44/git/desdm-dash/app/templates/reports'
-        filename = 'plots_{reqnum}'.format(reqnum=reqnum)
+        filename = 'plots_{reqnum}.html'.format(reqnum=reqnum)
         filepath = os.path.join(path,filename)
         with open(filepath,'w') as h:
             h.write('<center>\n')
