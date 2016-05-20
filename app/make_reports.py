@@ -2,6 +2,15 @@
 import os
 import pandas
 from datetime import datetime
+
+from bokeh.resources import CDN
+from bokeh.embed import file_html
+from bokeh.plotting import figure,ColumnDataSource
+from bokeh.models import (HoverTool, BoxSelectTool, BoxZoomTool,
+                          PanTool, ResetTool,WheelZoomTool,
+                          glyphs,Legend)
+from bokeh.charts import Scatter,Bar,Histogram,color
+from bokeh.io import vplot,hplot,gridplot
 import query
 
 csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
