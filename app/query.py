@@ -85,3 +85,8 @@ def get_nites(cur,reqnums):
     query = "select distinct a.unitname,a.reqnum,a.attnum, v.val from pfw_attempt a,pfw_attempt_val v where key in ('nite','range') and a.attnum=v.attnum and a.unitname=v.unitname and a.reqnum=v.reqnum and a.reqnum in (%s)" % (reqnums)
     cur.execute(query)
     return cur.fetchall()
+
+def get_teffs(cur,reqnums):
+    query = "select distinct a.unitname,a.reqnum,a.attnum, e.expnum, e.t_eff from pfw_attempt a,finalcut_eval e where and a.attnum=e.attnum and a.unitname=e.unitname and a.reqnum=e.reqnum and a.reqnum in (%s)" % (reqnums)
+    cur.execute(query)
+    return cur.fetchall()

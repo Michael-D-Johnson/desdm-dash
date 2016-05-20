@@ -22,6 +22,12 @@ if __name__ =='__main__':
                 query.get_nites(query.cursor('db-destest'),','.join(test_reqnums)),
                 columns = ['unitname','reqnum','attnum','nite'])
         try:
+            df_test_teffs = pandas.DataFrame(
+                query.get_expnum_info(query.cursor('db-destest'),','.join(test_reqnums)),
+                columns = ['unitname','reqnum','attnum','expnum','t_eff'])
+        except:
+            df_teset['t_eff'] = None
+        try:
             df_test_expnum = pandas.DataFrame(
                 query.get_expnum_info(query.cursor('db-destest'),','.join(test_reqnums)),
                 columns = ['unitname','reqnum','attnum','expnum','band'])
@@ -48,6 +54,12 @@ if __name__ =='__main__':
         df_oper_expnum = pandas.DataFrame(
                 query.get_expnum_info(query.cursor('db-desoper'),','.join(oper_reqnums)),
                 columns = ['unitname','reqnum','attnum','expnum','band'])
+        try:
+            df_oper_teffs = pandas.DataFrame(
+                query.get_expnum_info(query.cursor('db-desoper'),','.join(oper_reqnums)),
+                columns = ['unitname','reqnum','attnum','expnum','t_eff'])
+        except:
+            df_oper['t_eff'] = None
         for df in [df_oper_status,df_oper_expnum,df_oper_nites]:
             df_oper = pandas.merge(df_oper,df,on=['unitname','reqnum','attnum'],how='left',suffixes=('_orig',''))
         df_oper['db'] ='db-desoper'
