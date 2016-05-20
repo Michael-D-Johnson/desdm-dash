@@ -61,7 +61,7 @@ if __name__ =='__main__':
     df_master.to_csv(csv_path,index=False,mode='a')
     
     # Make plots html
-    for reqnum,group in df_master.groupby(by=['reqnum'])
+    for reqnum,group in df_master.groupby(by=['reqnum']):
         df2 = group.dropna()
         df_pass = group[group.status==0].dropna()
         df_teff = df_pass
