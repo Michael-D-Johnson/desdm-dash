@@ -105,7 +105,10 @@ def processing_detail(db,reqnum):
 
         df.insert(len(df.columns),'assessment', None)
         df.insert(len(df.columns),'program', None)
-        df.insert(len(df.columns),'t_eff', None)
+        try:
+            df.insert(len(df.columns),'t_eff', None)
+        except:
+            pass
         df.insert(13,'total time', None)
         def rename(row):
             row['submit_site'] = row['submit_site'].split('.')[0]
