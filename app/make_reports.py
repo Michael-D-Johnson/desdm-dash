@@ -57,7 +57,7 @@ if __name__ =='__main__':
     df_master = pandas.concat(dfs)
         
     with open(csv_path,'w') as csv:
-        csv.write('#%s\n' % datetime.datetime.now())
+        csv.write('#%s\n' % datetime.now())
     df_master.to_csv(csv_path,index=False,mode='a')
     
     # Make plots html
