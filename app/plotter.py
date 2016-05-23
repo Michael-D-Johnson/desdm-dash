@@ -16,7 +16,12 @@ def plot_times(dataframe):
     p = Histogram(dataframe,'total time',bins=24, color = 'green',
         title="Processing Times",height=500,width=1000)
     figscript,figdiv = components(p)
-
+    text = """Mean: {mean}
+            Min: {min}
+            Max: {max}""".format(mean=round(dataframe[dataframe.status==0]['total time'].mean(skipna=True),3),min = dataframe[dataframe.status==0]['total time'].min(),max=dataframe[dataframe.status==0]['total time'].max())
+    print (p.x_range.end)
+    mytext = glyphs.Text(x=p.x_range.end-5, y=p.y_range.end - 5,text=[text],text_font_size='10pt')
+    p.add_glyph(mytext)
     #return (figscript,figdiv)
     return p
 
