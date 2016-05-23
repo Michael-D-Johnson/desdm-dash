@@ -19,8 +19,7 @@ def plot_times(dataframe):
     text = """Mean: {mean}
             Min: {min}
             Max: {max}""".format(mean=round(dataframe[dataframe.status==0]['total time'].mean(skipna=True),3),min = dataframe[dataframe.status==0]['total time'].min(),max=dataframe[dataframe.status==0]['total time'].max())
-    print (p.x_range.end)
-    mytext = glyphs.Text(x=p.x_range.end-5, y=p.y_range.end - 5,text=[text],text_font_size='10pt')
+    mytext = glyphs.Text(x=p.x_range.end-(p.x_range.end/3), y=p.y_range.end - (p.y_range.end/3),text=[text],text_font_size='10pt')
     p.add_glyph(mytext)
     #return (figscript,figdiv)
     return p
