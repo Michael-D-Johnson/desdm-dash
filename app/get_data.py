@@ -86,13 +86,14 @@ def processing_summary(db,project,df=None):
     except: columns = []
     return (current_dict,rest_dict,columns,updated)
 
-def processing_detail(db,reqnum):
-    try: 
-        df = pandas.read_csv(csv_path,skiprows=1)
-        with open(csv_path,'r') as csvfile:
-            updated = csvfile.readlines()[0]
-    except IOError: 
-        sys.exit()
+def processing_detail(db,reqnum,df=None,updated=None):
+    if df is None:
+        try: 
+            df = pandas.read_csv(csv_path,skiprows=1)
+            with open(csv_path,'r') as csvfile:
+                updated = csvfile.readlines()[0]
+        except IOError: 
+            sys.exit()
     df = df[df.reqnum==int(reqnum)]
     if not len(df):
         results = query.processing_basic(query.cursor(db),reqnum)
@@ -107,8 +108,7 @@ def processing_detail(db,reqnum):
         df.insert(len(df.columns),'program', None)
         try:
             df.insert(len(df.columns),'t_eff', None)
-        except:
-            pass
+        except: pass
         df.insert(13,'total time', None)
         def rename(row):
             row['submit_site'] = row['submit_site'].split('.')[0]
@@ -122,8 +122,8 @@ def processing_detail(db,reqnum):
             index = df[(df['unitname']==name[0]) & (df['reqnum']==name[1]) & (df['attnum']==name[2])].index[0]
             df.loc[index,('start_time','end_time')] = group['start_time'].min(),group['end_time'].max()
             try:
-                start = datetime.strptime(str(group['start_time'].min()[:19]),'%Y-%m-%d %H:%M:%S')
-                end = datetime.strptime(str(group['end_time'].max()[:19]),'%Y-%m-%d %H:%M:%S')
+                start = datetime.strptime(str(group['start_time'].min())[:19],'%Y-%m-%d %H:%M:%S')
+                end = datetime.strptime(str(group['end_time'].max())[:19],'%Y-%m-%d %H:%M:%S')
 
                 total_time = (end - start)/pandas.Timedelta(hours=1)
                 df.loc[index,('total time')] = round(total_time,3)
@@ -138,7 +138,8 @@ def processing_detail(db,reqnum):
                 assess,t_eff,program = 'None','None','None'
 
             df.loc[index,('assessment')] = assess
-            df.loc[index,('t_eff')] = t_eff
+            try: df.loc[index,('t_eff')] = round(float(t_eff),4)
+            except: df.loc[index,('t_eff')] = t_eff
             df.loc[index,('program')] = program
 
         mean_times =round(df[df.status==0]['total time'].mean(skipna=True),3)

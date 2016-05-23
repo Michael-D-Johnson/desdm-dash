@@ -6,7 +6,8 @@ from datetime import datetime
 from bokeh.resources import CDN
 from bokeh.embed import file_html
 from bokeh.io import vplot
-
+import plotter
+import get_data
 import query
 
 csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
@@ -27,12 +28,6 @@ if __name__ =='__main__':
                 query.get_nites(query.cursor('db-destest'),','.join(test_reqnums)),
                 columns = ['unitname','reqnum','attnum','nite'])
         try:
-            df_test_teffs = pandas.DataFrame(
-                query.get_expnum_info(query.cursor('db-destest'),','.join(test_reqnums)),
-                columns = ['unitname','reqnum','attnum','expnum','t_eff'])
-        except:
-            df_teset['t_eff'] = None
-        try:
             df_test_expnum = pandas.DataFrame(
                 query.get_expnum_info(query.cursor('db-destest'),','.join(test_reqnums)),
                 columns = ['unitname','reqnum','attnum','expnum','band'])
@@ -41,7 +36,7 @@ if __name__ =='__main__':
             df_test_expnum.insert(len(df_test_expnum.columns),'unitname',None)
             df_test_expnum.insert(len(df_test_expnum.columns),'reqnum',None)
             df_test_expnum.insert(len(df_test_expnum.columns),'attnum',None)
-        for df in [df_test_status,df_test_expnum,df_test_nites,df_test_teffs]:
+        for df in [df_test_status,df_test_expnum,df_test_nites]:
             df_test = pandas.merge(df_test,df,on=['unitname','reqnum','attnum'],how='left',suffixes=('_orig',''))
         df_test['db'] = 'db-destest'
     else:
@@ -59,28 +54,27 @@ if __name__ =='__main__':
         df_oper_expnum = pandas.DataFrame(
                 query.get_expnum_info(query.cursor('db-desoper'),','.join(oper_reqnums)),
                 columns = ['unitname','reqnum','attnum','expnum','band'])
-        try:
-            df_oper_teffs = pandas.DataFrame(
-                query.get_expnum_info(query.cursor('db-desoper'),','.join(oper_reqnums)),
-                columns = ['unitname','reqnum','attnum','expnum','t_eff'])
-        except:
-            df_oper['t_eff'] = None
-        for df in [df_oper_status,df_oper_expnum,df_oper_nites,df_oper_teffs]:
+        for df in [df_oper_status,df_oper_expnum,df_oper_nites]:
             df_oper = pandas.merge(df_oper,df,on=['unitname','reqnum','attnum'],how='left',suffixes=('_orig',''))
         df_oper['db'] ='db-desoper'
     else:
         df_oper = pandas.DataFrame()
     dfs = [df_oper,df_test]
     df_master = pandas.concat(dfs)
-        
+    updated = datetime.now()    
     with open(csv_path,'w') as csv:
-        csv.write('#%s\n' % datetime.now())
+        csv.write('#%s\n' % updated)
     df_master.to_csv(csv_path,index=False,mode='a')
-    
+
+    df_master = pandas.read_csv(csv_path,skiprows=1)
+    updated = datetime.now()
     # Make plots html
     for reqnum,group in df_master.groupby(by=['reqnum']):
-        df2 = group.dropna()
-        df_pass = group[group.status==0].dropna()
+        print group.db.unique()[0],reqnum
+        df,columns,reqnum,mean_times,updated = get_data.processing_detail(group.db.unique()[0],reqnum,group,updated=updated)
+        df2 = df.dropna()
+        df_pass = df[df.status==0].dropna()
+
         df_teff = df_pass
         df_teff.t_eff.replace(0,'None')
         plots = []
@@ -100,13 +94,14 @@ if __name__ =='__main__':
         except:
             pass
         try:
-            fails = plotter.plot_status_per_host(df2)
+            fails = plotter.plot_status_per_host(df)
             plots.append(fails)
         except:
             pass
         try:
-            teff =plotter.plot_t_eff(df_teff[(df_teff.t_eff !='None')])
-            for p in teff: plots.append(p)
+            if len(df_teff.t_eff):
+                teff =plotter.plot_t_eff(df_teff[(df_teff.t_eff !='None')])
+                for p in teff: plots.append(p)
         except:
             pass
         html = file_html(vplot(*plots),CDN,'plots')

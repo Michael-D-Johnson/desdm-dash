@@ -2,10 +2,11 @@
 {% block content %}
 <h5> Last updated on: {{updated.split('#')[1] }}</h5>
 <center>
-{% for dict in [current_dict,rest_dict] %}
-{% if dict == current_dict %}
+{% for i, dict in [(0,current_dict),(1,rest_dict)] %}
+{% if i ==0 %}
 <h2> Currently running: </h2>
-{% else %}
+{% endif %}
+{% if i == 1 %}
 <h2> Runs in the last four days: </h2>
 {% endif %}
 {% if not dict %}
