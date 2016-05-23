@@ -66,11 +66,9 @@ if __name__ =='__main__':
         csv.write('#%s\n' % updated)
     df_master.to_csv(csv_path,index=False,mode='a')
 
-    df_master = pandas.read_csv(csv_path,skiprows=1)
     updated = datetime.now()
     # Make plots html
     for reqnum,group in df_master.groupby(by=['reqnum']):
-        print group.db.unique()[0],reqnum
         df,columns,reqnum,mean_times,updated = get_data.processing_detail(group.db.unique()[0],reqnum,group,updated=updated)
         df2 = df.dropna()
         df_pass = df[df.status==0].dropna()
