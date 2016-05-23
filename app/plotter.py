@@ -64,10 +64,29 @@ def plot_t_eff(dataframe):
 
     p.xaxis[0].formatter = NumeralTickFormatter(format="000000")
     plots.append(p)
-
+    
     try:
         h =  Histogram(dataframe['t_eff'], bins=25, color='skyblue', width=1000, height=500)
         plots.append(h)
     except:
+        h = np_hist(dataframe)
+        plots.append(h)
+    else:
         pass
     return plots
+
+def np_hist(dataframe):
+    import numpy as np
+    TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
+    p2 = figure(tools = TOOLS, x_axis_label = "t_eff", y_axis_label = "expnum", title = 't_eff',width=1000,height=500)
+
+    h,edges = np.histogram(dataframe['t_eff'].values, bins=np.linspace(0,2,40))
+    p2.quad(top=h, bottom=0, left=edges[:-1], right=edges[1:], fill_color="#036564", line_color="#033649")
+    text = """Mean: {mean}
+            Min: {min}
+            Max: {max}""".format(mean=round(dataframe.t_eff.mean(skipna=True),3),min = dataframe.t_eff.min(),max=dataframe.t_eff.max())
+    mytext = glyphs.Text(x=edges[-1]-(edges[-1]/3),y=h.max()-(h.max()/3),text=[text],text_font_size='10pt')
+    p2.add_glyph(mytext)
+
+    return p2
+

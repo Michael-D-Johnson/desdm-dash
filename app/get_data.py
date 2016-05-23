@@ -13,8 +13,10 @@ def processing_summary(db,project,df=None):
             df = pandas.read_csv(csv_path,skiprows=1)
             with open(csv_path,'r') as csvfile:
                 updated = csvfile.readlines()[0]
-        except IOError: sys.exit() 
-
+        except (ValueError,IOError):
+            updated = '#{time}'.format(time=datetime.now())
+            df = pandas.DataFrame(columns=['created_date','project','campaign','unitname','reqnum','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_site','exec_host','db']) 
+    
     df = df.sort(columns=['reqnum','unitname','attnum'],ascending=False)
     df = df.fillna(-99)
     if project =='TEST':
@@ -96,11 +98,7 @@ def processing_detail(db,reqnum,df=None,updated=None):
             sys.exit()
     df = df[df.reqnum==int(reqnum)]
     if not len(df):
-        results = query.processing_basic(query.cursor(db),reqnum)
-        df = pandas.DataFrame(results,columns=['created_date','project','campaign','unitname','reqnum','attnum','status','data_state','operator','pipeline','target_site','submit_site','exec_host'])
-        df = df.sort(columns=['unitname','attnum'],ascending=False)
-        columns = df.columns
-        return (df,columns,reqnum,None)
+        df = pandas.DataFrame(columns=['project','campaign','pipeline','reqnum','unitname','attnum','status','data_state','operator','target_site','submit_site','exec_host','start_time','end_time','total time','assessment','t_eff'])
     else:
         columns = ['project','campaign','pipeline','reqnum','unitname','attnum','status','data_state','operator','target_site','submit_site','exec_host','start_time','end_time','total time','assessment','t_eff']
 
@@ -142,5 +140,4 @@ def processing_detail(db,reqnum,df=None,updated=None):
             except: df.loc[index,('t_eff')] = t_eff
             df.loc[index,('program')] = program
 
-        mean_times =round(df[df.status==0]['total time'].mean(skipna=True),3)
-        return (df,columns,reqnum,mean_times,updated)
+        return (df,columns,reqnum,updated)

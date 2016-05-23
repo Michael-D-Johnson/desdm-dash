@@ -69,7 +69,7 @@ if __name__ =='__main__':
     updated = datetime.now()
     # Make plots html
     for reqnum,group in df_master.groupby(by=['reqnum']):
-        df,columns,reqnum,mean_times,updated = get_data.processing_detail(group.db.unique()[0],reqnum,group,updated=updated)
+        df,columns,reqnum,updated = get_data.processing_detail(group.db.unique()[0],reqnum,group,updated=updated)
         df2 = df.dropna()
         df_pass = df[df.status==0].dropna()
 
