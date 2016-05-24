@@ -10,7 +10,7 @@ csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
 templates = '/work/devel/mjohns44/git/desdm-dash/app/templates/reports'
 
 def processing_archive():
-    reqnums = os.path.listdir(templates)
+    reqnums = os.listdir(templates)
     return reqnums
 
 def processing_summary(db,project,df=None):
