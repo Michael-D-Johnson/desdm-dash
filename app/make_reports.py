@@ -105,7 +105,7 @@ if __name__ =='__main__':
             pass
         
         # Creating output path
-        path = '/Users/mjohns44/GIT_DESDM/desdm-dash-mjohns44/desdm-dash/app/templates/reports/{reqnum}'.format(reqnum=reqnum)
+        path = '/work/mjohns44/git/desdm-dash/app/templates/reports/{reqnum}'.format(reqnum=reqnum)
         if not os.path.isdir(path): os.makedirs(path)
 
         # Writing CSV
