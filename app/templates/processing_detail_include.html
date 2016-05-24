@@ -1,44 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
-<h5> Last updated on: {{updated.split('#')[1]}}</h5>
-<center>
-{% include filename %}
 
-<h1> Processing Attempts </h1>
-<table class="normal" border="1">
-<tr>
-{% for col in columns %}
-    <th>
-        {{ col }}
-    </th>
-{% endfor %}
-</tr>
-{% for key,row in df.iterrows() %}
-<tr>
-    {% for col in columns %}
-        {% if col == 'status' %}
-            {% if row[col] == 0 %}
-            <td bgcolor="#00FF00"> {{ row[col] }} </td>
-            {% elif row[col] in [-9,1,2,5,6,8,9,127,135,139,247] %}
-            <td bgcolor="#FF0000"> {{ row[col] }} </td>
-            {% else %}
-            <td bgcolor="#FF9900"> {{ row[col] }} </td>
-            {% endif %}
-        {% elif col == 'assessment' %}
-            {% if row[col] == 'True' %}
-            <td bgcolor="#00FF00"> {{ row[col] }} </td>
-            {% elif  row[col] == 'False' %}
-            <td bgcolor="#FF0000"> {{ row[col] }} </td>
-            {% else %}
-            <td bgcolor="#FF9900"> {{ row[col] }} </td>
-            {% endif %}
-        {% else %}
-            <td>  {{ row[col] }} </td>
-        {% endif %}
-    {% endfor %}
-    </tr>
-{% endfor %}
-</table>
-
-</center>
+{% include 'reportname' %}
 {% endblock %}

@@ -10,6 +10,8 @@ import plotter
 import get_data
 import query
 
+from app import app
+
 csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
 
 if __name__ =='__main__':
@@ -66,7 +68,6 @@ if __name__ =='__main__':
         csv.write('#%s\n' % updated)
     df_master.to_csv(csv_path,index=False,mode='a')
 
-    updated = datetime.now()
     # Make plots html
     for reqnum,group in df_master.groupby(by=['reqnum']):
         df,columns,reqnum,updated = get_data.processing_detail(group.db.unique()[0],reqnum,group,updated=updated)
@@ -102,11 +103,31 @@ if __name__ =='__main__':
                 for p in teff: plots.append(p)
         except:
             pass
+        
+        # Creating output path
+        path = '/Users/mjohns44/GIT_DESDM/desdm-dash-mjohns44/desdm-dash/app/templates/reports/{reqnum}'.format(reqnum=reqnum)
+        if not os.path.isdir(path): os.makedirs(path)
+
+        # Writing CSV
+        req_csv = '{reqnum}.csv'.format(reqnum=reqnum)
+        group.to_csv(os.path.join(path,req_csv))
+
+        # Writing plots to HTML
         html = file_html(vplot(*plots),CDN,'plots')
-        path = '/work/devel/mjohns44/git/desdm-dash/app/templates/reports'
         filename = 'plots_{reqnum}.html'.format(reqnum=reqnum)
+        includepath = 'reports/{reqnum}/{file}'.format(reqnum=reqnum,file=filename)
         filepath = os.path.join(path,filename)
         with open(filepath,'w') as h:
             h.write('<center>\n')
             h.write(html)
             h.write('</center>\n')
+
+        # Writing reports to HTML
+        template = app.jinja_env.get_template('processing_detail_plots.html')
+        output_from_parsed_template = template.render(
+                        columns=columns,df=group,reqnum=reqnum,
+                        db = group.db.unique(), updated=updated,filename=includepath)
+        reportfile = "{reqnum}_report.html".format(reqnum=reqnum)
+        reportpath = os.path.join(path,reportfile)
+        with open(reportpath, "wb") as fh:
+            fh.write(output_from_parsed_template)

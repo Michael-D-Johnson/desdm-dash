@@ -5,6 +5,7 @@ import plotter
 from app import app
 from bokeh.embed import components
 from bokeh.io import vplot
+
 @app.route('/')
 @app.route('/index')
 def index():
@@ -24,10 +25,8 @@ def testing_summary():
 
 @app.route('/processing_detail/<db>/<reqnum>')
 def processing_detail(db,reqnum):
-    df,columns,reqnum,mean_times,updated = get_data.processing_detail(db,reqnum)
-    filename = 'reports/plots_{reqnum}.html'.format(reqnum=reqnum)
-    return render_template('processing_detail_include.html',columns=columns,df = df,
-           reqnum=reqnum, mean_times=mean_times,db=db,updated = updated,filename=filename)
+    reportname = 'reports/{reqnum}/{reqnum}_report.html'.format(reqnum=reqnum)
+    return render_template('processing_detail_include.html',db = db,reportname=reportname)
 
 @app.route('/teff')
 def teff():
