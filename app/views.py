@@ -13,7 +13,7 @@ def index():
 
 @app.route('/processing_archive')
 def processing_archive():
-    reqnums = sorted(get_data.processing_archive())
+    reqnums = sorted(get_data.processing_archive(),ascending=False)
     return render_template('processing_archive.html',reqnums = reqnums)
 
 @app.route('/processing_summary')
@@ -28,10 +28,10 @@ def testing_summary():
 
     return render_template('testing_summary.html',columns=columns,current_dict=current_dict,rest_dict=rest_dict,tcurrent_dict=tcurrent_dict,trest_dict=trest_dict,tcolumns=tcolumns,updated=updated)
 
-@app.route('/processing_detail/<db>/<reqnum>')
-def processing_detail(db,reqnum):
-    reportname = 'reports/{reqnum}/{reqnum}_report.html'.format(reqnum=reqnum)
-    return render_template('processing_detail_include.html',db = db,reportname=reportname)
+@app.route('/processing_detail/<reqnum>')
+def processing_detail(reqnum):
+    reportname = 'reports/{reqnum}/report_{reqnum}.html'.format(reqnum=reqnum)
+    return render_template('processing_detail_include.html',reportname=reportname)
 
 @app.route('/teff')
 def teff():

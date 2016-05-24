@@ -2,7 +2,7 @@
 {% block content %}
 <center>
 {% for req in reqnums %}
-    <a href="{{ url_for('reports/{reqnum}/report_{reqnum}.html'.format(reqnum=req))}}"></a>
+    <a href="{{url_for('processing_detail',reqnum=req)}}">{{'report_{reqnum}.html'.format(reqnum=req)}}</a><br>
 {% endfor %}
 </center>
 {% endblock %}
