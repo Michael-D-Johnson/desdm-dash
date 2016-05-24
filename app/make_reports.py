@@ -12,13 +12,36 @@ import query
 
 from app import app
 
+# Creating command-line arguments
+from configargparse import ArgParser
+parser = ArgParser()
+parser.add('--db_section')
+parser.add('--reqnums')
+args = parser.parse_args()
+if args.reqnums:
+    reqnums = [str(r) for r in args.reqnums.split(',')]
+else:
+    reqnums = None
+if args.db_section:
+    db = args.db_section
+else:
+    db = None
+
 csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
 
-if __name__ =='__main__':
-    #1. get reqnums from last four days
-    #2. create dataframe for all reqnums in both databases
-    test_reqnums = [str(r) for r in query.get_reqnums(query.cursor('db-destest'))]
-    oper_reqnums = [str(r) for r in query.get_reqnums(query.cursor('db-desoper'))]
+def make_reports(db=None,reqnums=None):
+    if db is None and reqnum is None: 
+        #1. get reqnums from last four days
+        #2. create dataframe for all reqnums in both databases
+        test_reqnums = [str(r) for r in query.get_reqnums(query.cursor('db-destest'))]
+        oper_reqnums = [str(r) for r in query.get_reqnums(query.cursor('db-desoper'))]
+    else:
+        if db=='db-destest':
+            test_reqnums = reqnums
+            oper_reqnums = None
+        elif db=='db-desoper':
+            oper_reqnums = reqnums
+            test_reqnums = None
     if test_reqnums:
         df_test = pandas.DataFrame(
                 query.processing_summary(query.cursor('db-destest'),','.join(test_reqnums)),
@@ -131,3 +154,6 @@ if __name__ =='__main__':
         reportpath = os.path.join(path,reportfile)
         with open(reportpath, "wb") as fh:
             fh.write(output_from_parsed_template)
+
+if __name__ =='__main__':
+    make_reports(db=db,reqnums=reqnums)
