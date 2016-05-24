@@ -13,8 +13,8 @@ def index():
 
 @app.route('/processing_archive')
 def processing_archive():
-    current_dict,rest_dict,columns,updated = get_data.processing_archive()
-    return render_template('processing_summary.html',columns=columns,current_dict=current_dict,rest_dict=rest_dict,updated=updated)
+    reqnums = get_data.processing_archive().sorted()
+    return render_template('processing_archive.html',reqnums = reqnums)
 
 @app.route('/processing_summary')
 def processing_summary():
