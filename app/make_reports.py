@@ -128,7 +128,7 @@ def make_reports(db=None,reqnums=None):
             pass
         
         # Creating output path
-        path = '/work/mjohns44/git/desdm-dash/app/templates/reports/{reqnum}'.format(reqnum=reqnum)
+        path = '/work/devel/mjohns44/git/desdm-dash/app/templates/reports/{reqnum}'.format(reqnum=reqnum)
         if not os.path.isdir(path): os.makedirs(path)
 
         # Writing CSV
