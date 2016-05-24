@@ -11,7 +11,7 @@ templates = '/work/devel/mjohns44/git/desdm-dash/app/templates/reports'
 
 def processing_archive():
     reqnums = os.path.listdir(templates)
-    pass
+    return reqnums
 
 def processing_summary(db,project,df=None):
     if not df:
