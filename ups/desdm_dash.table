@@ -5,5 +5,5 @@ SetupRequired(bokeh 0.10.0+0)
 SetupRequired(flask 0.10.1+0)
 SetupRequired(configargparse,0.10.0+0)
 
-envAppend(PYTHONPATH, ${PRODUCT_DIR}/python)
-envAppend(PATH, ${PRODUCT_DIR}/bin)
+envAppend(PYTHONPATH, ${PRODUCT_DIR})
+envAppend(PATH, ${PRODUCT_DIR})
