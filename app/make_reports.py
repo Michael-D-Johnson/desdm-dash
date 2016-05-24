@@ -110,7 +110,7 @@ if __name__ =='__main__':
 
         # Writing CSV
         req_csv = '{reqnum}.csv'.format(reqnum=reqnum)
-        group.to_csv(os.path.join(path,req_csv))
+        df.to_csv(os.path.join(path,req_csv))
 
         # Writing plots to HTML
         html = file_html(vplot(*plots),CDN,'plots')
@@ -125,9 +125,9 @@ if __name__ =='__main__':
         # Writing reports to HTML
         template = app.jinja_env.get_template('processing_detail_plots.html')
         output_from_parsed_template = template.render(
-                        columns=columns,df=group,reqnum=reqnum,
+                        columns=columns,df=df,reqnum=reqnum,
                         db = group.db.unique(), updated=updated,filename=includepath)
-        reportfile = "{reqnum}_report.html".format(reqnum=reqnum)
+        reportfile = "report_{reqnum}.html".format(reqnum=reqnum)
         reportpath = os.path.join(path,reportfile)
         with open(reportpath, "wb") as fh:
             fh.write(output_from_parsed_template)

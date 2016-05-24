@@ -11,6 +11,11 @@ from bokeh.io import vplot
 def index():
     return render_template('home.html')
 
+@app.route('/processing_archive')
+def processing_archive():
+    current_dict,rest_dict,columns,updated = get_data.processing_archive()
+    return render_template('processing_summary.html',columns=columns,current_dict=current_dict,rest_dict=rest_dict,updated=updated)
+
 @app.route('/processing_summary')
 def processing_summary():
     current_dict,rest_dict,columns,updated = get_data.processing_summary('db-desoper','OPS')

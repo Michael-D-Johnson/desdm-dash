@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<center>
+{% for i, dict in [(0,current_dict),(1,rest_dict)] %}
+{% if i ==0 %}
+<h2> Currently running: </h2>
+{% endif %}
+{% if i == 1 %}
+<h2> Runs in the last four days: </h2>
+{% endif %}
+{% if not dict %}
+<h5>--NA--</h5>
+{% else %}
+<table class='normal' border="1">
+<tr>
+{% for col in columns %}
+    <th>
+        {{ col }}
+    </th>
+{% endfor %}
+</tr>
+{% for di in dict %}
+<tr>
+{% for col in columns %}
+    {% if col == 'reqnum' %}
+    <td> <a href="{{ url_for('processing_detail',db='db-desoper',reqnum =di[col])}}"><strong>{{ di[col] }}</strong></a></td>
+    {% else %}
+    <td> {{ di[col] }} </td> 
+    {% endif %}
+{% endfor %}
+</tr>
+{% endfor %}
+</table>
+{% endif %}
+{% endfor %}
+</center>
+{% endblock %}

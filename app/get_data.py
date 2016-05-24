@@ -5,7 +5,13 @@ import pandas
 import time
 from datetime import datetime
 import query
+
 csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
+templates = '/work/devel/mjohns44/git/desdm-dash/app/templates/reports'
+
+def processing_archive():
+    reqnums = os.path.listdir(templates)
+    pass
 
 def processing_summary(db,project,df=None):
     if not df:
