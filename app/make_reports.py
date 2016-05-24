@@ -86,7 +86,7 @@ def make_reports(db=None,reqnums=None):
         df_oper = pandas.DataFrame()
     dfs = [df_oper,df_test]
     df_master = pandas.concat(dfs)
-    updated = datetime.now()    
+    updated = "#{0}".format(datetime.now())
     with open(csv_path,'w') as csv:
         csv.write('#%s\n' % updated)
     df_master.to_csv(csv_path,index=False,mode='a')
