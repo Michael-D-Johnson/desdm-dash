@@ -58,7 +58,7 @@ def plot_t_eff(dataframe):
     plots = []
     df_false = dataframe[dataframe['assessment']=='False']
     df_true = dataframe[dataframe['assessment']=='True']
-    p = figure(tools = [HoverTool(tooltips = [('expnum','@expnum'),('band','@band'),('program', '@program'),('teff','@t_eff'),('attempt','@attnum')]),BoxZoomTool(),ResetTool(),WheelZoomTool()], x_axis_label = "t_eff", y_axis_label = "expnum", title = 't_eff',width=1000,height=500)
+    p = figure(tools = [HoverTool(tooltips = [('expnum','@expnum'),('band','@band'),('program', '@program'),('teff','@t_eff'),('attempt','@attnum')]),BoxZoomTool(),ResetTool(),WheelZoomTool()], x_axis_label = "expnum", y_axis_label = "t_eff", title = 't_eff',width=1000,height=500)
     p.scatter('expnum','t_eff',source=create_data_source(df_false),fill_color='red',line_color='white',alpha=0.5)
     p.scatter('expnum','t_eff',source=create_data_source(df_true),fill_color='green',line_color='white',alpha=0.5)
 
