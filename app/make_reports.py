@@ -3,9 +3,10 @@ import os
 import pandas
 from datetime import datetime
 
-from bokeh.resources import CDN
+from bokeh.resources import CDN,INLINE
 from bokeh.embed import file_html
 from bokeh.io import vplot
+
 import plotter
 import get_data
 import query
@@ -139,7 +140,7 @@ def make_reports(db=None,reqnums=None):
         df.to_csv(os.path.join(path,req_csv))
 
         # Writing plots to HTML
-        html = file_html(vplot(*plots),CDN,'plots')
+        html = file_html(vplot(*plots),INLINE,'plots')
         filename = 'plots_{reqnum}.html'.format(reqnum=reqnum)
         includepath = 'reports/{reqnum}/{file}'.format(reqnum=reqnum,file=filename)
         filepath = os.path.join(path,filename)
