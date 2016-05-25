@@ -13,7 +13,7 @@ def index():
 
 @app.route('/processing_archive')
 def processing_archive():
-    reqnums = sorted(get_data.processing_archive(),ascending=False)
+    reqnums = sorted(get_data.processing_archive(),reverse=True)
     return render_template('processing_archive.html',reqnums = reqnums)
 
 @app.route('/processing_summary')
