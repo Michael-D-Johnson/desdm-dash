@@ -80,7 +80,7 @@ def np_hist(dataframe):
     TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
     p2 = figure(tools = TOOLS, x_axis_label = "t_eff", y_axis_label = "expnum", title = 't_eff',width=1000,height=500)
 
-    h,edges = np.histogram(dataframe['t_eff'].values, bins=np.linspace(-1,6,50))
+    h,edges = np.histogram(dataframe['t_eff'].values, bins=np.linspace(min(dataframe.t_eff),max(dataframe.t_eff),35))
     p2.quad(top=h, bottom=0, left=edges[:-1], right=edges[1:], fill_color="#036564", line_color="#033649")
     text = """Mean: {mean}
             Min: {min}
