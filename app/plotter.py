@@ -54,11 +54,11 @@ def plot_status_per_host(dataframe):
 
 def plot_t_eff(dataframe):
     def create_data_source(df):
-        return ColumnDataSource(data=dict(t_eff=df['t_eff'],expnum=df['expnum'],program=df['program'],accepted=df['assessment'],attnum=df['attnum'],band=df['band']))
+        return ColumnDataSource(data=dict(t_eff=df['t_eff'],expnum=df['expnum'],program=df['program'],attnum=df['attnum'],band=df['band']))
     plots = []
     df_false = dataframe[dataframe['assessment']=='False']
     df_true = dataframe[dataframe['assessment']=='True']
-    p = figure(tools = [HoverTool(tooltips = [('expnum','@expnum'),('band','@band'),('program', '@program'),('teff','@t_eff'),('accepted','@assessment'),('attempt','@attnum')]),BoxZoomTool(),ResetTool(),WheelZoomTool()], x_axis_label = "t_eff", y_axis_label = "expnum", title = 't_eff',width=1000,height=500)
+    p = figure(tools = [HoverTool(tooltips = [('expnum','@expnum'),('band','@band'),('program', '@program'),('teff','@t_eff'),('attempt','@attnum')]),BoxZoomTool(),ResetTool(),WheelZoomTool()], x_axis_label = "t_eff", y_axis_label = "expnum", title = 't_eff',width=1000,height=500)
     p.scatter('expnum','t_eff',source=create_data_source(df_false),fill_color='red',line_color='white',alpha=0.5)
     p.scatter('expnum','t_eff',source=create_data_source(df_true),fill_color='green',line_color='white',alpha=0.5)
 
@@ -80,7 +80,7 @@ def np_hist(dataframe):
     TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
     p2 = figure(tools = TOOLS, x_axis_label = "t_eff", y_axis_label = "expnum", title = 't_eff',width=1000,height=500)
 
-    h,edges = np.histogram(dataframe['t_eff'].values, bins=np.linspace(0,2,40))
+    h,edges = np.histogram(dataframe['t_eff'].values, bins=np.linspace(-1,6,50))
     p2.quad(top=h, bottom=0, left=edges[:-1], right=edges[1:], fill_color="#036564", line_color="#033649")
     text = """Mean: {mean}
             Min: {min}
