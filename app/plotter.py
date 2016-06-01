@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 import os
+
+import numpy as np
+
 from bokeh.plotting import figure,ColumnDataSource
 from bokeh.models import (HoverTool, BoxSelectTool, BoxZoomTool,
                           PanTool, ResetTool,WheelZoomTool,
@@ -46,21 +49,16 @@ def plot_t_eff(dataframe):
     plots = []
     df_false = dataframe[dataframe['assessment']=='False']
     df_true = dataframe[dataframe['assessment']=='True']
-    p = figure(lod_threshold=100,tools = [HoverTool(tooltips = [('expnum','@expnum'),('band','@band'),('program', '@program'),('teff','@t_eff'),('attempt','@attnum')]),BoxZoomTool(),ResetTool(),WheelZoomTool()], x_axis_label = "expnum", y_axis_label = "t_eff", title = 't_eff',width=1000,height=500)
+
+    # Creating scatter pllot
+    p = figure(lod_threshold=100,tools = [HoverTool(tooltips = [('expnum','@expnum'),('band','@band'),('program', '@program'),('teff','@t_eff'),('attempt','@attnum')]),BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()], x_axis_label = "expnum", y_axis_label = "t_eff", title = 't_eff',width=1000,height=500)
     p.scatter('expnum','t_eff',source=create_data_source(df_false),fill_color='red',line_color='white',alpha=0.5)
     p.scatter('expnum','t_eff',source=create_data_source(df_true),fill_color='green',line_color='white',alpha=0.5)
 
     p.xaxis[0].formatter = NumeralTickFormatter(format="000000")
     plots.append(p)
-
-    h = np_hist(dataframe)
-    plots.append(h)
-
-    return plots
-
-def np_hist(dataframe):
-    import numpy as np
-    TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
+    
+    # Creating histogram
     p2 = figure(tools = TOOLS, x_axis_label = "t_eff", y_axis_label = "expnum", title = 't_eff',width=1000,height=500)
 
     h,edges = np.histogram(dataframe['t_eff'].values, bins=np.linspace(min(dataframe.t_eff),max(dataframe.t_eff),35))
@@ -71,5 +69,6 @@ def np_hist(dataframe):
     mytext = glyphs.Text(x=edges[-1]-(edges[-1]/3),y=h.max()-(h.max()/3),text=[text],text_font_size='10pt')
     p2.add_glyph(mytext)
 
-    return p2
+    plots.append(p2)
 
+    return plots
