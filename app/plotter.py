@@ -77,7 +77,8 @@ def plot_t_eff(dataframe):
 def plot_exec_wall_time(dataframe):
     TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
     dataframe.to_datetime.start_time()
-    datagrame.to_datetime.end_time()
+    dataframe.to_datetime.end_time()
+    dataframe = dataframe[dataframe['status'] == 0]
     df = dataframe.groupby(by = ['exec_host'])
 
     # Setup bokeh plot
