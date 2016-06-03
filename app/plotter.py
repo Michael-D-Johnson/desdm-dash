@@ -76,19 +76,21 @@ def plot_t_eff(dataframe):
 # Plots time running for each exec 
 def plot_exec_wall_time(dataframe):
     TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
-    dataframe.to_datetime.start_time()
-    dataframe.to_datetime.end_time()
-    dataframe = dataframe[dataframe['status'] == 0]
-    df = dataframe.groupby(by = ['exec_host'])
+    Colors=['red','navy','olive','firebrick','lightskyblue','yellowgreen','lightcoral','yellow', 'green','blue','gold','red']
+    pd.to_datetime(dataframe['start_time'])
+    pd.to_datetime(dataframe['end_time'])
+    tempframe = dataframe[dataframe['status'] == 0]
+    df = tempframe.groupby(by = ['exec_host'])
 
     # Setup bokeh plot
     p = figure(plot_height=500, plot_width=1000, x_axis_type="datetime", y_range=list(dataframe.exec_host.unique()), title='Wall time for Each Exec Host')
-
+    
     # Loop though each exec_host 1 at a time changing y value on each one.
     count = 0
     for exechost, group in df:
         count = count+1
         print count
-        p.segment( x0=group.start_time, y0=len(group) * [count], x1=group.end_time, y1=len(group) * [count], line_width=3)
+        for unitname in list(group.unitname.unique()):
+            for attnum in group.attnum.unique():
+                p.segment( x0=group[(group.unitname==unitname) & (group.attnum==attnum)].start_time, y0=len(group) * [count+(0.1*attnum)], x1=group[(group.unitname==unitname) & (group.attnum==attnum)].end_time, y1=len(group) * [count+(0.1*attnum)], color=Colors[attnum], line_width=3)
     return p
-
