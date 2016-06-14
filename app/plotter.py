@@ -80,18 +80,19 @@ def plot_exec_wall_time(dataframe):
     pd.to_datetime(dataframe['start_time'])
     pd.to_datetime(dataframe['end_time'])
     dataframe = dataframe.sort(['exec_host','start_time','end_time'] ,ascending=True)
-    tempframe = dataframe[dataframe['status'] == 0]
-    df = tempframe.groupby(by = ['exec_host'])
+    dataframe.dropna(axis=0)
+    df = dataframe.groupby(by = ['exec_host'])
 
     # Setup bokeh plot
     p = figure(plot_height=500, plot_width=1000, x_axis_type="datetime", y_range=list(tempframe.exec_host.unique()), title='Wall time for Each Exec Host')
     
     # Loop though each exec_host 1 at a time changing y value on each one.
     count = 0
+    print "Starting Plot"
     for exechost, group in df:
         count = count+1
-        print count
+        print exechost
         for unitname in list(group.unitname.unique()):
             for attnum in group.attnum.unique():
-                p.segment( x0=group[(group.unitname==unitname) & (group.attnum==attnum)].start_time, y0=len(group) * [count+(0.1*attnum)], x1=group[(group.unitname==unitname) & (group.attnum==attnum)].end_time, y1=len(group) * [count+(0.1*attnum)], color=Colors[attnum], line_width=3)
+                p.segment( x0=group[(group.unitname==unitname) & (group.attnum==attnum)].start_time, y0=len(group) * [count+(0.1*(attnum-1))], x1=group[(group.unitname==unitname) & (group.attnum==attnum)].end_time, y1=len(group) * [count+(0.1*(attnum-1))], color=Colors[attnum], line_width=3)
     return p
