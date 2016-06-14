@@ -92,7 +92,6 @@ def plot_exec_wall_time(dataframe):
     for exechost, group in df:
         count = count+1
         print exechost
-        for unitname in list(group.unitname.unique()):
-            for attnum in group.attnum.unique():
-                p.segment( x0=group[(group.unitname==unitname) & (group.attnum==attnum)].start_time, y0=len(group) * [count+(0.1*(attnum-1))], x1=group[(group.unitname==unitname) & (group.attnum==attnum)].end_time, y1=len(group) * [count+(0.1*(attnum-1))], color=Colors[attnum], line_width=3)
+        for attnum in group.attnum.unique():
+            p.segment( x0=group[group.attnum==attnum].start_time, y0=len(group) * [count+(0.1*(attnum-1))], x1=group[group.attnum==attnum].end_time, y1=len(group) * [count+(0.1*(attnum-1))], color=Colors[attnum], line_width=3)
     return p
