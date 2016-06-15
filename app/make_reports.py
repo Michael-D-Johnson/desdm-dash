@@ -164,4 +164,4 @@ def make_reports(db=None,reqnums=None):
 
 if __name__ =='__main__':
     args = create_args()
-    make_reports(db=db,reqnums=args.reqnums)
+    make_reports(db=args.db,reqnums=args.reqnums)
