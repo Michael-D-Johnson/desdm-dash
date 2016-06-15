@@ -75,6 +75,10 @@ def plot_t_eff(dataframe):
 
 # Plots time running for each exec 
 def plot_exec_wall_time(dataframe):
+### For Line Method ###
+#    def create_data_source(df):
+#        return ColumnDataSource(data=dict(exec_host=df['exec_host'],unitname=df['unitname'],attnum=df['attnum'],start_time=df['start_time'],end_time=df['end_time']))
+
     TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
     Colors=['red','navy','olive','firebrick','lightskyblue','yellowgreen','lightcoral','yellow', 'green','blue','gold','red']
     pd.to_datetime(dataframe['start_time'])
@@ -92,6 +96,15 @@ def plot_exec_wall_time(dataframe):
     for exechost, group in df:
         count = count+1
         print exechost
+        
         for attnum in group.attnum.unique():
             p.segment( x0=group[group.attnum==attnum].start_time, y0=len(group) * [count+(0.1*(attnum-1))], x1=group[group.attnum==attnum].end_time, y1=len(group) * [count+(0.1*(attnum-1))], color=Colors[attnum], line_width=3, legend="Attempt Num: " + str(attnum))
+
+### Line Method ###
+### If you want to use it, add hovertool to the list of tools and comment out segment ###    
+#        for attnum in group.attnum.unique():
+#            for i, row in group[group.attnum==attnum].iterrows():
+#                p.line(x=[row['start_time'],row['end_time']], y=[count+(0.1*(attnum-1)),count+(0.1*(attnum-1))], source=create_data_source(group), color=Colors[attnum], line_width=3)
+#                print row['start_time'] 
+
     return p
