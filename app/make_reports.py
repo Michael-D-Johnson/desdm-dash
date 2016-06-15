@@ -22,19 +22,7 @@ def create_args():
     parser.add('--reqnums')
     parser.add('--csv')
     args = parser.parse_args()
-
-    if args.reqnums:
-        reqnums = [str(r) for r in args.reqnums.split(',')]
-    else:
-        reqnums = None
-    if args.db_section:
-        db = args.db_section
-    else:
-        db = None
-    if args.csv:
-        csv_path = args.csv
-    else:
-        csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
+    return args
 
 def make_reports(db=None,reqnums=None):
     if db is None and reqnums is None: 
@@ -164,4 +152,17 @@ def make_reports(db=None,reqnums=None):
 
 if __name__ =='__main__':
     args = create_args()
-    make_reports(db=args.db,reqnums=args.reqnums)
+    if args.reqnums:
+        reqnums = [str(r) for r in args.reqnums.split(',')]
+    else:
+        reqnums = None
+    if args.db_section:
+        db = args.db_section
+    else:
+        db = None
+    if args.csv:
+        csv_path = args.csv
+    else:
+        csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
+
+    make_reports(db=db,reqnums=reqnums)
