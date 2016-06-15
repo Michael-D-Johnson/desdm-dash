@@ -15,26 +15,29 @@ from app import app
 
 # Creating command-line arguments
 from configargparse import ArgParser
-parser = ArgParser()
-parser.add('--db_section')
-parser.add('--reqnums')
-parser.add('--csv')
-args = parser.parse_args()
-if args.reqnums:
-    reqnums = [str(r) for r in args.reqnums.split(',')]
-else:
-    reqnums = None
-if args.db_section:
-    db = args.db_section
-else:
-    db = None
-if args.csv:
-    csv_path = args.csv
-else:
-    csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
+
+def create_args():
+    parser = ArgParser()
+    parser.add('--db_section')
+    parser.add('--reqnums')
+    parser.add('--csv')
+    args = parser.parse_args()
+
+    if args.reqnums:
+        reqnums = [str(r) for r in args.reqnums.split(',')]
+    else:
+        reqnums = None
+    if args.db_section:
+        db = args.db_section
+    else:
+        db = None
+    if args.csv:
+        csv_path = args.csv
+    else:
+        csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
 
 def make_reports(db=None,reqnums=None):
-    if db is None and reqnum is None: 
+    if db is None and reqnums is None: 
         #1. get reqnums from last four days
         #2. create dataframe for all reqnums in both databases
         test_reqnums = [str(r) for r in query.get_reqnums(query.cursor('db-destest'))]
@@ -160,4 +163,5 @@ def make_reports(db=None,reqnums=None):
             fh.write(output_from_parsed_template)
 
 if __name__ =='__main__':
-    make_reports(db=db,reqnums=reqnums)
+    args = create_args()
+    make_reports(db=db,reqnums=args.reqnums)
