@@ -90,7 +90,7 @@ def make_reports(db=None,reqnums=None):
     for reqnum,group in df_master.groupby(by=['reqnum']):
         df,columns,reqnum,updated = get_data.processing_detail(group.db.unique()[0],reqnum,group,updated=updated)
         df2 = df.dropna()
-        df_pass = df[df.status==0].dropna()
+        df_pass = df[df.status==0]
 
         df_teff = df_pass
         df_teff.t_eff.replace(0,'None')
