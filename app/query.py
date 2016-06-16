@@ -74,7 +74,7 @@ def get_status(cur,reqnums):
     return cur.fetchall()
 
 def get_expnum_info(cur,reqnums):
-    query = "select distinct a.unitname,a.reqnum,a.attnum,e.expnum,e.band from pfw_request r,exposure e, pfw_attempt a where a.reqnum in (%s) and e.expnum= substr(a.unitname,4) and r.reqnum=a.reqnum and r.pipeline in ('firstcut','finalcut') and a.unitname not like 'DES%'" % (reqnums)
+    query = "select distinct a.unitname,a.reqnum,a.attnum,e.expnum,e.band from pfw_request r,exposure e, pfw_attempt a where a.reqnum in (%s) and e.expnum= substr(a.unitname,4) and r.reqnum=a.reqnum and r.pipeline in ('firstcut','finalcut') and a.unitname not like 'DES%%'" % (reqnums)
     try: 
         cur.execute(query)
         return cur.fetchall()
