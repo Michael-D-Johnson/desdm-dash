@@ -132,17 +132,18 @@ def plot_coadd(all_df, processed_df):
     fn_df = fn_df.groupby(by = ['status'])
     newdf['status']=statuslist
 
-    TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool(),HoverTool()]
+    Hover = HoverTool(names=['processed'])
+    TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool(),Hover]
 
     p = figure(height=1000, width=1000, tools=TOOLS, title='Coadd Map')
 
-    p.patches(xs=newdf['x'], ys=newdf['y'], source=create_data_source(newdf), fill_color='grey', fill_alpha=0.1, line_color='black')
+    p.patches(xs=newdf['x'], ys=newdf['y'], fill_color='grey', fill_alpha=0.1, line_color='black')
 
     count = 0
     for status, group in fn_df:
         count += 1
         print status
-        p.patches(xs=group['x'], ys=group['y'], source=create_data_source(group),fill_color=Colors[count], fill_alpha=0.5, line_color='black')
+        p.patches(xs=group['x'], ys=group['y'], name='processed', source=create_data_source(group),fill_color=Colors[count], fill_alpha=0.5, line_color='black')
 
     hover = p.select_one(HoverTool)
     hover.point_policy = "follow_mouse"
