@@ -90,3 +90,8 @@ def get_teffs(cur,reqnums):
     query = "select distinct a.unitname,a.reqnum,a.attnum, e.expnum, e.t_eff from pfw_attempt a,finalcut_eval e where and a.attnum=e.attnum and a.unitname=e.unitname and a.reqnum=e.reqnum and a.reqnum in (%s)" % (reqnums)
     cur.execute(query)
     return cur.fetchall()
+
+def query_all_tiles(cur):
+    query = "select distinct tilename, decc1, rac1, decc2, rac2, decc3, rac3, decc4, rac4 from prodbeta.coaddtile_geom"
+    cur.execute(query)
+    return cur.fetchall()

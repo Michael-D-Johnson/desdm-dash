@@ -108,3 +108,32 @@ def plot_exec_wall_time(dataframe):
 #                print row['start_time'] 
 
     return p
+
+def plot_coadd(df):
+    def create_data_source(df):
+        return ColumnDataSource(data=dict(tilename=df['tilename']))
+
+    Colors=['red','Green','Blue','olive','firebrick','yellow','gold']
+
+    newdf = pd.DataFrame()
+    xlist, ylist, tilelist =[],[],[]
+    for i, row in df.iterrows():
+        xlist.append([row['rac1'], row['rac2'], row['rac3'], row['rac4']])
+        ylist.append([row['decc1'], row['decc2'], row['decc3'], row['decc4']])
+        tilelist.append(row['tilename'])
+
+    newdf['x']=xlist
+    newdf['y']=ylist
+    newdf['tilename']=tilelist
+
+    TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool(),HoverTool()]
+
+    p = figure(height=1000, width=1000, tools=TOOLS, title='Coadd Map')
+
+    p.patches(xs=newdf['x'], ys=newdf['y'], source=create_data_source(newdf),fill_color='grey',fill_alpha=0.1, line_color='black')
+    
+    hover = p.select_one(HoverTool)
+    hover.point_policy = "follow_mouse"
+    hover.tooltips = [("Tilename", "@tilename"),("Status","@status")]
+
+    return p
