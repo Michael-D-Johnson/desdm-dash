@@ -92,7 +92,7 @@ def make_reports(db=None,reqnums=None):
         df2 = df.dropna()
         df_pass = df[df.status==0]
 
-        df_teff = df_pass
+        df_teff = df_pass.dropna()
         df_teff.t_eff.replace(0,'None')
         plots = []
         try:
