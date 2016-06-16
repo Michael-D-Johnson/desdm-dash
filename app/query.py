@@ -82,7 +82,7 @@ def get_expnum_info(cur,reqnums):
         return None
 
 def get_nites(cur,reqnums):
-    query = "select distinct a.unitname,a.reqnum,a.attnum, v.val from pfw_attempt a,pfw_attempt_val v where key in ('nite','range') and a.attnum=v.attnum and a.unitname=v.unitname and a.reqnum=v.reqnum and a.reqnum in (%s)" % (reqnums)
+    query = "select distinct a.unitname,a.reqnum,a.attnum, v.val from pfw_attempt a,pfw_attempt_val v where key in ('nite','range') and a.id=v.pfw_attempt_id and a.reqnum in (%s)" % (reqnums)
     cur.execute(query)
     return cur.fetchall()
 
