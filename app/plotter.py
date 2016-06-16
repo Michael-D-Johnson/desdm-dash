@@ -109,29 +109,41 @@ def plot_exec_wall_time(dataframe):
 
     return p
 
-def plot_coadd(df):
+def plot_coadd(all_df, processed_df):
     def create_data_source(df):
-        return ColumnDataSource(data=dict(tilename=df['tilename']))
+        return ColumnDataSource(data=dict(tilename=df['tilename'],status=df['status']))
 
-    Colors=['red','Green','Blue','olive','firebrick','yellow','gold']
+    Colors=['grey','green','blue','yellow','olive','gold','firebrick']     
 
     newdf = pd.DataFrame()
-    xlist, ylist, tilelist =[],[],[]
-    for i, row in df.iterrows():
+    xlist, ylist, statuslist, tilelist =[],[],[],[]
+    for i, row in all_df.iterrows():
         xlist.append([row['rac1'], row['rac2'], row['rac3'], row['rac4']])
         ylist.append([row['decc1'], row['decc2'], row['decc3'], row['decc4']])
         tilelist.append(row['tilename'])
+        statuslist.append(' ')
 
     newdf['x']=xlist
     newdf['y']=ylist
-    newdf['tilename']=tilelist
+    newdf['tilename']=tilelist 
+    
+    fn_df = pd.merge(newdf, processed_df, how='inner', on=['tilename'])
+    fn_df.fillna('None', inplace=True)
+    fn_df = fn_df.groupby(by = ['status'])
+    newdf['status']=statuslist
 
     TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool(),HoverTool()]
 
     p = figure(height=1000, width=1000, tools=TOOLS, title='Coadd Map')
 
-    p.patches(xs=newdf['x'], ys=newdf['y'], source=create_data_source(newdf),fill_color='grey',fill_alpha=0.1, line_color='black')
-    
+    p.patches(xs=newdf['x'], ys=newdf['y'], source=create_data_source(newdf), fill_color='grey', fill_alpha=0.1, line_color='black')
+
+    count = 0
+    for status, group in fn_df:
+        count += 1
+        print status
+        p.patches(xs=group['x'], ys=group['y'], source=create_data_source(group),fill_color=Colors[count], fill_alpha=0.5, line_color='black')
+
     hover = p.select_one(HoverTool)
     hover.point_policy = "follow_mouse"
     hover.tooltips = [("Tilename", "@tilename"),("Status","@status")]
