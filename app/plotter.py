@@ -119,6 +119,9 @@ def plot_coadd(all_df, processed_df):
     newdf = pd.DataFrame()
     xlist, ylist, tilelist =[],[],[]
     for i, row in all_df.iterrows():
+        if (row['rac3']-row['rac4']) > 100:
+            row['rac4']=row['rac3'] + row['rac4']
+            row['rac1']=row['rac2'] + row['rac1']
         xlist.append([row['rac1'], row['rac2'], row['rac3'], row['rac4']])
         ylist.append([row['decc1'], row['decc2'], row['decc3'], row['decc4']])
         tilelist.append(row['tilename'])
