@@ -111,6 +111,11 @@ def make_reports(db=None,reqnums=None):
         except:
             pass
         try:
+            exec_time = plotter.plot_exec_wall_time(df_pass)
+            plots.append(exec_time)
+        except:
+            pass
+        try:
             fails = plotter.plot_status_per_host(df)
             plots.append(fails)
         except:

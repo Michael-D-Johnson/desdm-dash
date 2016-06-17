@@ -95,8 +95,7 @@ def plot_exec_wall_time(dataframe):
     print "Starting Plot"
     for exechost, group in df:
         count = count+1
-        print exechost
-        
+        #print exechost
         for attnum in group.attnum.unique():
             p.segment( x0=group[group.attnum==attnum].start_time, y0=len(group) * [count+(0.1*(attnum-1))], x1=group[group.attnum==attnum].end_time, y1=len(group) * [count+(0.1*(attnum-1))], color=Colors[attnum], line_width=3, legend="Attempt Num: " + str(attnum))
 
