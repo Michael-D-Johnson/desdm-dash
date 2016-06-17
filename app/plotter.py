@@ -119,8 +119,8 @@ def plot_coadd(all_df, processed_df,tag):
     for i, row in all_df.iterrows():
         # Fixes wrapping issue
         if (row['rac3']-row['rac4']) > 100:
-            row['rac4']=row['rac3'] + row['rac4']
-            row['rac1']=row['rac2'] + row['rac1']
+            row['rac4']=360 + row['rac4']
+            row['rac1']=360 + row['rac1']
         # Shifts image so that tank is visable
         if row['rac3'] < 150:
             row['rac1'] = row['rac1']+360
