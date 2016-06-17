@@ -113,15 +113,15 @@ def plot_coadd(all_df, processed_df):
     def create_data_source(df):
         return ColumnDataSource(data=dict(tilename=df['tilename'],status=df['status']))
 
-    Colors=['grey','green','blue','yellow','olive','gold','firebrick']     
+    statuses = ['None',0,8,9,2,5,1]
+    Colors=['grey','firebrick','blue','blue','blue','blue','blue','green']
 
     newdf = pd.DataFrame()
-    xlist, ylist, statuslist, tilelist =[],[],[],[]
+    xlist, ylist, tilelist =[],[],[]
     for i, row in all_df.iterrows():
         xlist.append([row['rac1'], row['rac2'], row['rac3'], row['rac4']])
         ylist.append([row['decc1'], row['decc2'], row['decc3'], row['decc4']])
         tilelist.append(row['tilename'])
-        statuslist.append(' ')
 
     newdf['x']=xlist
     newdf['y']=ylist
@@ -129,21 +129,19 @@ def plot_coadd(all_df, processed_df):
     
     fn_df = pd.merge(newdf, processed_df, how='inner', on=['tilename'])
     fn_df.fillna('None', inplace=True)
-    fn_df = fn_df.groupby(by = ['status'])
-    newdf['status']=statuslist
 
     Hover = HoverTool(names=['processed'])
     TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool(),Hover]
 
-    p = figure(height=1000, width=1000, tools=TOOLS, title='Coadd Map')
+    p = figure(height=1000, width=1000, x_axis_label='RA (Deg)', y_axis_label='DEC (Deg)', tools=TOOLS, title='Coadd Map')
 
     p.patches(xs=newdf['x'], ys=newdf['y'], fill_color='grey', fill_alpha=0.1, line_color='black')
 
     count = 0
-    for status, group in fn_df:
+    for status in statuses:
         count += 1
         print status
-        p.patches(xs=group['x'], ys=group['y'], name='processed', source=create_data_source(group),fill_color=Colors[count], fill_alpha=0.5, line_color='black')
+        p.patches(xs=fn_df[fn_df.status==status].x, ys=fn_df[fn_df.status==status].y, name='processed', source=create_data_source(fn_df[fn_df.status==status]), fill_color=Colors[count], fill_alpha=0.95, line_color='black')
 
     hover = p.select_one(HoverTool)
     hover.point_policy = "follow_mouse"

@@ -92,11 +92,11 @@ def get_teffs(cur,reqnums):
     return cur.fetchall()
 
 def query_all_tiles(cur):
-    query = "select distinct tilename, decc1, rac1, decc2, rac2, decc3, rac3, decc4, rac4 from prodbeta.coaddtile_geom"
+    query = "select distinct tilename, decc1, rac1, decc2, rac2, decc3, rac3, decc4, rac4 from coaddtile_geom"
     cur.execute(query)
     return cur.fetchall()
 
 def query_processed_tiles(cur,reqnum):
-    query = "select a.unitname, a.attnum, t.status from prodbeta.task t, prodbeta.pfw_attempt a, prodbeta.coaddtile_geom c where t.id=a.task_id and a.unitname=c.tilename and reqnum=%s" % reqnum
+    query = "select a.unitname, a.attnum, t.status from task t, pfw_attempt a, coaddtile_geom c where t.id=a.task_id and a.unitname=c.tilename and reqnum=%s" % reqnum
     cur.execute(query)
     return cur.fetchall()
