@@ -43,7 +43,7 @@ def backups():
 
 @app.route('/supernova_summary')
 def supernova_summary():
-    return render_template('supernova_summary.html',title='Supernova Summary')
+    return render_template('supernova_summary.html',title = 'Supernova Summary')
 
 @app.route('/coadd_map')
 def coadd_map():
