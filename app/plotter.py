@@ -113,8 +113,7 @@ def plot_coadd(all_df, processed_df):
     def create_data_source(df):
         return ColumnDataSource(data=dict(tilename=df['tilename'],status=df['status']))
 
-    statuses = ['None',0,8,9,2,5,1]
-    Colors=['grey','firebrick','blue','blue','blue','blue','blue','green']
+    Colors=['green','blue','blue','blue','blue','blue','blue','blue','blue','blue']
 
     newdf = pd.DataFrame()
     xlist, ylist, tilelist =[],[],[]
@@ -122,6 +121,11 @@ def plot_coadd(all_df, processed_df):
         if (row['rac3']-row['rac4']) > 100:
             row['rac4']=row['rac3'] + row['rac4']
             row['rac1']=row['rac2'] + row['rac1']
+        if row['rac3'] < 150:
+            row['rac1'] = row['rac1']+360
+            row['rac2'] = row['rac2']+360
+            row['rac3'] = row['rac3']+360
+            row['rac4'] = row['rac4']+360
         xlist.append([row['rac1'], row['rac2'], row['rac3'], row['rac4']])
         ylist.append([row['decc1'], row['decc2'], row['decc3'], row['decc4']])
         tilelist.append(row['tilename'])
@@ -132,6 +136,7 @@ def plot_coadd(all_df, processed_df):
     
     fn_df = pd.merge(newdf, processed_df, how='inner', on=['tilename'])
     fn_df.fillna('None', inplace=True)
+    fn_df = fn_df.groupby(by = ['tilename'])
 
     Hover = HoverTool(names=['processed'])
     TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool(),Hover]
@@ -140,11 +145,8 @@ def plot_coadd(all_df, processed_df):
 
     p.patches(xs=newdf['x'], ys=newdf['y'], fill_color='grey', fill_alpha=0.1, line_color='black')
 
-    count = 0
-    for status in statuses:
-        count += 1
-        print status
-        p.patches(xs=fn_df[fn_df.status==status].x, ys=fn_df[fn_df.status==status].y, name='processed', source=create_data_source(fn_df[fn_df.status==status]), fill_color=Colors[count], fill_alpha=0.95, line_color='black')
+    for i,group in fn_df:
+        p.patches(xs=group[group.attnum==max(group['attnum'])].x, ys=group[group.attnum==max(group['attnum'])].y, source=create_data_source(group[group.attnum==max(group['attnum'])]), name='processed', fill_color=Colors[int(group[group.attnum==max(group['attnum'])].status)], fill_alpha=0.5, line_color='black')
 
     hover = p.select_one(HoverTool)
     hover.point_policy = "follow_mouse"
