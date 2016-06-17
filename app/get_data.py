@@ -51,7 +51,6 @@ def processing_summary(db,project,df=None):
                         nitelist = str('NA' + ', ' + str(int(orig_nitelist_cp[-1])))
             else:
                 nitelist = str(int(orig_nitelist[0])) + ' - ' + str(int(orig_nitelist[-1]))
-            nitelist = 'NA, {nitelist}'.format(nitelist)
         else:
             nitelist = int(orig_nitelist[0])
         if pipeline =='supercal':
