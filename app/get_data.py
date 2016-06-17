@@ -58,9 +58,9 @@ def processing_summary(db,project,df=None):
             nite1,nite2 = nites[0],nites[0][:4]+nites[1]
             nitelist = str(int(nite1)) + ' - ' + str(int(nite2))
         if project =='TEST':
-            total_batch_size = query.basic_batch_query(query.cursor(db),int(req))
+            total_batch_size = query.basic_batch_query(query.connect_to_db(db)[1],int(req))
         else:
-            total_batch_size = query.batch_size_query(query.cursor(db),nitelist,int(req),pipeline)
+            total_batch_size = query.batch_size_query(query.connect_to_db(db)[1],nitelist,int(req),pipeline)
         passed_df =  group[group.status==0].drop_duplicates(['unitname'])
         passed = passed_df['status'].count()
         failed_df = group[~group.status.isin([0,-99])].drop_duplicates(['unitname'])
@@ -145,7 +145,7 @@ def processing_detail(db,reqnum,df=None,updated=None):
             except:
                 pass
             pipeline = group.pipeline.unique()
-            assess_query_results = query.assess_query(query.cursor(db),df,index,name,pipeline)
+            assess_query_results = query.assess_query(query.connect_to_db(db)[1],df,index,name,pipeline)
 
             try:
                 assess,t_eff,program = assess_query_results[0][0],assess_query_results[0][1],assess_query_results[0][2]
