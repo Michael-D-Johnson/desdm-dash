@@ -39,7 +39,7 @@ def dts():
 
 @app.route('/backups')
 def backups():
-    return render_template('back_ups.html',title='Back ups')
+    return render_template('back_ups.html',title='Backups')
 
 @app.route('/supernova_summary')
 def supernova_summary():
