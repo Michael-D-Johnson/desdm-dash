@@ -14,7 +14,7 @@ def processing_archive():
     return reqnums
 
 def processing_summary(db,project,df=None):
-    if not df:
+    if df is None:
         try: 
             df = pandas.read_csv(csv_path,skiprows=1)
             with open(csv_path,'r') as csvfile:
@@ -22,7 +22,9 @@ def processing_summary(db,project,df=None):
         except (ValueError,IOError):
             updated = '#{time}'.format(time=datetime.now())
             df = pandas.DataFrame(columns=['created_date','project','campaign','unitname','reqnum','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_site','exec_host','db']) 
-    
+    else:
+        updated = '#{time}'.format(time=datetime.now()) 
+
     df = df.sort(columns=['reqnum','unitname','attnum'],ascending=False)
     df = df.fillna(-99)
     if project =='TEST':
@@ -39,7 +41,16 @@ def processing_summary(db,project,df=None):
         orig_nitelist = sorted(group['nite'].unique())
         pipeline = group['pipeline'].unique()[0]
         if len(orig_nitelist) > 1:
-            nitelist = str(int(orig_nitelist[0])) + ' - ' + str(int(orig_nitelist[-1]))
+            orig_nitelist_cp = list(orig_nitelist)
+            if -99 in orig_nitelist_cp:
+                orig_nitelist_cp.remove(-99)
+                if orig_nitelist_cp:
+                    if len(orig_nitelist_cp) >1:
+                        nitelist = str('NA' + ', ' + str(int(orig_nitelist_cp[0])) + ' - ' + int(orig_nitelist_cp[-1]))
+                    else:
+                        nitelist = str('NA' + ', ' + str(int(orig_nitelist_cp[-1])))
+            else:
+                nitelist = str(int(orig_nitelist[0])) + ' - ' + str(int(orig_nitelist[-1]))
         else:
             nitelist = int(orig_nitelist[0])
         if pipeline =='supercal':

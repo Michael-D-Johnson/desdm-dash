@@ -19,13 +19,13 @@ def processing_basic(cur,reqnum):
     return cur.fetchall()
 
 def processing_summary(cur,reqnums):
-    query = "select distinct a.created_date,r.project,r.campaign,a.unitname,a.reqnum,a.attnum,t1.status,a.data_state,a.operator,r.pipeline,t2.start_time,t2.end_time,b.target_site,t1.exec_host,t2.exec_host from pfw_job j,pfw_attempt a,task t1, task t2,pfw_request r,pfw_block b where a.reqnum=r.reqnum and a.reqnum=j.reqnum and a.unitname=j.unitname and a.attnum=j.attnum and b.unitname=a.unitname and b.reqnum=a.reqnum and b.attnum=a.attnum and j.task_id = t2.id and a.task_id=t1.id and a.reqnum in (%s) " % reqnums
+    query = "select distinct a.created_date,r.project,r.campaign,a.unitname,a.reqnum,a.attnum,t1.status,a.data_state,a.operator,r.pipeline,t2.start_time,t2.end_time,b.target_site,t1.exec_host,t2.exec_host from pfw_job j,pfw_attempt a,task t1, task t2,pfw_request r,pfw_block b where a.reqnum=r.reqnum and a.id=j.pfw_attempt_id and b.pfw_attempt_id=a.id and j.task_id = t2.id and a.task_id=t1.id and a.reqnum in (%s) " % reqnums
 
     cur.execute(query)
     return cur.fetchall()
 
 def get_reqnums(cur):
-    query = "select distinct a.reqnum from pfw_attempt a,task t,pfw_request r,pfw_job j where a.created_date >= sysdate-4 and t.id =a.task_id and a.reqnum=r.reqnum and a.reqnum=j.reqnum"
+    query = "select distinct a.reqnum from pfw_attempt a,task t,pfw_request r,pfw_job j where a.created_date >= sysdate-4 and t.id =a.task_id and a.reqnum=r.reqnum and a.id=j.pfw_attempt_id"
     cur.execute(query)
     return [req[0] for req in cur.fetchall()]
 
@@ -74,7 +74,7 @@ def get_status(cur,reqnums):
     return cur.fetchall()
 
 def get_expnum_info(cur,reqnums):
-    query = "select distinct a.unitname,a.reqnum,a.attnum,e.expnum,e.band from pfw_request r,exposure e, pfw_attempt a where a.reqnum in (%s) and e.expnum= substr(a.unitname,4) and r.reqnum=a.reqnum and r.pipeline in ('firstcut','finalcut')" % (reqnums)
+    query = "select distinct a.unitname,a.reqnum,a.attnum,e.expnum,e.band from pfw_request r,exposure e, pfw_attempt a where a.reqnum in (%s) and e.expnum= substr(a.unitname,4) and r.reqnum=a.reqnum and r.pipeline in ('firstcut','finalcut') and a.unitname not like 'DES%%'" % (reqnums)
     try: 
         cur.execute(query)
         return cur.fetchall()
@@ -82,7 +82,7 @@ def get_expnum_info(cur,reqnums):
         return None
 
 def get_nites(cur,reqnums):
-    query = "select distinct a.unitname,a.reqnum,a.attnum, v.val from pfw_attempt a,pfw_attempt_val v where key in ('nite','range') and a.attnum=v.attnum and a.unitname=v.unitname and a.reqnum=v.reqnum and a.reqnum in (%s)" % (reqnums)
+    query = "select distinct a.unitname,a.reqnum,a.attnum, v.val from pfw_attempt a,pfw_attempt_val v where key in ('nite','range') and a.id=v.pfw_attempt_id and a.reqnum in (%s)" % (reqnums)
     cur.execute(query)
     return cur.fetchall()
 

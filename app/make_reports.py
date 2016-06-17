@@ -15,26 +15,17 @@ from app import app
 
 # Creating command-line arguments
 from configargparse import ArgParser
-parser = ArgParser()
-parser.add('--db_section')
-parser.add('--reqnums')
-parser.add('--csv')
-args = parser.parse_args()
-if args.reqnums:
-    reqnums = [str(r) for r in args.reqnums.split(',')]
-else:
-    reqnums = None
-if args.db_section:
-    db = args.db_section
-else:
-    db = None
-if args.csv:
-    csv_path = args.csv
-else:
-    csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
+
+def create_args():
+    parser = ArgParser()
+    parser.add('--db_section')
+    parser.add('--reqnums')
+    parser.add('--csv')
+    args = parser.parse_args()
+    return args
 
 def make_reports(db=None,reqnums=None):
-    if db is None and reqnum is None: 
+    if db is None and reqnums is None: 
         #1. get reqnums from last four days
         #2. create dataframe for all reqnums in both databases
         test_reqnums = [str(r) for r in query.get_reqnums(query.cursor('db-destest'))]
@@ -92,16 +83,16 @@ def make_reports(db=None,reqnums=None):
     df_master = pandas.concat(dfs)
     updated = "#{0}".format(datetime.now())
     with open(csv_path,'w') as csv:
-        csv.write('#%s\n' % updated)
+        csv.write('%s\n' % updated)
     df_master.to_csv(csv_path,index=False,mode='a')
 
     # Make plots html
     for reqnum,group in df_master.groupby(by=['reqnum']):
         df,columns,reqnum,updated = get_data.processing_detail(group.db.unique()[0],reqnum,group,updated=updated)
         df2 = df.dropna()
-        df_pass = df[df.status==0].dropna()
+        df_pass = df[df.status==0]
 
-        df_teff = df_pass
+        df_teff = df_pass.dropna()
         df_teff.t_eff.replace(0,'None')
         plots = []
         try:
@@ -160,4 +151,18 @@ def make_reports(db=None,reqnums=None):
             fh.write(output_from_parsed_template)
 
 if __name__ =='__main__':
+    args = create_args()
+    if args.reqnums:
+        reqnums = [str(r) for r in args.reqnums.split(',')]
+    else:
+        reqnums = None
+    if args.db_section:
+        db = args.db_section
+    else:
+        db = None
+    if args.csv:
+        csv_path = args.csv
+    else:
+        csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
+
     make_reports(db=db,reqnums=reqnums)
