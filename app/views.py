@@ -48,3 +48,10 @@ def backups():
 @app.route('/supernova_summary')
 def supernova_summary():
     return render_template('supernova_summary.html')
+
+@app.route('/coadd_map')
+def coadd_map():
+    all_df, processed_df = get_data.create_coadd_map('db-destest',"ME_TEST")
+    p = plot_coadd(all_df, processed_df, "ME_TEST")
+    script,div = compents(p)
+    return render_template('coadd_map.html', scripts=script, div=div)
