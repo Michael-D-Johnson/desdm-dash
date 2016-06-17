@@ -28,8 +28,8 @@ def make_reports(db=None,reqnums=None):
     if db is None and reqnums is None: 
         #1. get reqnums from last four days
         #2. create dataframe for all reqnums in both databases
-        test_reqnums = [str(r) for r in query.get_reqnums(query.cursor('db-destest'))]
-        oper_reqnums = [str(r) for r in query.get_reqnums(query.cursor('db-desoper'))]
+        test_reqnums = [str(r) for r in query.get_reqnums(query.connect_to_db('db-destest')[1])]
+        oper_reqnums = [str(r) for r in query.get_reqnums(query.connect_to_db('db-desoper')[1])]
     else:
         if db=='db-destest':
             test_reqnums = reqnums
@@ -39,17 +39,17 @@ def make_reports(db=None,reqnums=None):
             test_reqnums = None
     if test_reqnums:
         df_test = pandas.DataFrame(
-                query.processing_summary(query.cursor('db-destest'),','.join(test_reqnums)),
+                query.processing_summary(query.connect_to_db('db-destest')[1],','.join(test_reqnums)),
                 columns = ['created_date','project','campaign','unitname','reqnum','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_site','exec_host'])
         df_test_status = pandas.DataFrame(
-                query.get_status(query.cursor('db-destest'),','.join(test_reqnums)),
+                query.get_status(query.connect_to_db('db-destest')[1],','.join(test_reqnums)),
                 columns = ['unitname','reqnum','attnum','status'])
         df_test_nites = pandas.DataFrame(
-                query.get_nites(query.cursor('db-destest'),','.join(test_reqnums)),
+                query.get_nites(query.connect_to_db('db-destest')[1],','.join(test_reqnums)),
                 columns = ['unitname','reqnum','attnum','nite'])
         try:
             df_test_expnum = pandas.DataFrame(
-                query.get_expnum_info(query.cursor('db-destest'),','.join(test_reqnums)),
+                query.get_expnum_info(query.connect_to_db('db-destest')[1],','.join(test_reqnums)),
                 columns = ['unitname','reqnum','attnum','expnum','band'])
         except: 
             df_test_expnum = pandas.DataFrame()
@@ -63,16 +63,16 @@ def make_reports(db=None,reqnums=None):
         df_test = pandas.DataFrame()
     if oper_reqnums:
         df_oper = pandas.DataFrame(
-                query.processing_summary(query.cursor('db-desoper'),','.join(oper_reqnums)),
+                query.processing_summary(query.connect_to_db('db-desoper')[1],','.join(oper_reqnums)),
                 columns = ['created_date','project','campaign','unitname','reqnum','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_site','exec_host'])
         df_oper_status = pandas.DataFrame(
-                query.get_status(query.cursor('db-desoper'),','.join(oper_reqnums)),
+                query.get_status(query.connect_to_db('db-desoper')[1],','.join(oper_reqnums)),
                 columns = ['unitname','reqnum','attnum','status'])
         df_oper_nites = pandas.DataFrame(
-                query.get_nites(query.cursor('db-desoper'),','.join(oper_reqnums)),
+                query.get_nites(query.connect_to_db('db-desoper')[1],','.join(oper_reqnums)),
                 columns = ['unitname','reqnum','attnum','nite'])
         df_oper_expnum = pandas.DataFrame(
-                query.get_expnum_info(query.cursor('db-desoper'),','.join(oper_reqnums)),
+                query.get_expnum_info(query.connect_to_db('db-desoper')[1],','.join(oper_reqnums)),
                 columns = ['unitname','reqnum','attnum','expnum','band'])
         for df in [df_oper_status,df_oper_expnum,df_oper_nites]:
             df_oper = pandas.merge(df_oper,df,on=['unitname','reqnum','attnum'],how='left',suffixes=('_orig',''))
