@@ -88,7 +88,7 @@ def plot_exec_wall_time(dataframe):
     df = dataframe.groupby(by = ['exec_host'])
 
     # Setup bokeh plot
-    p = figure(plot_height=500, plot_width=1000, x_axis_type="datetime", y_range=list(tempframe.exec_host.unique()), title='Exec Wall Time')
+    p = figure(plot_height=500, plot_width=1000, x_axis_type="datetime", y_range=list(dataframe.exec_host.unique()), title='Exec Wall Time')
     
     # Loop though each exec_host 1 at a time changing y value on each one.
     count = 0
