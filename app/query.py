@@ -96,7 +96,8 @@ def query_all_tiles(cur):
     cur.execute(query)
     return cur.fetchall()
 
-def query_processed_tiles(cur,reqnum):
-    query = "select a.unitname, a.attnum, t.status from task t, pfw_attempt a, mjohns44.destiles c where t.id=a.task_id and a.unitname=c.tilename and reqnum=%s" % reqnum
-    cur.execute(query)
+def query_processed_tiles(dbh,cur,tag):
+    query = "select a.reqnum, a.unitname, a.attnum, a.id, t.status from prodbeta.task t, prodbeta.pfw_attempt a, mjohns44.destiles c, prodbeta.proctag p where t.id=a.task_id and a.unitname=c.tilename and a.id=p.pfw_attempt_id and p.tag=%s" % dbh.get_named_bind_string('tag')
+    params = {'tag': tag}
+    cur.execute(query, params)
     return cur.fetchall()

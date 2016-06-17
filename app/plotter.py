@@ -109,7 +109,7 @@ def plot_exec_wall_time(dataframe):
 
     return p
 
-def plot_coadd(all_df, processed_df):
+def plot_coadd(all_df, processed_df,tag):
     def create_data_source(df):
         return ColumnDataSource(data=dict(tilename=df['tilename'],status=df['status'],attnum=df['attnum'],reqnum=df['reqnum'],id=df['id']))
 
@@ -143,7 +143,7 @@ def plot_coadd(all_df, processed_df):
     Hover = HoverTool(names=['processed'])
     TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool(),Hover]
 
-    p = figure(height=1000, width=1000, x_axis_label='RA (Deg)', y_axis_label='DEC (Deg)', tools=TOOLS, title='Coadd Map')
+    p = figure(height=1000, width=1000, x_axis_label='RA (Deg)', y_axis_label='DEC (Deg)', tools=TOOLS, title=str(tag)+' Coadd Map')
 
     p.patches(xs=newdf['x'], ys=newdf['y'], fill_color='grey', fill_alpha=0.1, line_color='black')
 
