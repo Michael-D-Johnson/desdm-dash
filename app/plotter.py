@@ -111,16 +111,18 @@ def plot_exec_wall_time(dataframe):
 
 def plot_coadd(all_df, processed_df):
     def create_data_source(df):
-        return ColumnDataSource(data=dict(tilename=df['tilename'],status=df['status']))
+        return ColumnDataSource(data=dict(tilename=df['tilename'],status=df['status'],attnum=df['attnum'],reqnum=df['reqnum'],id=df['id']))
 
     Colors=['green','blue','blue','blue','blue','blue','blue','blue','blue','blue']
 
     newdf = pd.DataFrame()
     xlist, ylist, tilelist =[],[],[]
     for i, row in all_df.iterrows():
+        # Fixes wrapping issue
         if (row['rac3']-row['rac4']) > 100:
             row['rac4']=row['rac3'] + row['rac4']
             row['rac1']=row['rac2'] + row['rac1']
+        # Shifts image so that tank is visable
         if row['rac3'] < 150:
             row['rac1'] = row['rac1']+360
             row['rac2'] = row['rac2']+360
@@ -146,10 +148,10 @@ def plot_coadd(all_df, processed_df):
     p.patches(xs=newdf['x'], ys=newdf['y'], fill_color='grey', fill_alpha=0.1, line_color='black')
 
     for i,group in fn_df:
-        p.patches(xs=group[group.attnum==max(group['attnum'])].x, ys=group[group.attnum==max(group['attnum'])].y, source=create_data_source(group[group.attnum==max(group['attnum'])]), name='processed', fill_color=Colors[int(group[group.attnum==max(group['attnum'])].status)], fill_alpha=0.5, line_color='black')
+        p.patches(xs=group[group.attnum==max(group['attnum'])].x, ys=group[group.attnum==max(group['attnum'])].y, source=create_data_source(group[group.attnum==max(group['attnum'])]), name='processed', fill_color=Colors[int(group[group.attnum==max(group['attnum'])].status)], fill_alpha=0.75, line_color='black')
 
     hover = p.select_one(HoverTool)
     hover.point_policy = "follow_mouse"
-    hover.tooltips = [("Tilename", "@tilename"),("Status","@status")]
+    hover.tooltips = [("Tilename", "@tilename"),("Pfw_attempt_id","@id"),("Status","@status"),("Attnum","@attnum"),("Reqnum","@reqnum")]
 
     return p
