@@ -10,8 +10,8 @@ csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
 templates = '/work/devel/mjohns44/git/desdm-dash/app/templates/reports'
 
 def create_coadd_map(section, tag):
-    all_df = pd.DataFrame(query.query_all_tiles(cursor(section)), columns = ['tilename','decc1','rac1','decc2','rac2','decc3','rac3','decc4','rac4'])
-    processed_df = pd.DataFrame(query.query_processed_tiles(query.connect_to_db[0], cursor(section),','.join([tag])), columns = ['reqnum','tilename','attnum','id','status'])
+    all_df = pandas.DataFrame(query.query_all_tiles(cursor(section)), columns = ['tilename','decc1','rac1','decc2','rac2','decc3','rac3','decc4','rac4'])
+    processed_df = pandas.DataFrame(query.query_processed_tiles(query.connect_to_db[0], cursor(section),','.join([tag])), columns = ['reqnum','tilename','attnum','id','status'])
     return all_df,processed_df
 
 def processing_archive():
