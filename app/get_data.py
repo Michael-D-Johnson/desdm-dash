@@ -41,7 +41,17 @@ def processing_summary(db,project,df=None):
         orig_nitelist = sorted(group['nite'].unique())
         pipeline = group['pipeline'].unique()[0]
         if len(orig_nitelist) > 1:
-            nitelist = str(int(orig_nitelist[0])) + ' - ' + str(int(orig_nitelist[-1]))
+            orig_nitelist_cp = list(orig_nitelist)
+            if -99 in orig_nitelist_cp:
+                orig_nitelist_cp.remove(-99)
+                if orig_nitelist_cp:
+                    if len(orig_nitelist_cp) >1:
+                        nitelist = str('NA' + ', ' + str(int(orig_nitelist_cp[0])) + ' - ' + int(orig_nitelist_cp[-1]))
+                    else:
+                        nitelist = str('NA' + ', ' + str(int(orig_nitelist_cp[-1])))
+            else:
+                nitelist = str(int(orig_nitelist[0])) + ' - ' + str(int(orig_nitelist[-1]))
+            nitelist = 'NA, {nitelist}'.format(nitelist)
         else:
             nitelist = int(orig_nitelist[0])
         if pipeline =='supercal':
