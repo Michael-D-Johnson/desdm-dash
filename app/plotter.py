@@ -115,7 +115,7 @@ def plot_coadd(all_df, processed_df, band_df, tag):
     Colors=['green','blue','blue','blue','blue','blue','blue','blue','blue','blue']
 
     # All_df data prep
-    newdf = pd.DataFrame()
+    new_all_df = pd.DataFrame()
     xlist, ylist, tilelist =[],[],[]
     for i, row in all_df.iterrows():
         # Fixes wrapping issue
@@ -132,9 +132,9 @@ def plot_coadd(all_df, processed_df, band_df, tag):
         ylist.append([row['decc1'], row['decc2'], row['decc3'], row['decc4']])
         tilelist.append(row['tilename'])
 
-    newdf['x']=xlist
-    newdf['y']=ylist
-    newdf['tilename']=tilelist 
+    new_all_df['x']=xlist
+    new_all_df['y']=ylist
+    new_all_df['tilename']=tilelist 
     
     # Band_df data prep
     band_df = band_df.groupby(by = ['tilename'])
@@ -164,7 +164,7 @@ def plot_coadd(all_df, processed_df, band_df, tag):
 
     p = figure(height=1000, width=1000, x_axis_label='RA (Deg)', y_axis_label='DEC (Deg)', tools=TOOLS, title=str(tag)+' Coadd Map')
 
-    p.patches(xs=newdf['x'], ys=newdf['y'], fill_color='grey', fill_alpha=0.1, line_color='black')
+    p.patches(xs=new_all_df['x'], ys=new_all_df['y'], fill_color='grey', fill_alpha=0.1, line_color='black')
 
     for i,group in fn_df:
         p.patches(xs=group[group.attnum==max(group['attnum'])].x, ys=group[group.attnum==max(group['attnum'])].y, source=create_data_source(group[group.attnum==max(group['attnum'])]), name='processed', fill_color=Colors[int(group[group.attnum==max(group['attnum'])].status)], fill_alpha=0.75, line_color='black')
