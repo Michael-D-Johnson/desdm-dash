@@ -108,12 +108,13 @@ def plot_exec_wall_time(dataframe):
 
     return p
 
-def plot_coadd(all_df, processed_df,tag):
+def plot_coadd(all_df, processed_df, band_df, tag):
     def create_data_source(df):
-        return ColumnDataSource(data=dict(tilename=df['tilename'],status=df['status'],attnum=df['attnum'],reqnum=df['reqnum'],id=df['id']))
+       return ColumnDataSource(data=dict(tilename=df['tilename'],status=df['status'],attnum=df['attnum'],reqnum=df['reqnum'],id=df['id'],dmedian=df['dmedian']))
 
     Colors=['green','blue','blue','blue','blue','blue','blue','blue','blue','blue']
 
+    # All_df data prep
     newdf = pd.DataFrame()
     xlist, ylist, tilelist =[],[],[]
     for i, row in all_df.iterrows():
@@ -135,8 +136,27 @@ def plot_coadd(all_df, processed_df,tag):
     newdf['y']=ylist
     newdf['tilename']=tilelist 
     
-    fn_df = pd.merge(newdf, processed_df, how='inner', on=['tilename'])
+    # Band_df data prep
+    band_df = band_df.groupby(by = ['tilename'])
+
+    new_band_df = pd.DataFrame()
+    tilelist, depthlist = [],[]
+    for tile,group in band_df:
+        tilelist.append(tile)
+        depth,count = 0,0
+        for i,row in group.iterrows():
+            count += 1
+            depth += row['dmedian']
+        depth = depth/count
+        depthlist.append(depth)
+
+    new_band_df['tilename'] = tilelist
+    new_band_df['dmedian'] = depthlist
+
+    # Merge all dfs
+    fn_df = pd.merge(new_all_df, processed_df, how='inner', on=['tilename'])
     fn_df.fillna('None', inplace=True)
+    fn_df = pd.merge(fn_df, new_band_df, how='inner', on=['tilename'])
     fn_df = fn_df.groupby(by = ['tilename'])
 
     Hover = HoverTool(names=['processed'])
@@ -151,6 +171,6 @@ def plot_coadd(all_df, processed_df,tag):
 
     hover = p.select_one(HoverTool)
     hover.point_policy = "follow_mouse"
-    hover.tooltips = [("Tilename", "@tilename"),("Pfw_attempt_id","@id"),("Status","@status"),("Attnum","@attnum"),("Reqnum","@reqnum")]
+    hover.tooltips = [("Tilename", "@tilename"),("Pfw_attempt_id","@id"),("Status","@status"),("Attnum","@attnum"),("Reqnum","@reqnum"),("Depth","@dmedian")]
 
     return p

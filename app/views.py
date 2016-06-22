@@ -47,7 +47,7 @@ def supernova_summary():
 
 @app.route('/coadd_map')
 def coadd_map():
-    all_df, processed_df = get_data.create_coadd_map('db-destest',"ME_TEST")
-    p = plotter.plot_coadd(all_df, processed_df, "ME_TEST")
+    all_df, processed_df, band_df = get_data.create_coadd_map('db-destest',"ME_TEST")
+    p = plotter.plot_coadd(all_df, processed_df, band_df, "ME_TEST")
     script,div = components(p)
     return render_template('coadd_map.html', scripts=script, div=div,title = 'Coadd Map')
