@@ -37,13 +37,6 @@ def processing_detail(reqnum):
 def dts():
     return render_template('dts_monitor.html',title='DTS')
 
-@app.route('/test_df')
-def test_df():
-    df = get_data.create_des_usage('db-destest')
-    p = plotter.data_usage_plot(df)
-    script,div = components(p)
-    return render_template('back_ups.html', scripts=script, div=div, title='Backups')
-
 @app.route('/backups')
 def backups():
     df = get_data.create_des_usage('db-destest')
