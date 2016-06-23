@@ -39,7 +39,10 @@ def dts():
 
 @app.route('/backups')
 def backups():
-    return render_template('back_ups.html',title='Backups')
+    df = get_data.create_des_usage('db-destest')
+    p = plotter.data_usage_plot(df)
+    script,div = components(p)
+    return render_template('back_ups.html', scripts=script, div=div, title='Backups')
 
 @app.route('/supernova_summary')
 def supernova_summary():
@@ -50,4 +53,4 @@ def coadd_map():
     all_df, processed_df, band_df = get_data.create_coadd_map('db-destest',"ME_TEST")
     p = plotter.plot_coadd(all_df, processed_df, band_df, "ME_TEST")
     script,div = components(p)
-    return render_template('coadd_map.html', scripts=script, div=div,title = 'Coadd Map')
+    return render_template('coadd_map.html', scripts=script, div=div, title = 'Coadd Map')

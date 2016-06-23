@@ -163,24 +163,60 @@ def plot_coadd(all_df, processed_df, band_df, tag):
     new_all_df.fillna(0, inplace=True)
     fn_df = pd.merge(new_all_df, processed_df, how='inner', on=['tilename'])
     fn_df.fillna('None', inplace=True)
-#    fn_df = pd.merge(fn_df, new_band_df, how='inner', on=['tilename'])
     fn_df = fn_df.groupby(by = ['tilename'])
 
     all_hover = HoverTool(names=['all'])
     processed_hover = HoverTool(names=['processed'])
     TOOLS = [BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool(),all_hover,processed_hover]
 
+    # Begin Plotting
     p = figure(height=1000, width=1000, x_axis_label='RA (Deg)', y_axis_label='DEC (Deg)', tools=TOOLS, title=str(tag)+' Coadd Map')
 
+    # All Tiles and Depth Info
     p.patches(xs=new_all_df['x'], ys=new_all_df['y'], source=create_all_data_source(new_all_df), name='all', fill_color='blue', fill_alpha=new_all_df['alphas'], line_color='black')
 
+    # Tiles with Status Info
     for i,group in fn_df:
         p.patches(xs=group[group.attnum==max(group['attnum'])].x, ys=group[group.attnum==max(group['attnum'])].y, source=create_processed_data_source(group[group.attnum==max(group['attnum'])]), name='processed', fill_color=Colors[int(group[group.attnum==max(group['attnum'])].status)], fill_alpha=0.95, line_color='black')
 
-#    hover = p.select_one(HoverTool)
+    # Formating
     all_hover.point_policy = "follow_mouse"
     processed_hover.point_policy = "follow_mouse"
     processed_hover.tooltips = [("Tilename", "@tilename"),("Pfw_attempt_id","@id"),("Reqnum","@reqnum"),("Attnum","@attnum"),("Depth","@dmedian")]
     all_hover.tooltips = [("Tilename", "@tilename"),("Depth","@dmedian")]
+
+    return p
+
+def data_usage_plot(df):
+    def create_data_source(df):
+        return ColumnDataSource(data=dict(filesystem=df['filesystem'],total_size=df['total_size'],used=df['used'],available=df['available'],use_percent=df['use_percent'],mounted=['mounted'],submittime=[x.strftime("%Y-%m-%d") for x in df['submittime']]))
+
+    hover = HoverTool(names=['points'])
+    TOOLS = [BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool(),hover]
+    Colors = ['red','navy','olive','firebrick','lightskyblue','yellowgreen','lightcoral','yellow', 'green','blue','gold']
+1
+    # Change percents to format bokeh can use
+    fp_list = []
+    for row in df['use_percent']:
+        fp_list.append(float(row.replace('%','')))
+    df['f_percent'] = fp_list
+
+    # Begin Plotting
+    p = figure(height=500, width=1000, x_axis_type="datetime", y_axis_label='Percent Full', tools=TOOLS, title='Data Usage by Filesystem')
+
+    # Points with hover info
+    p.scatter(x=df['submittime'], y=df['f_percent'], name='points', source=create_data_source(df), color='black')
+    df = df.groupby(by = ['filesystem'])
+
+    # Connecting lines
+    count = 0
+    for filesystem, group in df:
+        count += 1
+        p.line(x=group['submittime'] ,y=group['f_percent'], color=Colors[count], legend=str(filesystem), line_width=3)
+
+    # Formating
+    p.legend.orientation = "top_left"
+    hover.point_policy = "follow_mouse"
+    hover.tooltips = [("Filesystem", "@filesystem"),("Size","@total_size"),("Available","@available"),("Percent Used","@use_percent"),("Time","@submittime")]
 
     return p

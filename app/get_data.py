@@ -15,6 +15,10 @@ def create_coadd_map(section, tag):
     band_df = pandas.DataFrame(query.query_band_info(query.connect_to_db('db-desoper')[1]), columns = ['tilename','dmedian'])
     return all_df, processed_df, band_df
 
+def create_des_usage(section):
+    df = pd.DataFrame(query.query_desdf(connect_to_db('destest')[1]), columns = ['filesystem','total_size','used','available','use_percent','mounted','submittime'])
+    return df
+
 def processing_archive():
     reqnums = os.listdir(templates)
     return reqnums

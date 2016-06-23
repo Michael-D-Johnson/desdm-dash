@@ -106,3 +106,8 @@ def query_band_info(cur):
     query = "select tilename, dmedian from mjohns44.Y3A1depth where band in ('g','r','i')"
     cur.execute(query)
     return cur.fetchall()
+
+def query_desdf(cur):
+    query = "select filesystem, total_size, used ,available, use_percent, mounted, submittime from abode.data_usage order by submittime"
+    cur.execute(query)
+    return cur.fetchall()
