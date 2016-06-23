@@ -8,6 +8,15 @@ def connect_to_db(section):
     cur = dbh.cursor()
     return (dbh,cur)
 
+def submit_desdf(cur,df):
+    for i, row in df.iterrows():
+        submit = "insert into abode.data_usage (FILESYSTEM, TOTAL_SIZE, USED, AVAILABLE, USE_PERCENT, MOUNTED, SUBMITTIME) values "
+        submit += "(\'%s\', \'%s\', \'%s\', \'%s\', \'%s\', \'%s\', %s)" % (row[0], row[1], row[2], row[3], row[4], row[5], row[6])
+        cur.execute(submit)
+    
+    cur.execute("commit")
+    return 0
+
 def processing_detail(cur,reqnums):
     query = "select distinct a.created_date,r.project,r.campaign,a.unitname,v.val,a.reqnum,a.attnum,t1.status,a.data_state,a.operator,r.pipeline,t2.start_time,t2.end_time,b.target_site,t1.exec_host,t2.exec_host from pfw_job j,pfw_attempt a,pfw_attempt_val v,task t1, task t2,pfw_request r,pfw_block b where a.reqnum=r.reqnum and a.reqnum=j.reqnum and a.unitname=j.unitname and a.attnum=j.attnum and a.reqnum=v.reqnum and a.unitname=v.unitname and a.attnum=v.attnum and key in ('nite','range') and a.reqnum in (%s) and b.unitname=a.unitname and b.reqnum=a.reqnum and b.attnum=a.attnum and j.task_id = t2.id and a.task_id=t1.id" % reqnums
     cur.execute(query)
