@@ -109,8 +109,10 @@ def plot_exec_wall_time(dataframe):
     return p
 
 def plot_coadd(all_df, processed_df, band_df, tag):
-    def create_data_source(df):
+   def create_processed_data_source(df):
        return ColumnDataSource(data=dict(tilename=df['tilename'],status=df['status'],attnum=df['attnum'],reqnum=df['reqnum'],id=df['id'],dmedian=df['dmedian']))
+    def create_all_data_source(df):
+       return ColumnDataSource(data=dict(tilename=df['tilename'],dmedian=df['dmedian'])) 
 
     Colors=['green','blue','blue','blue','blue','blue','blue','blue','blue','blue']
 
@@ -140,7 +142,8 @@ def plot_coadd(all_df, processed_df, band_df, tag):
     band_df = band_df.groupby(by = ['tilename'])
 
     new_band_df = pd.DataFrame()
-    tilelist, depthlist = [],[]
+    maxdepth=20
+    tilelist, depthlist, alphalist = [],[],[]
     for tile,group in band_df:
         tilelist.append(tile)
         depth,count = 0,0
@@ -148,29 +151,36 @@ def plot_coadd(all_df, processed_df, band_df, tag):
             count += 1
             depth += row['dmedian']
         depth = depth/count
+        alphalist.append(depth/maxdepth)
         depthlist.append(depth)
 
     new_band_df['tilename'] = tilelist
     new_band_df['dmedian'] = depthlist
-
+    new_band_df['alphas'] = alphalist
+    
     # Merge all dfs
+    new_all_df = pd.merge(new_all_df, new_band_df, how='outer', on=['tilename'])
+    new_all_df.fillna(0, inplace=True)
     fn_df = pd.merge(new_all_df, processed_df, how='inner', on=['tilename'])
     fn_df.fillna('None', inplace=True)
-    fn_df = pd.merge(fn_df, new_band_df, how='inner', on=['tilename'])
+#    fn_df = pd.merge(fn_df, new_band_df, how='inner', on=['tilename'])
     fn_df = fn_df.groupby(by = ['tilename'])
 
-    Hover = HoverTool(names=['processed'])
-    TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool(),Hover]
+    all_hover = HoverTool(names=['all'])
+    processed_hover = HoverTool(names=['processed'])
+    TOOLS = [BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool(),all_hover,processed_hover]
 
     p = figure(height=1000, width=1000, x_axis_label='RA (Deg)', y_axis_label='DEC (Deg)', tools=TOOLS, title=str(tag)+' Coadd Map')
 
-    p.patches(xs=new_all_df['x'], ys=new_all_df['y'], fill_color='grey', fill_alpha=0.1, line_color='black')
+    p.patches(xs=new_all_df['x'], ys=new_all_df['y'], source=create_all_data_source(new_all_df), name='all', fill_color='blue', fill_alpha=new_all_df['alphas'], line_color='black')
 
     for i,group in fn_df:
-        p.patches(xs=group[group.attnum==max(group['attnum'])].x, ys=group[group.attnum==max(group['attnum'])].y, source=create_data_source(group[group.attnum==max(group['attnum'])]), name='processed', fill_color=Colors[int(group[group.attnum==max(group['attnum'])].status)], fill_alpha=0.75, line_color='black')
+        p.patches(xs=group[group.attnum==max(group['attnum'])].x, ys=group[group.attnum==max(group['attnum'])].y, source=create_processed_data_source(group[group.attnum==max(group['attnum'])]), name='processed', fill_color=Colors[int(group[group.attnum==max(group['attnum'])].status)], fill_alpha=0.95, line_color='black')
 
-    hover = p.select_one(HoverTool)
-    hover.point_policy = "follow_mouse"
-    hover.tooltips = [("Tilename", "@tilename"),("Pfw_attempt_id","@id"),("Status","@status"),("Attnum","@attnum"),("Reqnum","@reqnum"),("Depth","@dmedian")]
+#    hover = p.select_one(HoverTool)
+    all_hover.point_policy = "follow_mouse"
+    processed_hover.point_policy = "follow_mouse"
+    processed_hover.tooltips = [("Tilename", "@tilename"),("Pfw_attempt_id","@id"),("Status","@status"),("Attnum","@attnum"),("Reqnum","@reqnum"),("Depth","@dmedian")]
+    all_hover.tooltips = [("Tilename", "@tilename"),("Depth","@dmedian")]
 
     return p
