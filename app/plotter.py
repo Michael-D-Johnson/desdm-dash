@@ -109,10 +109,10 @@ def plot_exec_wall_time(dataframe):
     return p
 
 def plot_coadd(all_df, processed_df, band_df, tag):
-   def create_processed_data_source(df):
-       return ColumnDataSource(data=dict(tilename=df['tilename'],status=df['status'],attnum=df['attnum'],reqnum=df['reqnum'],id=df['id'],dmedian=df['dmedian']))
-   def create_all_data_source(df):
-       return ColumnDataSource(data=dict(tilename=df['tilename'],dmedian=df['dmedian'])) 
+    def create_processed_data_source(df):
+        return ColumnDataSource(data=dict(tilename=df['tilename'],status=df['status'],attnum=df['attnum'],reqnum=df['reqnum'],id=df['id'],dmedian=df['dmedian']))
+    def create_all_data_source(df):
+        return ColumnDataSource(data=dict(tilename=df['tilename'],dmedian=df['dmedian'])) 
 
     Colors=['green','blue','blue','blue','blue','blue','blue','blue','blue','blue']
 
