@@ -38,7 +38,7 @@ def dts():
     return render_template('dts_monitor.html',title='DTS')
 
 @app.route('/test_df')
-def backups():
+def test_df():
     df = get_data.create_des_usage('db-destest')
     p = plotter.data_usage_plot(df)
     script,div = components(p)
