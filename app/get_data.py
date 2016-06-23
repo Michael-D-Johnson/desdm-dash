@@ -16,7 +16,7 @@ def create_coadd_map(section, tag):
     return all_df, processed_df, band_df
 
 def create_des_usage(section):
-    df = pandas.DataFrame(query.query_desdf(query.connect_to_db('destest')[1]), columns = ['filesystem','total_size','used','available','use_percent','mounted','submittime'])
+    df = pandas.DataFrame(query.query_desdf(query.connect_to_db('db-destest')[1]), columns = ['filesystem','total_size','used','available','use_percent','mounted','submittime'])
     return df
 
 def processing_archive():
