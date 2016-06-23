@@ -125,7 +125,7 @@ def plot_coadd(all_df, processed_df, band_df, tag):
             row['rac4']=360 + row['rac4']
             row['rac1']=360 + row['rac1']
         # Shifts image so that tank is visable
-        if row['rac3'] < 150:
+        if row['rac3'] < 180:
             row['rac1'] = row['rac1']+360
             row['rac2'] = row['rac2']+360
             row['rac3'] = row['rac3']+360
