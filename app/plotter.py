@@ -194,7 +194,7 @@ def data_usage_plot(df):
     hover = HoverTool(names=['points'])
     TOOLS = [BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool(),hover]
     Colors = ['red','navy','olive','firebrick','lightskyblue','yellowgreen','lightcoral','yellow', 'green','blue','gold']
-1
+
     # Change percents to format bokeh can use
     fp_list = []
     for row in df['use_percent']:
