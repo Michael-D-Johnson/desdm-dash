@@ -142,7 +142,7 @@ def plot_coadd(all_df, processed_df, band_df, tag):
     band_df = band_df.groupby(by = ['tilename'])
 
     new_band_df = pd.DataFrame()
-    maxdepth=20
+    maxdepth=40
     tilelist, depthlist, alphalist = [],[],[]
     for tile,group in band_df:
         tilelist.append(tile)
