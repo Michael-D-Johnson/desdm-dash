@@ -110,7 +110,7 @@ def plot_exec_wall_time(dataframe):
 
 def plot_coadd(all_df, processed_df, band_df, tag):
     def create_processed_data_source(df):
-        return ColumnDataSource(data=dict(tilename=df['tilename'],status=df['status'],attnum=df['attnum'],reqnum=df['reqnum'],id=df['id'],dmedian=df['dmedian']))
+        return ColumnDataSource(data=dict(tilename=df['tilename'],id=df['id'], reqnum=df['reqnum'],attnum=df['attnum'],dmedian=df['dmedian']))
     def create_all_data_source(df):
         return ColumnDataSource(data=dict(tilename=df['tilename'],dmedian=df['dmedian'])) 
 
@@ -142,7 +142,7 @@ def plot_coadd(all_df, processed_df, band_df, tag):
     band_df = band_df.groupby(by = ['tilename'])
 
     new_band_df = pd.DataFrame()
-    maxdepth=40
+    maxdepth=10
     tilelist, depthlist, alphalist = [],[],[]
     for tile,group in band_df:
         tilelist.append(tile)
@@ -180,7 +180,7 @@ def plot_coadd(all_df, processed_df, band_df, tag):
 #    hover = p.select_one(HoverTool)
     all_hover.point_policy = "follow_mouse"
     processed_hover.point_policy = "follow_mouse"
-    processed_hover.tooltips = [("Tilename", "@tilename"),("Pfw_attempt_id","@id"),("Status","@status"),("Attnum","@attnum"),("Reqnum","@reqnum"),("Depth","@dmedian")]
+    processed_hover.tooltips = [("Tilename", "@tilename"),("Pfw_attempt_id","@id"),("Reqnum","@reqnum"),("Attnum","@attnum"),("Depth","@dmedian")]
     all_hover.tooltips = [("Tilename", "@tilename"),("Depth","@dmedian")]
 
     return p
