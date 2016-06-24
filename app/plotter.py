@@ -173,7 +173,7 @@ def plot_coadd(all_df, processed_df, band_df, tag):
     p = figure(height=1000, width=1000, x_axis_label='RA (Deg)', y_axis_label='DEC (Deg)', tools=TOOLS, title=str(tag)+' Coadd Map')
     p.xaxis[0].ticker=FixedTicker(ticks=[360])
     # All Tiles and Depth Info
-    p.patches(xs=new_all_df['x'], ys=new_all_df['y'], source=create_all_data_source(new_all_df), name='all', fill_color='blue', fill_alpha=new_all_df['alphas'], line_color='black')
+    p.patches(xs=new_all_df['x'], ys=new_all_df['y'], source=create_all_data_source(new_all_df[~new_all_df.tilename.isin(processed_df.tilename.values])), name='all', fill_color='blue', fill_alpha=new_all_df['alphas'], line_color='black')
 
     # Tiles with Status Info
     for i,group in fn_df:
