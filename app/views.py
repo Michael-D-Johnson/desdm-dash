@@ -37,12 +37,12 @@ def processing_detail(reqnum):
 def dts():
     return render_template('dts_monitor.html',title='DTS')
 
-@app.route('/backups')
+@app.route('/System')
 def backups():
     df = get_data.create_des_usage('db-destest')
     p = plotter.data_usage_plot(df)
     script,div = components(p)
-    return render_template('back_ups.html', scripts=script, div=div, title='Backups')
+    return render_template('system.html', scripts=script, div=div, title='System')
 
 @app.route('/supernova_summary')
 def supernova_summary():
