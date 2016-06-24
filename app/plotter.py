@@ -4,7 +4,7 @@ import os
 import numpy as np
 import pandas as pd
 from bokeh.plotting import figure,ColumnDataSource
-from bokeh.models import (HoverTool, BoxSelectTool, BoxZoomTool,
+from bokeh.models import (HoverTool, BoxSelectTool, BoxZoomTool,FixedTicker,
                           PanTool, ResetTool,WheelZoomTool, ResizeTool,
                           glyphs,Legend,NumeralTickFormatter)
 from bokeh.charts import Scatter,Bar,Histogram,color
@@ -171,7 +171,7 @@ def plot_coadd(all_df, processed_df, band_df, tag):
 
     # Begin Plotting
     p = figure(height=1000, width=1000, x_axis_label='RA (Deg)', y_axis_label='DEC (Deg)', tools=TOOLS, title=str(tag)+' Coadd Map')
-
+    p.xaxis[0].ticker=FixedTicker(ticks=[360])
     # All Tiles and Depth Info
     p.patches(xs=new_all_df['x'], ys=new_all_df['y'], source=create_all_data_source(new_all_df), name='all', fill_color='blue', fill_alpha=new_all_df['alphas'], line_color='black')
 
