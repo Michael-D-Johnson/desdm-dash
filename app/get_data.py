@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+import subprocess
 import os
 import sys
 import pandas
@@ -17,6 +18,19 @@ def create_coadd_map(section, tag):
 
 def create_des_usage(section):
     df = pandas.DataFrame(query.query_desdf(query.connect_to_db('db-destest')[1]), columns = ['filesystem','total_size','used','available','use_percent','mounted','submittime'])
+    return df
+
+def get_desdf():
+    df = pandas.DataFrame()
+    for column in range(1,7):
+        p1 = subprocess.Popen( "/usr/local/bin/desdf | awk {\'print $%i\'}" % column, stdout=subprocess.PIPE, shell=True)
+        output = p1.stdout.read().split('\n')
+        print output
+        df[output[0]] = [output[1], output[2], output[3], output[4], output[5], output[6], output[7], output[8]]
+    st = 'sysdate'
+    df['submittime'] = [st,st,st,st,st,st,st,st]
+
+    df.columns = ['FILESYSTEM','TOTAL_SIZE','USED','AVALIABLE','USE_PERCENT','MOUNTED','SUBMITTIME']
     return df
 
 def processing_archive():
