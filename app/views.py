@@ -18,7 +18,7 @@ def processing_archive():
 
 @app.route('/processing_summary')
 def processing_summary():
-    current_dict,rest_dict,columns,updated = get_data.processing_summary('db-desoper','OPS')
+    current_dict,rest_dict,columns,updated,curr_df,rest_df = get_data.processing_summary('db-desoper','OPS')
     return render_template('processing_summary.html',columns=columns,current_dict=current_dict,rest_dict=rest_dict,updated=updated,title='Processing Summary')
 
 @app.route('/testing_summary')
