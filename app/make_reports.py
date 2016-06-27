@@ -87,7 +87,9 @@ def make_reports(db=None,reqnums=None):
     df_master.to_csv(csv_path,index=False,mode='a')
 
     # Make plots html
-    for reqnum,group in df_master.groupby(by=['reqnum']):
+    for name,group in df_master.groupby(by=['reqnum','db']):
+        reqnum = name[0]
+        db = name[1]
         df,columns,reqnum,updated = get_data.processing_detail(group.db.unique()[0],reqnum,group,updated=updated)
         df2 = df.dropna()
         df_pass = df[df.status==0]
