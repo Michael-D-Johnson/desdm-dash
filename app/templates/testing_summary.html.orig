@@ -9,20 +9,20 @@
 <hr>
 </div>
 {% if db=='db-desoper' %}
-{% set df_list = [curr_df,rest_df] %}
+{% set dict_list = [current_dict,rest_dict] %}
 {% else %}
-{% set df_list = [tcurr_df,trest_df] %}
+{% set dict_list = [tcurrent_dict,trest_dict] %}
 {% set columns = tcolumns %}
 {% endif %}
 {% set n=1 %}
-{% for df in df_list %}
+{% for dict in dict_list %}
 {% if n==1 %}
 <h2> Currently running: </h2>
 {% else %}
 <h2> Runs in the last four days: </h2>
 {% endif %}
 {% set n=2 %}
-{% if df.count()[0] ==0 %}
+{% if not dict %}
 <h5> ---NA--- </h5>
 {% else %}
 <table class='normal' border="1">
@@ -33,13 +33,13 @@
     </th>
 {% endfor %}
 </tr>
-{% for i,row in df.iterrows() %}
+{% for di in dict %}
 <tr>
 {% for col in columns %}
     {% if col == 'reqnum' %}
-    <td> <a href="{{ url_for('processing_detail',db=db,reqnum = row['reqnum']) }}"><strong>{{ row['reqnum'] }}</strong></a></td>
+    <td> <a href="{{ url_for('processing_detail',db=db,reqnum =di[col]) }}"><strong>{{ di[col] }}</strong></a></td>
     {% else %}
-    <td> {{ row[col]}} </td> 
+    <td> {{ di[col] }} </td> 
     {% endif %}
 {% endfor %}
 </tr>

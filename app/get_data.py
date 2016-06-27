@@ -57,9 +57,11 @@ def processing_summary(db,project,df=None):
     else:
         df = df[(df.project == 'OPS') & (df.db =='db-desoper')]
     columns = ['operator','project','campaign','pipeline','submit_site','target_site','reqnum','nite','batch size','passed','failed','unknown','remaining']
-    df_op = df.groupby(by=['reqnum'])
+    df_op = df.groupby(by=['reqnum','db'])
     current_dict,rest_dict = [],[]
-    for req,group in sorted(df_op,reverse=True):
+    for name,group in sorted(df_op,reverse=True):
+        req = name[0]
+        db = name[1]
         req = int(float(req))
         orig_nitelist = sorted(group['nite'].unique())
         pipeline = group['pipeline'].unique()[0]
@@ -117,7 +119,8 @@ def processing_summary(db,project,df=None):
                     'target_site':target_site,
                     'campaign':group.campaign.unique()[0],
                     'project':group.project.unique()[0],
-                    'pipeline':pipeline}
+                    'pipeline':pipeline,
+                    'db':db}
         if unknown: current_dict.append(req_dict)
         else: rest_dict.append(req_dict)
     try: current_dict
@@ -126,7 +129,7 @@ def processing_summary(db,project,df=None):
     except: rest_dict = []
     try: columns
     except: columns = []
-    return (current_dict,rest_dict,columns,updated)
+    return (current_dict,rest_dict,columns,updated,pandas.DataFrame(current_dict),pandas.DataFrame(rest_dict))
 
 def processing_detail(db,reqnum,df=None,updated=None):
     if df is None:
