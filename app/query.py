@@ -112,7 +112,7 @@ def query_processed_tiles(dbh,cur,tag):
     return cur.fetchall()
 
 def query_band_info(cur):
-    query = "select tilename, dmedian from mjohns44.Y3A1depth where band in ('g','r','i')"
+    query = "select tilename, band, dmedian from mjohns44.Y3A1depth"
     cur.execute(query)
     return cur.fetchall()
 

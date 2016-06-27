@@ -25,7 +25,6 @@ def get_desdf():
     for column in range(1,7):
         p1 = subprocess.Popen( "/usr/local/bin/desdf | awk {\'print $%i\'}" % column, stdout=subprocess.PIPE, shell=True)
         output = p1.stdout.read().split('\n')
-        print output
         df[output[0]] = [output[1], output[2], output[3], output[4], output[5], output[6], output[7], output[8]]
     st = 'sysdate'
     df['submittime'] = [st,st,st,st,st,st,st,st]

@@ -116,7 +116,7 @@ def plot_coadd(all_df, processed_df, band_df, tag):
 
     Colors=['green','blue','blue','blue','blue','blue','blue','blue','blue','blue']
 
-    # All_df data prep
+    ### All_df data prep ###
     new_all_df = pd.DataFrame()
     xlist, ylist, tilelist =[],[],[]
     for i, row in all_df.iterrows():
