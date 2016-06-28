@@ -165,7 +165,7 @@ def make_coadd_html():
         pass    
 
     # Creating output path
-    path = '/work/devel/mjohns44/git/desdm-dash/app/templates/reports/coadd/'
+    path = '/work/devel/mjohns44/git/desdm-dash/app/static/reports/coadd/'
     if not os.path.isdir(path): os.makedirs(path)
 
     # Writing plots to HTML    
