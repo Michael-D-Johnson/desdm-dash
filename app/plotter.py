@@ -115,6 +115,7 @@ def create_tab(df, band, hover, tag, tab_name):
 
     p = figure(height=1000, width=1000, x_axis_label='RA (Deg)', y_axis_label='DEC (Deg)', tools=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool(),hover], title=str(tag)+' Coadd Map')
     p.patches(xs=df['x'], ys=df['y'], source=create_all_data_source(df), name=tab_name, fill_color='blue', fill_alpha=df['alphas'], line_color='black')
+    p.xaxis[0].ticker=FixedTicker(ticks=[360])
     tab = Panel(child=p, title=tab_name)
 
     return tab
