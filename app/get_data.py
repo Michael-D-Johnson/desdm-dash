@@ -13,7 +13,7 @@ templates = '/work/devel/mjohns44/git/desdm-dash/app/templates/reports'
 def create_coadd_map(section, tag):
     all_df = pandas.DataFrame(query.query_all_tiles(query.connect_to_db(section)[1]), columns = ['tilename','decc1','rac1','decc2','rac2','decc3','rac3','decc4','rac4'])
     processed_df = pandas.DataFrame(query.query_processed_tiles(query.connect_to_db(section)[0], query.connect_to_db(section)[1],','.join([tag])), columns = ['reqnum','tilename','attnum','id','status'])
-    band_df = pandas.DataFrame(query.query_band_info(query.connect_to_db('db-desoper')[1]), columns = ['tilename','dmedian'])
+    band_df = pandas.DataFrame(query.query_band_info(query.connect_to_db('db-desoper')[1]), columns = ['tilename','band','dmedian'])
     return all_df, processed_df, band_df
 
 def create_des_usage(section):

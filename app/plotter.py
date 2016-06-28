@@ -137,14 +137,14 @@ def plot_coadd(all_df, processed_df, band_df, tag):
     new_all_df['x']=xlist
     new_all_df['y']=ylist
     new_all_df['tilename']=tilelist 
-    
-    # Band_df data prep
-    band_df = band_df.groupby(by = ['tilename'])
 
-    new_band_df = pd.DataFrame()
-    maxdepth=10
+    ### Avg_df data prep ###
+    avg_band_df = band_df.groupby(by = ['tilename'])
+
+    new_avg_band_df = pd.DataFrame()
+    maxdepth=20
     tilelist, depthlist, alphalist = [],[],[]
-    for tile,group in band_df:
+    for tile,group in avg_band_df:
         tilelist.append(tile)
         depth,count = 0,0
         for i,row in group.iterrows():
@@ -154,38 +154,63 @@ def plot_coadd(all_df, processed_df, band_df, tag):
         alphalist.append(depth/maxdepth)
         depthlist.append(depth)
 
-    new_band_df['tilename'] = tilelist
-    new_band_df['dmedian'] = depthlist
-    new_band_df['alphas'] = alphalist
+    new_avg_band_df['tilename'] = tilelist
+    new_avg_band_df['dmedian'] = depthlist
+    new_avg_band_df['alphas'] = alphalist
     
-    # Merge all dfs
-    new_all_df = pd.merge(new_all_df, new_band_df, how='outer', on=['tilename'])
-    new_all_df.fillna(0, inplace=True)
-    fn_df = pd.merge(new_all_df, processed_df, how='inner', on=['tilename'])
+    ### Individual_df data prep ###
+    maxdepth=20
+    alphalist = []
+    for i,row in band_df.iterrows():
+        alphalist.append(row['dmedian']/maxdepth)
+
+    band_df['alphas'] = alphalist
+
+    ### Merge all dfs ###
+    individual_df = pd.merge(new_all_df, band_df, how='outer', on=['tilename'])
+    individual_df.fillna(0, inplace=True)
+    avg_df = pd.merge(new_all_df, new_avg_band_df, how='outer', on=['tilename'])
+    avg_df.fillna(0, inplace=True)
+    fn_df = pd.merge(avg_df, processed_df, how='inner', on=['tilename'])
     fn_df.fillna('None', inplace=True)
     fn_df = fn_df.groupby(by = ['tilename'])
 
+    tablist = []
+
+    ### Avg band plot ###
     all_hover = HoverTool(names=['all'])
     processed_hover = HoverTool(names=['processed'])
     TOOLS = [BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool(),all_hover,processed_hover]
 
-    # Begin Plotting
     p = figure(height=1000, width=1000, x_axis_label='RA (Deg)', y_axis_label='DEC (Deg)', tools=TOOLS, title=str(tag)+' Coadd Map')
-    p.xaxis[0].ticker=FixedTicker(ticks=[360])
-    # All Tiles and Depth Info
-    p.patches(xs=new_all_df['x'], ys=new_all_df['y'], source=create_all_data_source(new_all_df[~new_all_df.tilename.isin(processed_df.tilename.values)]), name='all', fill_color='blue', fill_alpha=new_all_df['alphas'], line_color='black')
 
-    # Tiles with Status Info
+    p.patches(xs=avg_df['x'], ys=avg_df['y'], source=create_all_data_source(avg_df), name='all', fill_color='blue', fill_alpha=avg_df['alphas'], line_color='black')
+
     for i,group in fn_df:
         p.patches(xs=group[group.attnum==max(group['attnum'])].x, ys=group[group.attnum==max(group['attnum'])].y, source=create_processed_data_source(group[group.attnum==max(group['attnum'])]), name='processed', fill_color=Colors[int(group[group.attnum==max(group['attnum'])].status)], fill_alpha=0.95, line_color='black')
 
-    # Formating
     all_hover.point_policy = "follow_mouse"
     processed_hover.point_policy = "follow_mouse"
-    processed_hover.tooltips = [("Tilename", "@tilename"),("Pfw_attempt_id","@id"),("Reqnum","@reqnum"),("Attnum","@attnum"),("Depth","@dmedian")]
+    processed_hover.tooltips = [("Tilename", "@tilename"),("Pfw_attempt_id","@id"),("Status","@status"),("Attnum","@attnum"),("Reqnum","@reqnum"),("Depth","@dmedian")]
     all_hover.tooltips = [("Tilename", "@tilename"),("Depth","@dmedian")]
 
-    return p
+    avg = Panel(child=p, title='Avg')
+    tablist.append(avg)
+
+    ### Individual band plots ###
+    bands, names = ['g','r','i','z','Y','u'], ['G','R','I','Z','Y','U']
+    for i in range(0,6):
+        hover = HoverTool(names=[names[i]])
+
+        tab = create_tab(individual_df[individual_df['band']==bands[i]], bands[i], hover, tag, names[i])
+        tablist.append(tab)
+
+        hover.point_policy = "follow_mouse"
+        hover.tooltips = [("Tilename", "@tilename"),("Depth","@dmedian")]
+
+    tabs = Tabs(tabs=tablist)
+
+    return tabs
 
 def data_usage_plot(df):
     def create_data_source(df):
