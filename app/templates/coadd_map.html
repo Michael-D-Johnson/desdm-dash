@@ -1,8 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
-<center>
-{{ scripts|safe }}
-{{ div|safe }}
-<h5>* Depth is calculated from an average of detection bands (g,r,i)
-</center>
+
+{% include name %}
 {% endblock %}

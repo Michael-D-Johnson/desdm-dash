@@ -157,6 +157,26 @@ def make_reports(db=None,reqnums=None):
         with open(reportpath, "wb") as fh:
             fh.write(output_from_parsed_template)
 
+def make_coadd_html():
+    try:
+        all_df, processed_df, band_df = get_data.create_coadd_map('db-destest',"ME_TEST")
+        p = plotter.plot_coadd(all_df, processed_df, band_df, "ME_TEST")
+    except:
+        pass    
+
+    # Creating output path
+    path = '/work/devel/mjohns44/git/desdm-dash/app/templates/reports/coadd/'
+
+    # Writing plots to HTML    
+    html = file_html(vplot(p),INLINE,'coadd')
+    filename = 'coadd_map_save.html'
+    includepath = 'reports/coadd/coadd_map_save.html'
+    filepath = os.path.join(path,filename)
+    with open(filepath,'w') as h:
+        h.write('<center>\n')
+        h.write(html)
+        h.write('</center>\n')
+
 if __name__ =='__main__':
     args = create_args()
     if args.reqnums:
