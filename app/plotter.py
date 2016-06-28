@@ -122,7 +122,7 @@ def create_tab(df, band, hover, tag, tab_name):
 
 def plot_coadd(all_df, processed_df, band_df, tag):
     def create_processed_data_source(df):
-        return ColumnDataSource(data=dict(tilename=df['tilename'],id=df['id'], reqnum=df['reqnum'],attnum=df['attnum'],dmedian=df['dmedian']))
+        return ColumnDataSource(data=dict(status=df['status'],tilename=df['tilename'],id=df['id'], reqnum=df['reqnum'],attnum=df['attnum'],dmedian=df['dmedian']))
     def create_all_data_source(df):
         return ColumnDataSource(data=dict(tilename=df['tilename'],dmedian=df['dmedian'])) 
 
@@ -203,7 +203,7 @@ def plot_coadd(all_df, processed_df, band_df, tag):
 
     all_hover.point_policy = "follow_mouse"
     processed_hover.point_policy = "follow_mouse"
-    processed_hover.tooltips = [("Tilename", "@tilename"),("Pfw_attempt_id","@id"),("Status","@status"),("Attnum","@attnum"),("Reqnum","@reqnum"),("Depth","@dmedian")]
+    processed_hover.tooltips = [("Tilename", "@tilename"),("Pfw_attempt_id","@id"),("Reqnum","@reqnum"),("Attnum","@attnum"),("Status","@status"),("Depth","@dmedian")]
     all_hover.tooltips = [("Tilename", "@tilename"),("Depth","@dmedian")]
 
     avg = Panel(child=p, title='DET')
