@@ -194,8 +194,8 @@ def plot_coadd(all_df, processed_df, band_df, tag):
     TOOLS = [BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool(),all_hover,processed_hover]
 
     p = figure(height=1000, width=1000, x_axis_label='RA (Deg)', y_axis_label='DEC (Deg)', tools=TOOLS, title=str(tag)+' Coadd Map')
-
-    p.patches(xs=avg_df['x'], ys=avg_df['y'], source=create_all_data_source(avg_df), name='all', fill_color='blue', fill_alpha=avg_df['alphas'], line_color='black')
+    p.xaxis[0].ticker=FixedTicker(ticks=[360])
+    p.patches(xs=avg_df['x'], ys=avg_df['y'], source=create_all_data_source(avg_df[~avg_df.tilename.isin(processed_df.tilename.values)]), name='all', fill_color='blue', fill_alpha=avg_df['alphas'], line_color='black')
 
     for i,group in fn_df:
         p.patches(xs=group[group.attnum==max(group['attnum'])].x, ys=group[group.attnum==max(group['attnum'])].y, source=create_processed_data_source(group[group.attnum==max(group['attnum'])]), name='processed', fill_color=Colors[int(group[group.attnum==max(group['attnum'])].status)], fill_alpha=0.95, line_color='black')
@@ -207,7 +207,7 @@ def plot_coadd(all_df, processed_df, band_df, tag):
 
     avg = Panel(child=p, title='DET')
     tablist.append(avg)
-
+    
     ### Individual band plots ###
     bands, names = ['g','r','i','z','Y','u'], ['G','R','I','Z','Y','U']
     for i in range(0,6):
