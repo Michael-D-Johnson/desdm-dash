@@ -194,7 +194,7 @@ def plot_coadd(all_df, processed_df, band_df, tag):
     processed_hover.tooltips = [("Tilename", "@tilename"),("Pfw_attempt_id","@id"),("Status","@status"),("Attnum","@attnum"),("Reqnum","@reqnum"),("Depth","@dmedian")]
     all_hover.tooltips = [("Tilename", "@tilename"),("Depth","@dmedian")]
 
-    avg = Panel(child=p, title='Avg')
+    avg = Panel(child=p, title='DET')
     tablist.append(avg)
 
     ### Individual band plots ###
