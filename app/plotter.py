@@ -8,6 +8,7 @@ from bokeh.models.widgets import Panel, Tabs
 from bokeh.models import (HoverTool, BoxSelectTool, BoxZoomTool,FixedTicker,
                           PanTool, ResetTool,WheelZoomTool, ResizeTool,
                           glyphs,Legend,NumeralTickFormatter)
+from bokeh.models.widgets import Panel
 from bokeh.charts import Scatter,Bar,Histogram,color
 
 def plot_times(dataframe):
