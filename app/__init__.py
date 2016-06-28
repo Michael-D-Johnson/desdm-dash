@@ -3,6 +3,8 @@ import jinja2
 
 app=Flask(__name__)
 app.jinja_loader = jinja2.FileSystemLoader(['/work/devel/mjohns44/git/desdm-dash/app/templates',
-                                            '/work/QA/'])
+                                            '/work/QA/',
+                                            '/work/devel/mjohns44/git/desdm-dash/app/static',
+                                          ])
 
 from app import views

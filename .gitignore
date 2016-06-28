@@ -1,4 +1,4 @@
 *.pyc
 /app/static/completed_requests/*
 /app/static/processing.csv
-/app/templates/reports/*
+/app/static/reports/*
