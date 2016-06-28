@@ -95,6 +95,7 @@ def plot_exec_wall_time(dataframe):
     count = 0
     print "Starting Plot"
     for exechost, group in df:
+        print exechost, group.reqnum.unique()[0]
         count = count+1
         #print exechost
         for attnum in group.attnum.unique():

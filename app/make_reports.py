@@ -194,3 +194,4 @@ if __name__ =='__main__':
         csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
 
     make_reports(db=db,reqnums=reqnums)
+    make_coadd_html() 
