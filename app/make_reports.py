@@ -174,6 +174,7 @@ def make_coadd_html():
     includepath = 'reports/coadd/coadd_map_save.html'
     filepath = os.path.join(path,filename)
     with open(filepath,'w') as h:
+        h.write('<h5> Last updated on: %s </h5>' % "#{0}".format(datetime.now()))
         h.write('<center>\n')
         h.write(html)
         h.write('</center>\n')
