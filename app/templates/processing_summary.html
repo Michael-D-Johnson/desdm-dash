@@ -12,7 +12,8 @@
 {% if not dict %}
 <h5>--NA--</h5>
 {% else %}
-<table class='normal' border="1">
+<table class='display black' cellspacing="0" width="100%" border="1">
+<thead>
 <tr>
 {% for col in columns %}
     <th>
@@ -20,6 +21,8 @@
     </th>
 {% endfor %}
 </tr>
+</thead>
+<tbody>
 {% for di in dict %}
 <tr>
 {% for col in columns %}
@@ -31,6 +34,7 @@
 {% endfor %}
 </tr>
 {% endfor %}
+</tbody>
 </table>
 {% endif %}
 {% endfor %}

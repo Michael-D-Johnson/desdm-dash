@@ -3,7 +3,8 @@
 {% include filename %}
 
 <h1> Processing Attempts </h1>
-<table class="normal" border="1">
+<table id="example" class="black display" border="1" cellspacing="0" width="100%">
+<thead background="black" color="white">
 <tr>
 {% for col in columns %}
     <th>
@@ -11,6 +12,8 @@
     </th>
 {% endfor %}
 </tr>
+</thead>
+<tbody>
 {% for key,row in df.iterrows() %}
 <tr>
     {% for col in columns %}
@@ -36,5 +39,6 @@
     {% endfor %}
     </tr>
 {% endfor %}
+</tbody>
 </table>
 </center>

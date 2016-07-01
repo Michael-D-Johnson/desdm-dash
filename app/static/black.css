@@ -1,0 +1,23 @@
+.black{
+  border:2px solid black;
+}
+
+.black thead{
+  background:black;
+}
+
+.black table {
+  width: 100%;
+}
+.black thead{
+  color:white;
+}
+
+.black tbody tr:nth-child(even) {
+  background:#ECF0F1;
+}
+
+.black tbody tr:hover {
+background:#BDC3C7;
+  color:purple;
+}
