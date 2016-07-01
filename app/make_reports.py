@@ -113,8 +113,9 @@ def make_reports(db=None,reqnums=None):
         except:
             pass
         try:
-            exec_time = plotter.plot_exec_wall_time(df_pass)
-            plots.append(exec_time)
+            if not df_pass.empty:
+                exec_time = plotter.plot_exec_wall_time(df_pass)
+                plots.append(exec_time)
         except:
             pass
         try:
