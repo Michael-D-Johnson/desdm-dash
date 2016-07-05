@@ -26,10 +26,14 @@ def testing_summary():
     current_dict,rest_dict,columns,updated,curr_df,rest_df = get_data.processing_summary('db-desoper','TEST')
     tcurrent_dict,trest_dict,tcolumns,tupdated,tcurr_df,trest_df = get_data.processing_summary('db-destest','TEST')
 
-    curr_df = curr_df[curr_df.db=='db-desoper']
-    rest_df = rest_df[rest_df.db=='db-desoper']
-    tcurr_df = tcurr_df[tcurr_df.db=='db-destest']
-    trest_df = trest_df[trest_df.db=='db-destest']
+    if len(curr_df) > 0:
+        curr_df = curr_df[curr_df.db=='db-desoper']
+    if len(rest_df) > 0:
+        rest_df = rest_df[rest_df.db=='db-desoper']
+    if len(tcurr_df) > 0:
+        tcurr_df = tcurr_df[tcurr_df.db=='db-destest']
+    if len(trest_df) > 0:
+        trest_df = trest_df[trest_df.db=='db-destest']
     return render_template('testing_summary.html',curr_df = curr_df, trest_df = trest_df,rest_df = rest_df, tcurr_df = tcurr_df, columns=columns,current_dict=current_dict,rest_dict=rest_dict,tcurrent_dict=tcurrent_dict,trest_dict=trest_dict,tcolumns=tcolumns,updated=updated,title='Testing Summary')
 
 @app.route('/processing_detail/<reqnum>')
