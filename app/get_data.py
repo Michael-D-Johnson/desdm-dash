@@ -8,7 +8,7 @@ from datetime import datetime
 import query
 
 csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
-templates = '/work/devel/mjohns44/git/desdm-dash/app/templates/reports'
+templates = '/work/devel/mjohns44/git/desdm-dash/app/static/reports'
 
 def create_coadd_map(section, tag):
     all_df = pandas.DataFrame(query.query_all_tiles(query.connect_to_db(section)[1]), columns = ['tilename','decc1','rac1','decc2','rac2','decc3','rac3','decc4','rac4'])
