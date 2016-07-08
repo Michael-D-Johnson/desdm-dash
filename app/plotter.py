@@ -241,7 +241,7 @@ def data_usage_plot(df):
 
     # Begin Plotting
     x_max = datetime.now()
-    p = figure(height=500, width=1000, x_axis_type="datetime", x_range=(x_max,(x_max-timedelta(14))) y_axis_label='Percent Full', tools=TOOLS, title='Data Usage by Filesystem')
+    p = figure(height=500, width=1000, x_axis_type="datetime", x_range=(x_max,(x_max-timedelta(14))), y_axis_label='Percent Full', tools=TOOLS, title='Data Usage by Filesystem')
 
     # Points with hover info
     p.scatter(x=df['submittime'], y=df['f_percent'], name='points', source=create_data_source(df), color='black', size=6)
