@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import os
-
 import numpy as np
 import pandas as pd
+from datetime import datetime, timedelta
 from bokeh.plotting import figure,ColumnDataSource
 from bokeh.models.widgets import Panel, Tabs
 from bokeh.models import (HoverTool, BoxSelectTool, BoxZoomTool,FixedTicker,
@@ -240,7 +240,8 @@ def data_usage_plot(df):
     df['f_percent'] = fp_list
 
     # Begin Plotting
-    p = figure(height=500, width=1000, x_axis_type="datetime", y_axis_label='Percent Full', tools=TOOLS, title='Data Usage by Filesystem')
+    x_max = datetime.now()
+    p = figure(height=500, width=1000, x_axis_type="datetime", x_range=(x_max,(x_max-timedelta(14))) y_axis_label='Percent Full', tools=TOOLS, title='Data Usage by Filesystem')
 
     # Points with hover info
     p.scatter(x=df['submittime'], y=df['f_percent'], name='points', source=create_data_source(df), color='black')
