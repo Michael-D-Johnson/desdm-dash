@@ -2,3 +2,4 @@
 /app/static/completed_requests/*
 /app/static/processing.csv
 /app/static/reports/*
+.idea
