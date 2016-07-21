@@ -18,23 +18,38 @@ def submit_desdf(cur,df):
     return 0
 
 def processing_detail(cur,reqnums):
-    query = "select distinct a.created_date,r.project,r.campaign,a.unitname,v.val,a.reqnum,a.attnum,t1.status,a.data_state,a.operator,r.pipeline,t2.start_time,t2.end_time,b.target_site,t1.exec_host,t2.exec_host from pfw_job j,pfw_attempt a,pfw_attempt_val v,task t1, task t2,pfw_request r,pfw_block b where a.reqnum=r.reqnum and a.reqnum=j.reqnum and a.unitname=j.unitname and a.attnum=j.attnum and a.reqnum=v.reqnum and a.unitname=v.unitname and a.attnum=v.attnum and key in ('nite','range') and a.reqnum in (%s) and b.unitname=a.unitname and b.reqnum=a.reqnum and b.attnum=a.attnum and j.task_id = t2.id and a.task_id=t1.id" % reqnums
+    query = "SELECT distinct a.created_date,r.project,r.campaign,a.reqnum,a.unitname,a.attnum,a.id,v.val,t1.status,\
+            a.data_state,a.operator,r.pipeline,t2.start_time,t2.end_time,b.target_site,t1.exec_host,t2.exec_host \
+            FROM pfw_job j,pfw_attempt a, pfw_attempt_val v,task t1, task t2,pfw_request r,pfw_block b \
+            WHERE a.reqnum=r.reqnum and a.id=j.pfw_attempt_id and a.id=v.pfw_attempt_id and key in ('nite','range') \
+            and a.reqnum in ({reqnums}) and b.unitname=a.unitname and b.pfw_attempt_id = a.id and \
+            j.task_id = t2.id and a.task_id=t1.id".format(reqnums=reqnums)
     cur.execute(query)
     return cur.fetchall()
 
 def processing_basic(cur,reqnum):
-    query = "select distinct r.project,r.campaign,a.unitname,a.reqnum,a.attnum,t1.status,a.data_state,a.operator,r.pipeline,b.target_site,t1.exec_host,t2.exec_host from pfw_attempt a, pfw_job j, task t1,task t2, pfw_request r,pfw_block b where a.created_date >= sysdate-4 and t1.id =a.task_id and a.reqnum=r.reqnum and a.reqnum=%s and b.unitname=a.unitname and a.reqnum=b.reqnum and a.attnum=b.attnum and j.task_id=t2.id and j.unitname=a.unitname and j.attnum=a.attnum and j.reqnum=a.reqnum" % reqnum
+    query = "SELECT distinct r.project,r.campaign,a.reqnum,a.id,t1.status,a.data_state,a.operator,r.pipeline,\
+            b.target_site,t1.exec_host,t2.exec_host \
+            FROM pfw_attempt a, pfw_job j, task t1,task t2, pfw_request r,pfw_block b \
+            WHERE a.created_date >= sysdate-4 and t1.id =a.task_id and a.reqnum=r.reqnum and a.reqnum={reqnum}\
+            and a.id=b.pfw_attempt_id and j.task_id=t2.id and j.pfw_attempt_id=a.id".format(reqnum=reqnum)
     cur.execute(query)
     return cur.fetchall()
 
 def processing_summary(cur,reqnums):
-    query = "select distinct a.created_date,r.project,r.campaign,a.unitname,a.reqnum,a.attnum,t1.status,a.data_state,a.operator,r.pipeline,t2.start_time,t2.end_time,b.target_site,t1.exec_host,t2.exec_host from pfw_job j,pfw_attempt a,task t1, task t2,pfw_request r,pfw_block b where a.reqnum=r.reqnum and a.id=j.pfw_attempt_id and b.pfw_attempt_id=a.id and j.task_id = t2.id and a.task_id=t1.id and a.reqnum in (%s) " % reqnums
+    query = "SELECT distinct a.created_date,r.project,r.campaign,a.unitname, a.reqnum,a.attnum,a.id,t1.status,\
+            a.data_state,a.operator, r.pipeline,t2.start_time,t2.end_time,b.target_site,t1.exec_host,t2.exec_host \
+            FROM pfw_job j,pfw_attempt a,task t1, task t2,pfw_request r,pfw_block b \
+            WHERE a.reqnum=r.reqnum and a.id=j.pfw_attempt_id and b.pfw_attempt_id=a.id and j.task_id = t2.id \
+            and a.task_id=t1.id and a.reqnum in ({reqnums}) ".format(reqnums=reqnums)
 
     cur.execute(query)
     return cur.fetchall()
 
 def get_reqnums(cur):
-    query = "select distinct a.reqnum from pfw_attempt a,task t,pfw_request r,pfw_job j where a.created_date >= sysdate-4 and t.id =a.task_id and a.reqnum=r.reqnum and a.id=j.pfw_attempt_id"
+    query = "SELECT distinct a.reqnum \
+            FROM pfw_attempt a,task t,pfw_request r,pfw_job j \
+            WHERE a.created_date >= sysdate-4 and t.id =a.task_id and a.reqnum=r.reqnum and a.id=j.pfw_attempt_id"
     cur.execute(query)
     return [req[0] for req in cur.fetchall()]
 
@@ -46,44 +61,59 @@ def basic_batch_query(cur,reqnum):
 
 def batch_size_query(cur,nitelist,reqnum,pipeline):
     if pipeline=='sne':
-        batch_size_query = "select count(*) from (select distinct field,band from exposure where nite in (%s) and field like 'SN%%' group by field,band)" % nitelist
+        batch_size_query = "SELECT count(*) \
+                            FROM (SELECT distinct field,band from exposure where nite in ({nitelist}) \
+                            and field like 'SN%%' group by field,band)".format(nitelist=nitelist)
     elif pipeline =='finalcut':
         key = 'DESOPS-%s' % reqnum
         summary = jiracmd.Jira('jira-desdm').get_issue(key).fields.summary
-        batch_size_query = "select count(*) from exposuretag where tag in ('%s')" % summary
+        batch_size_query = "select count(*) from exposuretag where tag in ('{summary}')".format(summary=summary)
     elif pipeline=='supercal' or pipeline=='precal':
-        batch_size_query = "select count(distinct unitname) from pfw_attempt where reqnum=%s" % reqnum
+        batch_size_query = "SELECT count(distinct unitname) \
+                            FROM pfw_attempt where reqnum={reqnum}".format(reqnum=reqnum)
     else:
-        batch_size_query = "select count(distinct expnum) from exposure where obstype='object' and object not like '%%pointing%%' and object not like '%%focus%%' and object not like '%%donut%%' and object not like '%%test%%' and object not like '%%junk%%' and nite in (%s)" % nitelist
+        batch_size_query = "select count(distinct expnum) from exposure where obstype='object' \
+                            and object not like '%%pointing%%' and object not like '%%focus%%' \
+                            and object not like '%%donut%%' and object not like '%%test%%' \
+                            and object not like '%%junk%%' and nite in ({nitelist})".format(nitelist=nitelist)
     cur.execute(batch_size_query)
     results = cur.fetchone()[0]
     if not results:
-        batch_size_query = "select count(distinct unitname) from pfw_attempt where reqnum=%s" % reqnum
+        batch_size_query = "SELECT count(distinct unitname) \
+                            FROM pfw_attempt where reqnum={reqnum}".format(reqnum=reqnum)
         cur.execute(batch_size_query)
         results = cur.fetchone()[0]
     return results
 
-def assess_query(cur,df,index,triplet,pipeline):
+def assess_query(cur,df,index,pfw_attempt_id,pipeline):
     if pipeline=='sne':
         camsym,field,band,seq = triplet[0].split('_')
         comment = field.strip('SN-') + band + ' ' + str(df.loc[index,('nite')])
-        assess_q = "select distinct accepted,t_eff,program from firstcut_eval where analyst='SNQUALITY' and analyst_comment='%s'" % (comment)
+        assess_q = "select distinct accepted,t_eff,program from firstcut_eval where analyst='SNQUALITY' \
+                    and analyst_comment='{comment}'".format(comment=comment)
     elif pipeline =='finalcut':
-        assess_q = "select distinct accepted,t_eff,program from finalcut_eval where unitname='%s' and reqnum='%s' and attnum='%s'" % (triplet[0],triplet[1],triplet[2])
+        assess_q = "SELECT distinct accepted,t_eff,program from finalcut_eval \
+                    WHERE pfw_attempt_id={pfwid}".format(pfwid=pfw_attempt_id)
     elif pipeline =='firstcut':
-        assess_q = "select distinct accepted,t_eff,program from firstcut_eval where unitname='%s' and reqnum='%s' and attnum='%s'" % (triplet[0],triplet[1],triplet[2])
+        assess_q = "SELECT distinct accepted,t_eff,program \
+                    FROM firstcut_eval where pfw_attempt_id={pfwid}'".format(pfwid=pfw_attempt_id)
     else:
-        assess_q = "select distinct accepted,t_eff,program from firstcut_eval where unitname='%s' and reqnum='%s' and attnum='%s'" % (triplet[0],triplet[1],triplet[2])
+        assess_q = "SELECT distinct accepted,t_eff,program \
+                    FROM firstcut_eval where pfw_attempt_id={pfwid}".format(pfwid=pfw_attempt_id)
     cur.execute(assess_q)
     return cur.fetchall()
 
 def get_status(cur,reqnums):
-    query = "select unitname,reqnum,attnum,status from pfw_attempt a,task t where t.id=a.task_id and reqnum in (%s)" % (reqnums)
+    query = "select unitname,reqnum,attnum,a.id, status from pfw_attempt a,task t where t.id=a.task_id \
+            and reqnum in ({reqnums})".format(reqnums=reqnums)
     cur.execute(query)
     return cur.fetchall()
 
 def get_expnum_info(cur,reqnums):
-    query = "select distinct a.unitname,a.reqnum,a.attnum,e.expnum,e.band from pfw_request r,exposure e, pfw_attempt a where a.reqnum in (%s) and e.expnum= substr(a.unitname,4) and r.reqnum=a.reqnum and r.pipeline in ('firstcut','finalcut') and a.unitname not like 'DES%%'" % (reqnums)
+    query = "SELECT distinct a.unitname,a.reqnum,a.attnum,a.id, e.expnum,e.band from pfw_request r,exposure e, \
+            pfw_attempt a\
+            WHERE a.reqnum in ({reqnums}) and e.expnum= substr(a.unitname,4) and r.reqnum=a.reqnum \
+            and r.pipeline in ('firstcut','finalcut') and a.unitname not like 'DES%%'".format(reqnums=reqnums)
     try: 
         cur.execute(query)
         return cur.fetchall()
@@ -91,12 +121,14 @@ def get_expnum_info(cur,reqnums):
         return None
 
 def get_nites(cur,reqnums):
-    query = "select distinct a.unitname,a.reqnum,a.attnum, v.val from pfw_attempt a,pfw_attempt_val v where key in ('nite','range') and a.id=v.pfw_attempt_id and a.reqnum in (%s)" % (reqnums)
+    query = "SELECT distinct a.unitname,a.reqnum,a.attnum,a.id,v.val from pfw_attempt a,pfw_attempt_val v \
+             WHERE key in ('nite','range') and a.id=v.pfw_attempt_id and a.reqnum in ({reqnums})".format(reqnums=reqnums)
     cur.execute(query)
     return cur.fetchall()
 
 def get_teffs(cur,reqnums):
-    query = "select distinct a.unitname,a.reqnum,a.attnum, e.expnum, e.t_eff from pfw_attempt a,finalcut_eval e where and a.attnum=e.attnum and a.unitname=e.unitname and a.reqnum=e.reqnum and a.reqnum in (%s)" % (reqnums)
+    query = "SELECT distinct a.reqnum,a.id, e.expnum, e.t_eff from pfw_attempt a,finalcut_eval e \
+            WHERE and a.id=e.pfw_attempt_id and a.reqnum in ({reqnums})".format(reqnums=reqnums)
     cur.execute(query)
     return cur.fetchall()
 
@@ -106,7 +138,10 @@ def query_all_tiles(cur):
     return cur.fetchall()
 
 def query_processed_tiles(dbh,cur,tag):
-    query = "select a.reqnum, a.unitname, a.attnum, a.id, t.status from prodbeta.task t, prodbeta.pfw_attempt a, mjohns44.destiles c, prodbeta.proctag p where t.id=a.task_id and a.unitname=c.tilename and a.id=p.pfw_attempt_id and p.tag=%s" % dbh.get_named_bind_string('tag')
+    query = "SELECT a.reqnum, a.unitname, a.attnum, a.id, t.status \
+            FROM prodbeta.task t, prodbeta.pfw_attempt a, mjohns44.destiles c, prodbeta.proctag p \
+            WHERE t.id=a.task_id and a.unitname=c.tilename and a.id=p.pfw_attempt_id \
+            and p.tag={tag}".format(tag= dbh.get_named_bind_string('tag'))
     params = {'tag': tag}
     cur.execute(query, params)
     return cur.fetchall()
@@ -117,6 +152,7 @@ def query_band_info(cur):
     return cur.fetchall()
 
 def query_desdf(cur):
-    query = "select filesystem, total_size, used ,available, use_percent, mounted, submittime from abode.data_usage order by submittime"
+    query = "select filesystem, total_size, used ,available, use_percent, mounted, submittime from abode.data_usage \
+             order by submittime"
     cur.execute(query)
     return cur.fetchall()

@@ -40,13 +40,15 @@ def make_reports(db=None,reqnums=None):
     if test_reqnums:
         df_test = pandas.DataFrame(
                 query.processing_summary(query.connect_to_db('db-destest')[1],','.join(test_reqnums)),
-                columns = ['created_date','project','campaign','unitname','reqnum','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_site','exec_host'])
+                columns = ['created_date','project','campaign','unitname','reqnum','attnum','pfw_attempt_id','status',
+                           'data_state','operator','pipeline','start_time','end_time','target_site','submit_site',
+                           'exec_host'])
         df_test_status = pandas.DataFrame(
                 query.get_status(query.connect_to_db('db-destest')[1],','.join(test_reqnums)),
-                columns = ['unitname','reqnum','attnum','status'])
+                columns = ['unitname','reqnum','attnum','pfw_attempt_id','status'])
         df_test_nites = pandas.DataFrame(
                 query.get_nites(query.connect_to_db('db-destest')[1],','.join(test_reqnums)),
-                columns = ['unitname','reqnum','attnum','nite'])
+                columns = ['unitname','reqnum','attnum','pfw_attempt_id','nite'])
         try:
             df_test_expnum = pandas.DataFrame(
                 query.get_expnum_info(query.connect_to_db('db-destest')[1],','.join(test_reqnums)),
@@ -57,25 +59,29 @@ def make_reports(db=None,reqnums=None):
             df_test_expnum.insert(len(df_test_expnum.columns),'reqnum',None)
             df_test_expnum.insert(len(df_test_expnum.columns),'attnum',None)
         for df in [df_test_status,df_test_expnum,df_test_nites]:
-            df_test = pandas.merge(df_test,df,on=['unitname','reqnum','attnum'],how='left',suffixes=('_orig',''))
+            df_test = pandas.merge(df_test,df,on=['unitname','reqnum','attnum','pfw_attempt_id'],how='left',
+                                   suffixes=('_orig',''))
         df_test['db'] = 'db-destest'
     else:
         df_test = pandas.DataFrame()
     if oper_reqnums:
         df_oper = pandas.DataFrame(
                 query.processing_summary(query.connect_to_db('db-desoper')[1],','.join(oper_reqnums)),
-                columns = ['created_date','project','campaign','unitname','reqnum','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_site','exec_host'])
+                columns = ['created_date','project','campaign','unitname','reqnum','attnum','pfw_attempt_id',
+                           'status','data_state','operator','pipeline','start_time','end_time','target_site',
+                           'submit_site','exec_host'])
         df_oper_status = pandas.DataFrame(
                 query.get_status(query.connect_to_db('db-desoper')[1],','.join(oper_reqnums)),
-                columns = ['unitname','reqnum','attnum','status'])
+                columns = ['unitname','reqnum','attnum','pfw_attempt_id','status'])
         df_oper_nites = pandas.DataFrame(
                 query.get_nites(query.connect_to_db('db-desoper')[1],','.join(oper_reqnums)),
-                columns = ['unitname','reqnum','attnum','nite'])
+                columns = ['unitname','reqnum','attnum','pfw_attempt_id','nite'])
         df_oper_expnum = pandas.DataFrame(
                 query.get_expnum_info(query.connect_to_db('db-desoper')[1],','.join(oper_reqnums)),
-                columns = ['unitname','reqnum','attnum','expnum','band'])
+                columns = ['unitname','reqnum','attnum','pfw_attempt_id','expnum','band'])
         for df in [df_oper_status,df_oper_expnum,df_oper_nites]:
-            df_oper = pandas.merge(df_oper,df,on=['unitname','reqnum','attnum'],how='left',suffixes=('_orig',''))
+            df_oper = pandas.merge(df_oper,df,on=['unitname','reqnum','attnum','pfw_attempt_id'],how='left',
+                                   suffixes=('_orig',''))
         df_oper['db'] ='db-desoper'
     else:
         df_oper = pandas.DataFrame()
@@ -131,7 +137,7 @@ def make_reports(db=None,reqnums=None):
             pass
         
         # Creating output path
-        path = '/work/devel/mjohns44/git/desdm-dash/app/static/reports/{reqnum}'.format(reqnum=reqnum)
+        path = os.path.join(app.config["STATIC_PATH"],"reports/{reqnum}".format(reqnum=reqnum))
         if not os.path.isdir(path): os.makedirs(path)
 
         # Writing CSV
@@ -166,7 +172,7 @@ def make_coadd_html():
         pass    
 
     # Creating output path
-    path = '/work/devel/mjohns44/git/desdm-dash/app/static/reports/coadd/'
+    path = os.path.join(app.config["STATIC_PATH"],"reports/coadd/")
     if not os.path.isdir(path): os.makedirs(path)
 
     # Writing plots to HTML    
@@ -193,7 +199,7 @@ if __name__ =='__main__':
     if args.csv:
         csv_path = args.csv
     else:
-        csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
+        csv_path = os.path.join(app.config["STATIC_PATH"],"processing.csv")
 
     make_reports(db=db,reqnums=reqnums)
     make_coadd_html() 
