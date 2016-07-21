@@ -58,6 +58,7 @@ def make_reports(db=None,reqnums=None):
             df_test_expnum.insert(len(df_test_expnum.columns),'unitname',None)
             df_test_expnum.insert(len(df_test_expnum.columns),'reqnum',None)
             df_test_expnum.insert(len(df_test_expnum.columns),'attnum',None)
+            df_test_expnum.insert(len(df_test_expnum.columns),'pfw_attempt_id',None)
         for df in [df_test_status,df_test_expnum,df_test_nites]:
             df_test = pandas.merge(df_test,df,on=['unitname','reqnum','attnum','pfw_attempt_id'],how='left',
                                    suffixes=('_orig',''))
