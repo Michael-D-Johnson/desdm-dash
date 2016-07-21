@@ -171,7 +171,8 @@ def processing_detail(db,reqnum,df=None,updated=None):
             except:
                 pass
             pipeline = group.pipeline.unique()
-            assess_query_results = query.assess_query(query.connect_to_db(db)[1],df,index,name,pipeline)
+            assess_query_results = query.assess_query(query.connect_to_db(db)[1],df,index,
+                                                      group.pfw_attempt_id.unique()[0],pipeline)
 
             try:
                 assess,t_eff,program = assess_query_results[0][0],assess_query_results[0][1],assess_query_results[0][2]
