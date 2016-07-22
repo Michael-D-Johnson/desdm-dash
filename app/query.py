@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 import os
+import pandas
 from opstoolkit import jiracmd
 from despydb import DesDbi
 
