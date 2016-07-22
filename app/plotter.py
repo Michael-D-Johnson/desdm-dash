@@ -254,8 +254,103 @@ def data_usage_plot(df):
         p.line(x=group['submittime'] ,y=group['f_percent'], color=Colors[count], legend=str(filesystem), line_width=3)
 
     # Formating
-    p.legend.orientation = "top_left"
+    p.legend.location = "top_left"
     hover.point_policy = "follow_mouse"
     hover.tooltips = [("Filesystem", "@filesystem"),("Size","@total_size"),("Available","@available"),("Percent Used","@use_percent"),("Time","@submittime")]
+
+    return p
+
+def plot_tape_tar_file_transfer_status(npx,npxf,npnxf):
+
+    TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
+
+    ### Setup bokeh plot ###
+    p = figure(plot_height=500, plot_width=1000, x_range=(npx.min(),npx.max()), x_axis_type="datetime", x_axis_label="Date", y_axis_label="Number of Tape Tar Files", tools=TOOLS,title='Tape Tar File Transfer Status')
+
+    p.line(x=npx , y=npxf+npnxf , color='black' , legend='Total', line_width=3)
+    p.line(x=npx , y=npxf , color='firebrick' , legend='Transferred', line_width=3)
+    p.line(x=npx , y=npnxf , color='navy' , legend='In queue to be transferred', line_width=3)
+
+    p.scatter(x=npx, y=npxf+npnxf, color='black', size=6)
+    p.scatter(x=npx, y=npxf, color='firebrick', size=6)
+    p.scatter(x=npx, y=npnxf, color='navy', size=6)
+
+    p.legend.location = "top_left"
+
+    return p
+
+def plot_backup_size(npx,npsxf,npsnxf):
+
+    TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
+
+    # Setup bokeh plot
+    p = figure(plot_height=500, plot_width=1000, x_range=(npx.min(),npx.max()), x_axis_type="datetime", x_axis_label="Date", y_axis_label="Tbytes", tools=TOOLS,title='Backup Size')
+
+    p.line(x=npx , y=npsnxf+npsxf , color='black' , legend='Total', line_width=3)
+    p.line(x=npx , y=npsxf , color='firebrick' , legend='Transferred', line_width=3)
+    p.line(x=npx , y=npsnxf , color='navy' , legend='In queue to be transferred', line_width=3)
+
+    p.scatter(x=npx, y=npsnxf+npsxf, color='black', size=6)
+    p.scatter(x=npx, y=npsxf, color='firebrick', size=6)
+    p.scatter(x=npx, y=npsnxf, color='navy', size=6)
+
+    p.legend.location = "top_left"
+
+    return p
+
+def plot_pipeline_run_progress(npx,nppp,npp2p):
+
+    TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
+
+    # Setup bokeh plot
+    p = figure(plot_height=500, plot_width=1000, x_range=(npx.min(),npx.max()), x_axis_type="datetime", x_axis_label="Date", tools=TOOLS,title='Pipeline Run\'s progress')
+
+    p.line(x=npx , y=nppp+npp2p , color='black' , legend='Total', line_width=3)
+    p.line(x=npx , y=nppp , color='firebrick' , legend='Tarred', line_width=3)
+    p.line(x=npx , y=npp2p , color='navy' , legend='In queue to be tarred', line_width=3)
+
+    p.scatter(x=npx, y=nppp+npp2p, color='black', size=6)
+    p.scatter(x=npx, y=nppp, color='firebrick', size=6)
+    p.scatter(x=npx, y=npp2p, color='navy', size=6)
+
+    p.legend.location = "top_left"
+
+    return p
+
+def plot_dts_status(npx,nprp,npr2p):
+
+    TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
+
+    # Setup bokeh plot
+    p = figure(plot_height=500, plot_width=1000, x_range=(npx.min(),npx.max()), x_axis_type="datetime", x_axis_label="Date", y_axis_label="Number of Nites", tools=TOOLS,title='DTS Status')
+    p.legend.orientation = "top_left"
+
+    p.line(x=npx , y=nprp+npr2p , color='black' , legend='Total', line_width=3)
+    p.line(x=npx , y=nprp , color='firebrick' , legend='Tarred', line_width=3)
+    p.line(x=npx , y=npr2p , color='navy' , legend='In queue to be tarred', line_width=3)
+
+    p.scatter(x=npx, y=nprp+npr2p, color='black', size=6)
+    p.scatter(x=npx, y=nprp, color='firebrick', size=6)
+    p.scatter(x=npx, y=npr2p, color='navy', size=6)
+
+    p.legend.location = "top_left"
+
+    return p
+
+def plot_system_transfer_rates(tdate,tsize,tav):
+
+    TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
+
+    # Setup bokeh plot
+    p = figure(plot_height=500, plot_width=1000, x_range=(min(tdate),max(tdate)), x_axis_type="datetime", x_axis_label="Date", y_axis_label="Rate (Gb/Hour) / Size (Gb)", tools=TOOLS,title='Transfer Rates')
+    p.legend.orientation = "top_left"
+
+    p.line(x=tdate , y=tav , color='firebrick' , legend='File Size (Gb)', line_width=3)
+    p.line(x=tdate , y=tsize , color='navy' , legend='Transfer Rate (Gb/Hour)', line_width=3)
+
+    p.scatter(x=tdate, y=tav, color='firebrick', size=6)
+    p.scatter(x=tdate, y=tsize, color='navy', size=6)
+
+    p.legend.location = "top_left"
 
     return p

@@ -4,7 +4,8 @@ import os
 import sys
 import pandas
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
+import math
 import query
 
 csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
@@ -16,9 +17,15 @@ def create_coadd_map(section, tag):
     band_df = pandas.DataFrame(query.query_band_info(query.connect_to_db('db-desoper')[1]), columns = ['tilename','band','dmedian'])
     return all_df, processed_df, band_df
 
-def create_des_usage(section):
-    df = pandas.DataFrame(query.query_desdf(query.connect_to_db('db-destest')[1]), columns = ['filesystem','total_size','used','available','use_percent','mounted','submittime'])
-    return df
+def create_system_data(section, section2):
+    ### Length of graph (Defult 14 days) ###
+    start = datetime.now() - timedelta(days=int(14))
+    df, res = query.get_system_info(start, section, section2)
+    ### Change from GB to TB ### 
+    df['size_transferred'] /= math.pow(1024,4)
+    df['size_to_be_transferred'] /= math.pow(1024,4)
+    desdf_df = pandas.DataFrame(query.query_desdf(query.connect_to_db(section)[1]), columns = ['filesystem','total_size','used','available','use_percent','mounted','submittime'])
+    return df, res, desdf
 
 def get_desdf():
     df = pandas.DataFrame()

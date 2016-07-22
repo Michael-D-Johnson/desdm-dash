@@ -47,9 +47,9 @@ def dts():
 
 @app.route('/system')
 def backups():
-    df = get_data.create_des_usage('db-destest')
-    p = plotter.data_usage_plot(df)
-    script,div = components(p)
+    sys_df, res, desdf_df = get_data.create_system_data('db-destest','db-databot')
+    plots = make_system_plots(sys_df, res, desdf_df)
+    script,div = components(plots)
     return render_template('system.html', scripts=script, div=div, title='System')
 
 @app.route('/supernova_summary')
