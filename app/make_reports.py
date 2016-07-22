@@ -170,8 +170,8 @@ def make_system_plots(sys_df, res, des_df):
     plots = []
     
     try:
-        p_du = plotter.data_usage_plot(des_df)
-        plots.append(p_du)
+         p_du = plotter.data_usage_plot(des_df)
+         plots.append(p_du)
     except:
         print "data_usage failed"
         pass
