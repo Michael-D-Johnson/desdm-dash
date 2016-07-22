@@ -28,7 +28,7 @@ def create_system_data(section, section2):
     df['size_transferred'] /= math.pow(1024,4)
     df['size_to_be_transferred'] /= math.pow(1024,4)
     desdf_df = pandas.DataFrame(query.query_desdf(query.connect_to_db(section2)[1]), columns = ['filesystem','total_size','used','available','use_percent','mounted','submittime'])
-    return df, res, desdf
+    return df, res, desdf_df
 
 def get_desdf():
     df = pandas.DataFrame()
