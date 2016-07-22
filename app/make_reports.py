@@ -169,12 +169,12 @@ def make_system_plots(sys_df, res, des_df):
     
     plots = []
     
-#    try:
-    p_du = plotter.data_usage_plot(des_df)
-    plots.append(p_du)
-#    except:
-#        print "data_usage failed"
-#        pass
+    try:
+        p_du = plotter.data_usage_plot(des_df)
+        plots.append(p_du)
+    except:
+        print "data_usage failed"
+        pass
     try:
         p_ttfts = plotter.plot_tape_tar_file_transfer_status(sys_df['run_time'],sys_df['number_transferred'],sys_df['number_not_transferred'])
         plots.append(p_ttfts)
