@@ -2,6 +2,7 @@
 from flask import render_template
 import get_data
 import plotter
+from make_reports import make_system_plots
 from app import app
 from bokeh.embed import components
 from bokeh.io import vplot
