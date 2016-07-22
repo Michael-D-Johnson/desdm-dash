@@ -200,9 +200,9 @@ def make_system_plots(sys_df, res, desdf_df):
     except:
         pass
 
-    html_plots = file_html(vplot(*plots),INLINE,'plots')
+    html_vplots = vplot(*plots)
 
-    return html_plots
+    return html_vplots
 
 def make_coadd_html():
     try:
