@@ -20,7 +20,7 @@ def create_coadd_map(section, tag):
 def create_system_data(section, section2):
     ### Length of graph (Defult 14 days) ###
     start = datetime.now() - timedelta(days=int(14))
-    df, res = query.get_system_info(start, section, section2)
+    df, res = query.get_system_info(start, query.connect_to_db(section)[1], query.connect_to_db(section2)[1])
     ### Change from GB to TB ### 
     df['size_transferred'] /= math.pow(1024,4)
     df['size_to_be_transferred'] /= math.pow(1024,4)
