@@ -165,7 +165,7 @@ def make_reports(db=None,reqnums=None):
         with open(reportpath, "wb") as fh:
             fh.write(output_from_parsed_template)
 
-def make_system_plots(sys_df, res, desdf_df):
+def make_system_plots(sys_df, res, des_df):
     
     plots = []
     
