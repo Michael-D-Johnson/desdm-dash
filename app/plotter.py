@@ -254,7 +254,7 @@ def data_usage_plot(df):
         p.line(x=group['submittime'] ,y=group['f_percent'], color=Colors[count], legend=str(filesystem), line_width=3)
 
     # Formating
-    p.legend.location = "top_left"
+    p.legend.orientation = "top_left"
     hover.point_policy = "follow_mouse"
     hover.tooltips = [("Filesystem", "@filesystem"),("Size","@total_size"),("Available","@available"),("Percent Used","@use_percent"),("Time","@submittime")]
 
@@ -275,7 +275,7 @@ def plot_tape_tar_file_transfer_status(npx,npxf,npnxf):
     p.scatter(x=npx, y=npxf, color='firebrick', size=6)
     p.scatter(x=npx, y=npnxf, color='navy', size=6)
 
-    p.legend.location = "top_left"
+    p.legend.orientation = "top_left"
 
     return p
 
@@ -294,7 +294,7 @@ def plot_backup_size(npx,npsxf,npsnxf):
     p.scatter(x=npx, y=npsxf, color='firebrick', size=6)
     p.scatter(x=npx, y=npsnxf, color='navy', size=6)
 
-    p.legend.location = "top_left"
+    p.legend.orientation = "top_left"
 
     return p
 
@@ -313,7 +313,7 @@ def plot_pipeline_run_progress(npx,nppp,npp2p):
     p.scatter(x=npx, y=nppp, color='firebrick', size=6)
     p.scatter(x=npx, y=npp2p, color='navy', size=6)
 
-    p.legend.location = "top_left"
+    p.legend.orientation = "top_left"
 
     return p
 
@@ -333,7 +333,7 @@ def plot_dts_status(npx,nprp,npr2p):
     p.scatter(x=npx, y=nprp, color='firebrick', size=6)
     p.scatter(x=npx, y=npr2p, color='navy', size=6)
 
-    p.legend.location = "top_left"
+    p.legend.orientation = "top_left"
 
     return p
 
@@ -351,6 +351,6 @@ def plot_system_transfer_rates(tdate,tsize,tav):
     p.scatter(x=tdate, y=tav, color='firebrick', size=6)
     p.scatter(x=tdate, y=tsize, color='navy', size=6)
 
-    p.legend.location = "top_left"
+    p.legend.orientation = "top_left"
 
     return p
