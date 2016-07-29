@@ -54,7 +54,7 @@ def processing_summary(db,project,df=None):
                 updated = csvfile.readlines()[0]
         except (ValueError,IOError):
             updated = '#{time}'.format(time=datetime.now())
-            df = pandas.DataFrame(columns=['created_date','project','campaign','unitname','reqnum','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_site','exec_host','db']) 
+            df = pandas.DataFrame(columns=['created_date','project','campaign','pfw_attempt_id','reqnum','unitname','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_site','exec_host','db']) 
     else:
         updated = '#{time}'.format(time=datetime.now()) 
 
@@ -151,9 +151,9 @@ def processing_detail(db,reqnum,df=None,updated=None):
             sys.exit()
     df = df[df.reqnum==int(reqnum)]
     if not len(df):
-        df = pandas.DataFrame(columns=['project','campaign','pipeline','reqnum','unitname','attnum','status','data_state','operator','target_site','submit_site','exec_host','start_time','end_time','total time','assessment','t_eff'])
+        df = pandas.DataFrame(columns=['project','campaign','pipeline','pfw_attempt_id','reqnum','unitname','attnum','status','data_state','operator','target_site','submit_site','exec_host','start_time','end_time','total time','assessment','t_eff'])
     else:
-        columns = ['project','campaign','pipeline','reqnum','unitname','attnum','status','data_state','operator','target_site','submit_site','exec_host','start_time','end_time','total time','assessment','t_eff']
+        columns = ['project','campaign','pipeline','pfw_attempt_id','reqnum','unitname','attnum','status','data_state','operator','target_site','submit_site','exec_host','start_time','end_time','total time','assessment','t_eff']
 
         df.insert(len(df.columns),'assessment', None)
         df.insert(len(df.columns),'program', None)
