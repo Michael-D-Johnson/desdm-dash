@@ -165,6 +165,51 @@ def make_reports(db=None,reqnums=None):
         with open(reportpath, "wb") as fh:
             fh.write(output_from_parsed_template)
 
+def make_system_plots(sys_df, res, des_df):
+    
+    plots = []
+    
+    try:
+        p_du = plotter.data_usage_plot(des_df)
+        plots.append(p_du)
+    except:
+        print "data_usage failed"
+        pass
+    try:
+        p_ttfts = plotter.plot_tape_tar_file_transfer_status(sys_df['run_time'],sys_df['number_transferred'],sys_df['number_not_transferred'])
+        plots.append(p_ttfts)
+    except:
+        print "tape_tar_file failed"
+        pass
+    try:
+        p_bs = plotter.plot_backup_size(sys_df['run_time'],sys_df['size_transferred'],sys_df['size_to_be_transferred'])
+        plots.append(p_bs)
+    except:
+        print "bakcup_size failed"
+        pass
+    try:
+        p_prp = plotter.plot_pipeline_run_progress(sys_df['run_time'],sys_df['pipe_processed'],sys_df['pipe_to_be_processed'])
+        plots.append(p_prp)
+    except:
+        print "pipeline_run failed"
+        pass
+    try:
+        p_dtss = plotter.plot_dts_status(sys_df['run_time'],sys_df['raw_processed'],sys_df['raw_to_be_processed'])
+        plots.append(p_dtss)
+    except:
+        print "dts_status failed"
+        pass
+    try:
+        p_ts = plotter.plot_system_transfer_rates(res['tdate'],res['tsize'],res['tav'])
+        plots.append(p_ts)
+    except:
+        print "system_transfer failed"
+        pass
+
+    html_vplots = vplot(*plots)
+
+    return html_vplots
+
 def make_coadd_html():
     try:
         all_df, processed_df, band_df = get_data.create_coadd_map('db-destest',"ME_TEST")

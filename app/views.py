@@ -2,6 +2,7 @@
 from flask import render_template
 import get_data
 import plotter
+from make_reports import make_system_plots
 from app import app
 from bokeh.embed import components
 from bokeh.io import vplot
@@ -47,9 +48,9 @@ def dts():
 
 @app.route('/system')
 def backups():
-    df = get_data.create_des_usage('db-destest')
-    p = plotter.data_usage_plot(df)
-    script,div = components(p)
+    sys_df, res, desdf_df = get_data.create_system_data('db-databot','db-destest')
+    plots = make_system_plots(sys_df, res, desdf_df)
+    script,div = components(plots)
     return render_template('system.html', scripts=script, div=div, title='System')
 
 @app.route('/supernova_summary')
