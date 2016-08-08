@@ -9,20 +9,18 @@
 <hr>
 </div>
 {% if db=='db-desoper' %}
-{% set df_list = [curr_df,rest_df] %}
+{% set df_list = [(0,curr_df),(1,rest_df)] %}
 {% else %}
-{% set df_list = [tcurr_df,trest_df] %}
+{% set df_list = [(0,tcurr_df),(1,trest_df)] %}
 {% set columns = tcolumns %}
 {% endif %}
-{% set n=1 %}
-{% for df in df_list %}
-{% if n==1 %}
+{% for i,df in df_list %}
+{% if i==1 %}
 <h2> Currently running: </h2>
 {% else %}
 <h2> Runs in the last four days: </h2>
 {% endif %}
-{% set n=2 %}
-{% if df.count()[0] ==0 %}
+{% if df.empty %}
 <h5> ---NA--- </h5>
 {% else %}
 <table class="black normal" border="1">
