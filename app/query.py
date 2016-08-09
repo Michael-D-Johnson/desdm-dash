@@ -9,9 +9,11 @@ def connect_to_db(section):
     return (dbh,cur)
 
 def submit_desdf(cur,df):
+    ### List of mounts for insert ###
+    mounts = ["/home /home2 /usr/apps","/work","OPS inputs and ACT","OPS multi-epoch","OPS single-epoch","DTS archive","Scratch and db_backup"," "]
     for i, row in df.iterrows():
         submit = "insert into abode.data_usage (FILESYSTEM, TOTAL_SIZE, USED, AVAILABLE, USE_PERCENT, MOUNTED, SUBMITTIME) values "
-        submit += "(\'%s\', \'%s\', \'%s\', \'%s\', \'%s\', \'%s\', %s)" % (row[0], row[1], row[2], row[3], row[4], row[5], row[6])
+        submit += "(\'%s\', \'%s\', \'%s\', \'%s\', \'%s\', \'%s\', %s)" % (row[0], row[1], row[2], row[3], row[4], mounts[i], row[6])
         cur.execute(submit)
     
     cur.execute("commit")

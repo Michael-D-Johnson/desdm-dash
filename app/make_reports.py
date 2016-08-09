@@ -185,7 +185,7 @@ def make_system_plots(sys_df, res, des_df):
         p_bs = plotter.plot_backup_size(sys_df['run_time'],sys_df['size_transferred'],sys_df['size_to_be_transferred'])
         plots.append(p_bs)
     except:
-        print "bakcup_size failed"
+        print "backup_size failed"
         pass
     try:
         p_prp = plotter.plot_pipeline_run_progress(sys_df['run_time'],sys_df['pipe_processed'],sys_df['pipe_to_be_processed'])
