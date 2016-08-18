@@ -42,6 +42,77 @@ def get_desdf():
     df.columns = ['FILESYSTEM','TOTAL_SIZE','USED','AVALIABLE','USE_PERCENT','MOUNTED','SUBMITTIME']
     return df
 
+def get_ingest_time(stime, etime):
+
+    times, filenames = [],[]
+
+    ### Defined time range ###
+    maxrng = etime - stime
+    for i in range(0,maxrng.days):
+        curdate = stime + timedelta(days=int(i))
+
+    ### Past 2 weeks ###
+    #now = datetime.now()
+    #for i in range(0,14):
+    #    curdate = now - timedelta(days=int(i))
+
+        ### Desar3 ###
+        permlocation = "/local/dts_desdm/logs/dts_file_handler_logs/%s/%s/%s-handle_file_from_dts.log" % (curdate.year, curdate.strftime('%m'), str(curdate.year)+str(curdate.strftime('%m'))+str(curdate.strftime('%d')))
+        ### Testing on Deslogin ###
+        templocation = "/work/devel/abode/logs/dts_logs/dts_file_handler_logs/%s/%s/%s-handle_file_from_dts.log" % (curdate.year, curdate.strftime('%m'), str(curdate.year)+str(curdate.strftime('%m'))+str(curdate.strftime('%d')))
+        try:
+            with open(permlocation) as fh:
+                for line in fh:
+                    if "move_file_to_archive" in line:
+                        contents = line.split(' ')
+                        times.append(datetime.strptime(contents[0]+" "+contents[1], '%Y/%m/%d %H:%M:%S'))
+                        filenames.append(os.path.basename(contents[5].rstrip(':')))
+        except:
+            print "No ingest log for: " + str(curdate)
+            pass
+
+    df = pd.DataFrame()
+    df['ingest_time'] = times
+    df['filename'] = filenames
+
+    return df
+
+def get_accept_time(stime, etime):
+
+    times, filenames = [], []
+
+    ### Defined time range ###
+    maxrng = etime - stime
+    for i in range(0,maxrng.days):
+        curdate = stime + timedelta(days=int(i))
+
+    ### Past 2 weeks ###
+    #now = datetime.now()
+    #for i in range(0,14):
+    #    curdate = now - timedelta(days=int(i))        
+
+        ### Desar3 ###
+        permlocation = "/local/dts_desdm/logs/accept_dts_delivery_logs/%s/%s/%s_dts_accept.log" % (curdate.year, curdate.strftime('%m'), str(curdate.year)+str(curdate.strftime('%m'))+str(curdate.strftime('%d')))
+        ### Testing on deslogin ###
+        templocation = "/work/devel/abode/logs/dts_logs/accept_dts_delivery_logs/%s/%s/%s_dts_accept.log" % (curdate.year, curdate.strftime('%m'), str(curdate.year)+str(curdate.strftime('%m'))+str(curdate.strftime('%d')))
+        try:
+            with open(permlocation) as fh:
+                for line in fh:
+                    if "accept file" in line:
+                        contents = line.split(' ')
+                        if os.path.basename(contents[6].rstrip('\n')) not in filenames:
+                            times.append(datetime.strptime(contents[0]+" "+contents[1], '%Y/%m/%d %H:%M:%S'))
+                            filenames.append(os.path.basename(contents[6].rstrip('\n')))
+        except:
+            print "No accept log for: " + str(curdate)
+            pass
+
+    df = pd.DataFrame()
+    df['accept_time'] = times
+    df['filename'] = filenames
+
+    return df
+
 def processing_archive():
     reqnums = os.listdir(templates)
     return reqnums

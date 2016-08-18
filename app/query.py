@@ -166,3 +166,9 @@ def get_system_info(start, cur, cur2):
     query2 = "select transfer_date,(tar_size/(1024*1024*1024)),(tar_size/(transfer_time*1024*1024*1024)) from prod.backup_tape where transfer_date is not null and transfer_date >= TO_DATE('%s', 'YYYY-MM-DD HH24:MI:SS') order by transfer_date desc" % (start.strftime('%Y-%m-%d %H:%M:%S'))
     cur.execute(query2)
     return cur.fetchall(), cur2.fetchall()
+
+def query_exptime(cur, stime, etime):
+    format = "%Y-%m-%d %H:%M:%S"
+    query = "select date, file_uri from exposure where delivered=True and date between \'%s\' and \'%s\' order by date" % (stime.strftime(format), etime.strftime(format))
+    cur.execute(query)
+    return cur.fetchall()
