@@ -74,7 +74,7 @@ def batch_size_query(cur,nitelist,reqnum,pipeline):
         batch_size_query = "SELECT count(distinct unitname) \
                             FROM pfw_attempt where reqnum={reqnum}".format(reqnum=reqnum)
     else:
-        batch_size_query = "select count(distinct expnum) from exposure where obstype='object' \
+        batch_size_query = "select count(distinct expnum) from exposure where obstype in ('standard','object') \
                             and object not like '%%pointing%%' and object not like '%%focus%%' \
                             and object not like '%%donut%%' and object not like '%%test%%' \
                             and object not like '%%junk%%' and nite in ({nitelist})".format(nitelist=nitelist)
