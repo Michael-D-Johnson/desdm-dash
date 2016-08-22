@@ -11,12 +11,30 @@ import query
 
 ### Submits DTS_delay info to DB ###
 ### Run once a day by dts_submit.sh ###
-def submit_dts_logs(cur,df):
+def submit_dts_logs(connection, df):
+
+    cur = connection[1]
+    dbh = connection[0]
+
+    print df
 
     for i, row in df.iterrows():
         submit = "insert into abode.dts_delay (SISPI_TIME, ACCEPT_TIME, INGEST_TIME, DELIVERED, FILENAME) values "
-        submit += "(\'%s\', \'%s\', \'%s\', \'%s\', \'%s\')" % (row[0], row[1], row[2], row[3], row[4])
-        cur.execute(submit)
+        submit += "(convert(datetime, \'%s\'), convert(datetime, \'%s\'), convert(datetime, \'%s\'), \'%s\', \'%s\')" % (dbh.get_named_bind_string('exptime'), 
+           dbh.get_named_bind_string('accept_time'), 
+           dbh.get_named_bind_string('ingest_time'), 
+           dbh.get_named_bind_string('delivered'), 
+           dbh.get_named_bind_string('filename'))
+        
+        params = {'exptime': row['exptime'],
+                  'accept_time': row['accept_time'],
+                  'ingest_time': row['ingest_time'],
+                  'delivered': row['delivered'],
+                  'filename': row['filename']}
+
+        print submit
+        
+        cur.execute(submit, params)
 
     cur.execute("commit")
     return 0
@@ -93,6 +111,30 @@ def create_delivered(df):
 
     return delivered_list
 
-### Things to move into cron_funcs ###
-# get_desdf() from get_data.py
-# submit_desdf() from query.py
+### Gets data from the cmd line desdf ###
+### Run evey 12 hours at noon and midnight ###
+def get_desdf():
+    df = pandas.DataFrame()
+    for column in range(1,7):
+        p1 = subprocess.Popen( "/usr/local/bin/desdf | awk {\'print $%i\'}" % column, stdout=subprocess.PIPE, shell=True)
+        output = p1.stdout.read().split('\n')
+        df[output[0]] = [output[1], output[2], output[3], output[4], output[5], output[6], output[7], output[8]]
+    st = 'sysdate'
+    df['submittime'] = [st,st,st,st,st,st,st,st]
+
+    df.columns = ['FILESYSTEM','TOTAL_SIZE','USED','AVALIABLE','USE_PERCENT','MOUNTED','SUBMITTIME']
+    return df
+
+### Submits desdf data to destest db ###
+### Run every 12 hours at noon and midnight ###
+def submit_desdf(cur,df):
+    ### List of mounts for insert ###
+    mounts = ["/home /home2 /usr/apps","/work","OPS inputs and ACT","OPS multi-epoch","OPS single-epoch","DTS archive","Scratch and db_backup"," "]
+    for i, row in df.iterrows():
+        submit = "insert into abode.data_usage (FILESYSTEM, TOTAL_SIZE, USED, AVAILABLE, USE_PERCENT, MOUNTED, SUBMITTIME) values "
+        submit += "(\'%s\', \'%s\', \'%s\', \'%s\', \'%s\', \'%s\', %s)" % (row[0], row[1], row[2], row[3], row[4], mounts[i], row[6])
+        cur.execute(submit)
+
+    cur.execute("commit")
+    return 0
+

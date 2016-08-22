@@ -17,6 +17,7 @@ def create_coadd_map(section, tag):
     band_df = pandas.DataFrame(query.query_band_info(query.connect_to_db('db-desoper')[1]), columns = ['tilename','band','dmedian'])
     return all_df, processed_df, band_df
 
+### Gets data for all plots on system plots page ###
 def create_system_data(section, section2):
     ### Length of graph (Defult 14 days) ###
     start = datetime.now() - timedelta(days=int(14))
@@ -30,18 +31,7 @@ def create_system_data(section, section2):
     desdf_df = pandas.DataFrame(query.query_desdf(query.connect_to_db(section2)[1]), columns = ['filesystem','total_size','used','available','use_percent','mounted','submittime'])
     return df, res, desdf_df
 
-def get_desdf():
-    df = pandas.DataFrame()
-    for column in range(1,7):
-        p1 = subprocess.Popen( "/usr/local/bin/desdf | awk {\'print $%i\'}" % column, stdout=subprocess.PIPE, shell=True)
-        output = p1.stdout.read().split('\n')
-        df[output[0]] = [output[1], output[2], output[3], output[4], output[5], output[6], output[7], output[8]]
-    st = 'sysdate'
-    df['submittime'] = [st,st,st,st,st,st,st,st]
-
-    df.columns = ['FILESYSTEM','TOTAL_SIZE','USED','AVALIABLE','USE_PERCENT','MOUNTED','SUBMITTIME']
-    return df
-
+### Live Render version of get_ingest_time for dts plot ###
 def get_ingest_time(stime, etime):
 
     times, filenames = [],[]
@@ -77,6 +67,7 @@ def get_ingest_time(stime, etime):
 
     return df
 
+### Live Render version of get_accept_time for dts plot ###
 def get_accept_time(stime, etime):
 
     times, filenames = [], []

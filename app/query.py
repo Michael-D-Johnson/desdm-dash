@@ -8,17 +8,6 @@ def connect_to_db(section):
     cur = dbh.cursor()
     return (dbh,cur)
 
-def submit_desdf(cur,df):
-    ### List of mounts for insert ###
-    mounts = ["/home /home2 /usr/apps","/work","OPS inputs and ACT","OPS multi-epoch","OPS single-epoch","DTS archive","Scratch and db_backup"," "]
-    for i, row in df.iterrows():
-        submit = "insert into abode.data_usage (FILESYSTEM, TOTAL_SIZE, USED, AVAILABLE, USE_PERCENT, MOUNTED, SUBMITTIME) values "
-        submit += "(\'%s\', \'%s\', \'%s\', \'%s\', \'%s\', \'%s\', %s)" % (row[0], row[1], row[2], row[3], row[4], mounts[i], row[6])
-        cur.execute(submit)
-    
-    cur.execute("commit")
-    return 0
-
 def processing_detail(cur,reqnums):
     query = "SELECT distinct a.created_date,r.project,r.campaign,a.reqnum,a.unitname,a.attnum,a.id,v.val,t1.status,\
             a.data_state,a.operator,r.pipeline,t2.start_time,t2.end_time,b.target_site,t1.exec_host,t2.exec_host \
@@ -170,5 +159,6 @@ def get_system_info(start, cur, cur2):
 def query_exptime(cur, stime, etime):
     format = "%Y-%m-%d %H:%M:%S"
     query = "select date, file_uri from exposure where delivered=True and date between \'%s\' and \'%s\' order by date" % (stime.strftime(format), etime.strftime(format))
+    print query
     cur.execute(query)
     return cur.fetchall()

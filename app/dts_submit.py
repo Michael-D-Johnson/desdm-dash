@@ -15,7 +15,11 @@ def main():
     stime = etime - timedelta(days=int(1))
 
     ### Fetch Data ###
-    send_df = pd.DataFrame(query.query_exptime(query.connect_to_db('db-sispi')[1], stime, etime), columns = ['exptime', 'filename'])
+    try:
+        send_df = pd.DataFrame(query.query_exptime(query.connect_to_db('db-sispi')[1], stime, etime), columns = ['exptime', 'filename'])
+    except:
+        send_df = pd.DataFrame(columns = ['exptime', 'filename'])
+        pass
     accept_df = cf.get_cron_accept_time()
     ingest_df = cf.get_cron_ingest_time()
 
@@ -44,7 +48,7 @@ def main():
 
     ### Insert to db ###
     # issues with insert statement currently.
-     cf.submit_dts_logs(query.connect_to_db('db-destest')[1], fn_df)
+    cf.submit_dts_logs(query.connect_to_db('db-destest'), fn_df)
 
 if __name__=='__main__':
     main()
