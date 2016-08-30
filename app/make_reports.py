@@ -46,9 +46,17 @@ def make_reports(db=None,reqnums=None):
         df_test_status = pandas.DataFrame(
                 query.get_status(query.connect_to_db('db-destest')[1],','.join(test_reqnums)),
                 columns = ['unitname','reqnum','attnum','pfw_attempt_id','status'])
-        df_test_nites = pandas.DataFrame(
-                query.get_nites(query.connect_to_db('db-destest')[1],','.join(test_reqnums)),
-                columns = ['unitname','reqnum','attnum','pfw_attempt_id','nite'])
+        try:
+            df_test_nites = pandas.DataFrame(
+                query.get_nites(query.connect_to_db('db-destest')[1], ','.join(test_reqnums)),
+                columns=['unitname', 'reqnum', 'attnum', 'pfw_attempt_id', 'nite'])
+        except:
+            df_test_nites = pandas.DataFrame()
+            df_test_nites.insert(len(df_test_nites.columns), 'unitname', None)
+            df_test_nites.insert(len(df_test_nites.columns), 'reqnum', None)
+            df_test_nites.insert(len(df_test_nites.columns), 'attnum', None)
+            df_test_nites.insert(len(df_test_nites.columns), 'pfw_attempt_id', None)
+            df_test_nites.insert(len(df_test_nites.columns), 'nite', None)
         try:
             df_test_expnum = pandas.DataFrame(
                 query.get_expnum_info(query.connect_to_db('db-destest')[1],','.join(test_reqnums)),
