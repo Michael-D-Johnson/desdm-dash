@@ -159,6 +159,5 @@ def get_system_info(start, cur, cur2):
 def query_exptime(cur, stime, etime):
     format = "%Y-%m-%d %H:%M:%S"
     query = "select date, file_uri from exposure where delivered=True and date between \'%s\' and \'%s\' order by date" % (stime.strftime(format), etime.strftime(format))
-    print query
     cur.execute(query)
     return cur.fetchall()

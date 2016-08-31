@@ -16,25 +16,29 @@ def submit_dts_logs(connection, df):
     cur = connection[1]
     dbh = connection[0]
 
-    print df
-
     for i, row in df.iterrows():
-        submit = "insert into abode.dts_delay (SISPI_TIME, ACCEPT_TIME, INGEST_TIME, DELIVERED, FILENAME) values "
-        submit += "(convert(datetime, \'%s\'), convert(datetime, \'%s\'), convert(datetime, \'%s\'), \'%s\', \'%s\')" % (dbh.get_named_bind_string('exptime'), 
-           dbh.get_named_bind_string('accept_time'), 
-           dbh.get_named_bind_string('ingest_time'), 
-           dbh.get_named_bind_string('delivered'), 
-           dbh.get_named_bind_string('filename'))
-        
-        params = {'exptime': row['exptime'],
-                  'accept_time': row['accept_time'],
-                  'ingest_time': row['ingest_time'],
-                  'delivered': row['delivered'],
-                  'filename': row['filename']}
+        print row     
 
-        print submit
+        submit = "insert into abode.dts_delay (SISPI_TIME, ACCEPT_TIME, INGEST_TIME, DELIVERED, FILENAME) values "
+        submit += "(TO_DATE(\'%s\',\'YYYY-MM-DD HH24:MI:SS\'), TO_DATE(\'%s\',\'YYYY-MM-DD HH24:MI:SS\'), TO_DATE(\'%s\',\'YYYY-MM-DD HH24:MI:SS\'), \'%s\', \'%s\')" % (row['exptime'].strftime('%Y-%m-%d %H:%M:%S'), row['accept_time'].strftime('%Y-%m-%d %H:%M:%S'), row['ingest_time'].strftime('%Y-%m-%d %H:%M:%S'), row['delivered'], row['filename'])
+       # submit += "(TO_DATE(\'%s\',\'YYYY-MM-DD HH24:MI:SS\'), TO_DATE(\'%s\',\'YYYY-MM-DD HH24:MI:SS\'), TO_DATE(\'%s\',\'YYYY-MM-DD HH24:MI:SS\'), \'%s\', \'%s\')" % (dbh.get_named_bind_string('exptime'), 
+#                                                           dbh.get_named_bind_string('accept_time'), 
+#                                                           dbh.get_named_bind_string('ingest_time'), 
+#                                                           dbh.get_named_bind_string('delivered'), 
+#                                                           dbh.get_named_bind_string('filename'))
         
-        cur.execute(submit, params)
+        #print "(TO_DATE(\'%s\',\'YYYY-MM-DD HH24:MI:SS\'), TO_DATE(\'%s\',\'YYYY-MM-DD HH24:MI:SS\'), TO_DATE(\'%s\',\'YYYY-MM-DD HH24:MI:SS\'), \'%s\', \'%s\')" % (row['exptime'].strftime('%Y-%m-%d %H:%M:%S'), row['accept_time'].strftime('%Y-%m-%d %H:%M:%S'), row['ingest_time'].strftime('%Y-%m-%d %H:%M:%S'), row['delivered'], row['filename'])
+        #print "(\'%s\', \'%s\', \'%s\', \'%s\', \'%s\')" % (row['exptime'], row['accept_time'], row['ingest_time'], row['delivered'], row['filename'])
+
+#        params = {'exptime': row['exptime'].strftime('%Y-%m-%d %H:%M:%S'),
+#                  'accept_time': row['accept_time'].strftime('%Y-%m-%d %H:%M:%S'),
+#                  'ingest_time': row['ingest_time'].strftime('%Y-%m-%d %H:%M:%S'),
+#                  'delivered': row['delivered'],
+#                  'filename': row['filename']}
+
+        #print submit
+        
+        cur.execute(submit)#, params)
 
     cur.execute("commit")
     return 0
