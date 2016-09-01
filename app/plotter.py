@@ -356,51 +356,16 @@ def plot_system_transfer_rates(tdate,tsize,tav):
     return p
 
 def plot_dts(df):
-    localtz = pytz.timezone('US/Central')
-    noaodiff, ncsadiff, totaldiff, xtime = [],[],[],[]
-    df.sort(['exptime'],inplace=True)
-    for i,line in df.iterrows():
-        accept_time = localtz.localize(line['accept_time'])
-        ingest_time = localtz.localize(line['ingest_time'])
-        try:
-            totaldiff.append((ingest_time.astimezone (pytz.utc) - line['exptime'].astimezone (pytz.utc)).total_seconds()/60)
-            if ((accept_time.astimezone (pytz.utc) - line['exptime'].astimezone (pytz.utc)).total_seconds()/60) < 0:
-                print "############## WARNING: NEGITIVE NOAO TIME ##############"
-                print line['filename']
-                print "Accept: ", accept_time
-                print "Ingest: ", ingest_time
-                print "Sispi:  ", line['exptime']
-            noaodiff.append((accept_time.astimezone (pytz.utc) - line['exptime'].astimezone (pytz.utc)).total_seconds()/60)
-            if ((ingest_time.astimezone (pytz.utc) - accept_time.astimezone (pytz.utc)).total_seconds()/60) < 0:
-                print "############## WARNING: NEGITIVE NCSA TIME ##############"
-                print line['filename']
-                print "Accept: ", accept_time
-                print "Ingest: ", ingest_time
-                print "Sispi:  ", line['exptime']
-            ncsadiff.append((ingest_time.astimezone (pytz.utc) - accept_time.astimezone (pytz.utc)).total_seconds()/60)
-            xtime.append(line['exptime'])
-        except:
-            print "############## WARNING: FILE FAILED TO BE ADDED TO PLOT ##############"
-            print line['filename']
-            print "Accept: ", accept_time
-            print "Ingest: ", ingest_time
-            print "Sispi:  ", line['exptime']
-            pass
-
+    
     TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
 
-    #p = figure(plot_height=500, plot_width=1000, x_axis_type="datetime", x_axis_label="Date", y_axis_label="Time difference in minutes", tools=TOOLS, title='DTS times')
     p = figure(plot_height=500, plot_width=1000, x_axis_type="datetime", x_range=((datetime.now()-timedelta(days=int(14))), datetime.now()), x_axis_label="Date", y_axis_label="Time difference in minutes", tools=TOOLS, title='DTS times')
 
-    p.line(x=xtime, y=totaldiff,legend="Total", color='black', line_width=3)
-    p.line(x=xtime, y=noaodiff, legend="NOAO Delay", color="navy", line_width=3)
-    p.line(x=xtime, y=ncsadiff, legend="NCSA Delay", color="firebrick", line_width=3)
+    p.line(x=df['xtime'], y=df['total_time'],legend="Total", color='black', line_width=3)
+    p.line(x=df['xtime'], y=df['noao_time'], legend="NOAO Delay", color="navy", line_width=3)
+    p.line(x=df['xtime'], y=df['ncsa_time'], legend="NCSA Delay", color="firebrick", line_width=3)
 
     #p.legend.orientation = "top_left"  ### Bokeh 0.10.0 ###
-    try:
-        p.legend.location = "top_left"      ### Bokeh 0.11.0 ###
-    except:
-        print "Change your version of Bokoeh to 0.11.0 or newer, or change legend flag in app/plotter to the bokeh 0.10.0 version"
-        raise
-
+    p.legend.location = "top_left"      ### Bokeh 0.11.0 ###
+    
     return p
