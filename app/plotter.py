@@ -43,20 +43,22 @@ def plot_status_per_host(dataframe):
 def plot_t_eff(dataframe):
     def create_data_source(df):
         return ColumnDataSource(data=dict(t_eff=df['t_eff'],expnum=df['expnum'],program=df['program'],attnum=df['attnum'],band=df['band']))
+    line_colors = ['black','blue','yellow','pink']
     plots = []
-    df_false = dataframe[dataframe['assessment']=='False']
-    df_true = dataframe[dataframe['assessment']=='True']
-    df_unknown = dataframe[dataframe['assessment']=='Unknown']
-
     # Creating scatter plot
-    p = figure(tools = [PanTool(),BoxZoomTool(),ResizeTool(),WheelZoomTool(),ResetTool(),HoverTool(tooltips = [('expnum','@expnum'),('band','@band'),('program', '@program'),('teff','@t_eff'),('attempt','@attnum')])], x_axis_label = "expnum", y_axis_label = "t_eff", title = 't_eff',width=1000,height=500)
-    p.scatter('expnum','t_eff',source=create_data_source(df_false),fill_color='red',line_color='white',alpha=0.5)
-    p.scatter('expnum','t_eff',source=create_data_source(df_true),fill_color='green',line_color='white',alpha=0.5)
-    p.scatter('expnum','t_eff',source=create_data_source(df_unknown),fill_color='orange',line_color='white',alpha=0.5)
+    p = figure(tools = [PanTool(),BoxZoomTool(),ResizeTool(),WheelZoomTool(),ResetTool(),HoverTool(tooltips = [('expnum','@expnum'),('band','@band'),('program', '@program'),('teff','@t_eff'),('attempt','@attnum')])], x_axis_label = "expnum", y_axis_label = "t_eff", title = 't_eff',width=1000,height=500 )
+    for i,prog in enumerate(dataframe.program.unique()):
+        df_false = dataframe[(dataframe['assessment']=='False') & (dataframe['program'] ==prog)]
+        df_true = dataframe[(dataframe['assessment']=='True') & (dataframe['program'] ==prog)]
+        df_unknown = dataframe[(dataframe['assessment']=='Unknown') & (dataframe['program']==prog)]
+
+        p.scatter('expnum','t_eff',source=create_data_source(df_false),fill_color='red',line_color=line_colors[i],alpha=0.5,size=8,line_width=4,legend = prog)
+        p.scatter('expnum','t_eff',source=create_data_source(df_true),fill_color='green',line_color=line_colors[i],alpha=0.5,size=8,line_width = 4, legend = prog)
+        p.scatter('expnum','t_eff',source=create_data_source(df_unknown),fill_color='orange',line_color=line_colors[i],alpha=0.5,size=8,line_width=4,legend = prog)
 
     p.xaxis[0].formatter = NumeralTickFormatter(format="000000")
     plots.append(p)
-    
+
     # Creating histogram
     dataframe.t_eff = dataframe.t_eff.convert_objects(convert_numeric=True)
 
@@ -80,33 +82,37 @@ def plot_exec_wall_time(dataframe):
 #    def create_data_source(df):
 #        return ColumnDataSource(data=dict(exec_host=df['exec_host'],unitname=df['unitname'],attnum=df['attnum'],start_time=df['start_time'],end_time=df['end_time']))
 
-    TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
-    Colors=['red','navy','olive','firebrick','lightskyblue','yellowgreen','lightcoral','yellow', 'green','blue','gold','red']
+    TOOLS = [BoxZoomTool(), PanTool(), ResetTool(), WheelZoomTool()]
+    Colors = ['red', 'navy', 'olive', 'firebrick', 'lightskyblue', 'yellowgreen', 'lightcoral', 'yellow', 'green',
+              'blue', 'gold', 'red']
     pd.to_datetime(dataframe['start_time'])
     pd.to_datetime(dataframe['end_time'])
-    dataframe = dataframe.sort(['exec_host','start_time','end_time'] ,ascending=True)
+    dataframe = dataframe.sort(['exec_host', 'start_time', 'end_time'], ascending=True)
     dataframe.dropna(axis=0)
-    df = dataframe.groupby(by = ['exec_host'])
+    df = dataframe.groupby(by=['exec_host'])
 
     # Setup bokeh plot
-    p = figure(plot_height=500, plot_width=1000, x_axis_type="datetime", y_range=list(dataframe.exec_host.unique()), title='Exec Wall Time')
-    
+    p = figure(plot_height=500, plot_width=1000, x_axis_type="datetime", y_range=list(dataframe.exec_host.unique()),
+               title='Exec Wall Time')
+
     # Loop though each exec_host 1 at a time changing y value on each one.
     count = 0
     print "Starting Plot"
     for exechost, group in df:
         print exechost, group.reqnum.unique()[0]
-        count = count+1
-        #print exechost
+        count = count + 1
+        # print exechost
         for attnum in group.attnum.unique():
-            p.segment( x0=group[group.attnum==attnum].start_time, y0=len(group) * [count+(0.1*(attnum-1))], x1=group[group.attnum==attnum].end_time, y1=len(group) * [count+(0.1*(attnum-1))], color=Colors[attnum], line_width=3, legend="Attempt Num: " + str(attnum))
+            p.segment(x0=group[group.attnum == attnum].start_time, y0=len(group) * [count + (0.1 * (attnum - 1))],
+                      x1=group[group.attnum == attnum].end_time, y1=len(group) * [count + (0.1 * (attnum - 1))],
+                      color=Colors[attnum], line_width=3, legend="Attempt Num: " + str(attnum))
 
 ### Line Method ###
-### If you want to use it, add hovertool to the list of tools and comment out segment ###    
+### If you want to use it, add hovertool to the list of tools and comment out segment ###
 #        for attnum in group.attnum.unique():
 #            for i, row in group[group.attnum==attnum].iterrows():
 #                p.line(x=[row['start_time'],row['end_time']], y=[count+(0.1*(attnum-1)),count+(0.1*(attnum-1))], source=create_data_source(group), color=Colors[attnum], line_width=3)
-#                print row['start_time'] 
+#                print row['start_time']
 
     return p
 
