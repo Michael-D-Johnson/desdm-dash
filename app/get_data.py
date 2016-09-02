@@ -213,9 +213,11 @@ def processing_detail(db,reqnum,df=None,updated=None):
             sys.exit()
     df = df[df.reqnum==int(reqnum)]
     if not len(df):
-        df = pandas.DataFrame(columns=['project','campaign','pipeline','pfw_attempt_id','reqnum','unitname','attnum','status','data_state','operator','target_site','submit_site','exec_host','start_time','end_time','total time','assessment','t_eff'])
+        df = pandas.DataFrame(columns=['project','campaign','pipeline','pfw_attempt_id','reqnum','unitname','attnum','status','data_state','operator','target_site','submit_site','exec_host','start_time','end_time','total time','assessment','t_eff',
+                                       'b_eff','c_eff','f_eff','program'])
     else:
-        columns = ['project','campaign','pipeline','pfw_attempt_id','reqnum','unitname','attnum','status','data_state','operator','target_site','submit_site','exec_host','start_time','end_time','total time','assessment','t_eff']
+        columns = ['project','campaign','pipeline','pfw_attempt_id','reqnum','unitname','attnum','status','data_state','operator','target_site','submit_site','exec_host','start_time','end_time','total time','assessment','t_eff','b_eff',
+                   'c_eff','f_eff','program']
 
         df.insert(len(df.columns),'assessment', None)
         df.insert(len(df.columns),'program', None)
