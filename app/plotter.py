@@ -46,7 +46,7 @@ def plot_t_eff(dataframe):
     line_colors = ['black','blue','yellow','pink']
     plots = []
     # Creating scatter plot
-    p = figure(tools = [PanTool(),BoxZoomTool(),ResizeTool(),WheelZoomTool(),ResetTool(),HoverTool(tooltips = [('expnum','@expnum'),('band','@band'),('program', '@program'),('teff','@t_eff'),('b_eff','@b_eff'),('ceff','@c_eff'),('feff','@f_eff'),('attempt','@attnum')])], x_axis_label = "expnum", y_axis_label = "t_eff", title = 't_eff',width=1000,height=500 )
+    p = figure(tools = [PanTool(),BoxZoomTool(),ResizeTool(),WheelZoomTool(),ResetTool(),HoverTool(tooltips = [('expnum','@expnum'),('band','@band'),('program', '@program'),('teff','@t_eff'),('b_eff','@b_eff'),('c_eff','@c_eff'),('f_eff','@f_eff'),('attempt','@attnum')])], x_axis_label = "expnum", y_axis_label = "t_eff", title = 't_eff',width=1000,height=500 )
     for i,prog in enumerate(dataframe.program.unique()):
         df_false = dataframe[(dataframe['assessment']=='False') & (dataframe['program'] ==prog)]
         df_true = dataframe[(dataframe['assessment']=='True') & (dataframe['program'] ==prog)]

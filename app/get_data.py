@@ -258,9 +258,9 @@ def processing_detail(db,reqnum,df=None,updated=None):
             df.loc[index,('assessment')] = assess
             try:
                 df.loc[index,('t_eff')] = round(float(t_eff),4)
-                df.loc[index,('b_eff')] = round(float(b_eff/t_eff),4)
-                df.loc[index,('c_eff')] = round(float(c_eff/t_eff), 4)
-                df.loc[index,('f_eff')] = round(float(f_eff/t_eff),4)
+                df.loc[index,('b_eff')] = round(float(b_eff),4)
+                df.loc[index,('c_eff')] = round(float(c_eff), 4)
+                df.loc[index,('f_eff')] = round(float(f_eff),4)
             except:
                 df.loc[index,('t_eff')] = t_eff
                 df.loc[index,('b_eff')] = b_eff
