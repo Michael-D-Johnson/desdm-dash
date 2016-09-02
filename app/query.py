@@ -159,6 +159,13 @@ def get_system_info(start, cur, cur2):
 def query_exptime(cur, stime, etime):
     format = "%Y-%m-%d %H:%M:%S"
     query = "select date, file_uri from exposure where delivered=True and date between \'%s\' and \'%s\' order by date" % (stime.strftime(format), etime.strftime(format))
-    print query
+    cur.execute(query)
+    return cur.fetchall()
+
+def query_dts_delay(cur, stime, etime):
+    format = "%Y-%m-%d %H:%M:%S"
+    #query = "select interval_to_seconds(sispi_time), accept_time, ingest_time, delivered from abode.dts_delay where sispi_time between \'%s\' and \'%s\' order by sispi_time" % (stime.strftime(format), etime.strftime(format))
+    query = "select intervalToSeconds(ingest_time - sispi_time)/60 as total_time, intervalToSeconds(ingest_time - accept_time)/60 as ncsa_time, intervalToSeconds(accept_time - sispi_time)/60 as noao_time, sispi_time as xtime from abode.dts_delay where sispi_time between TO_DATE(\'%s\', \'YYYY-MM-DD HH24:MI:SS\') and TO_DATE(\'%s\', \'YYYY-MM-DD HH24:MI:SS\') order by sispi_time" % (stime.strftime(format), etime.strftime(format))
+    #print query
     cur.execute(query)
     return cur.fetchall()

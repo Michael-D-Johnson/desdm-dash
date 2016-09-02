@@ -32,16 +32,22 @@ def main():
     ### Merge Dataframes ###
     # will need to be changed to outer and put nan handling in.
     tmp_df = pd.merge(ingest_df, accept_df, how='inner', on=['filename'])
-    fn_df = pd.merge(tmp_df, send_df, how='left', on=['filename'])
+    merge_df = pd.merge(tmp_df, send_df, how='left', on=['filename'])
 
-    ### Standardize timezones to UTC ###
-    adjust_at, adjust_it = [],[]
+    ### Standardize timezones to UTC and drop manifests ###
+    fn_df = pd.DataFrame()
+    adjust_at, adjust_it, adjust_et, adjust_fn = [],[],[],[]
     localtz = pytz.timezone('US/Central')
-    for i, line in fn_df.iterrows():
-        adjust_at.append(localtz.localize(line['accept_time']).astimezone (pytz.utc))
-        adjust_it.append(localtz.localize(line['ingest_time']).astimezone (pytz.utc))
+    for i, line in merge_df.iterrows():
+        if ".fits.fz" in line['filename']:
+            adjust_at.append(localtz.localize(line['accept_time']).astimezone (pytz.utc))
+            adjust_it.append(localtz.localize(line['ingest_time']).astimezone (pytz.utc))
+            adjust_et.append(line['exptime'])
+            adjust_fn.append(line['filename'])
     fn_df['accept_time'] = adjust_at
     fn_df['ingest_time'] = adjust_it
+    fn_df['exptime'] = adjust_et
+    fn_df['filename'] = adjust_fn
 
     ### Add Delivered column ###
     fn_df['delivered'] = cf.create_delivered(fn_df)
