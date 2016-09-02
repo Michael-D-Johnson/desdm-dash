@@ -80,16 +80,16 @@ def assess_query(cur,df,index,triplet,pfw_attempt_id,pipeline):
     if pipeline=='sne':
         camsym,field,band,seq = triplet[0].split('_')
         comment = field.strip('SN-') + band + ' ' + str(df.loc[index,('nite')])
-        assess_q = "select distinct accepted,t_eff,program from firstcut_eval where analyst='SNQUALITY' \
+        assess_q = "select distinct accepted,t_eff,b_eff,c_eff,f_eff,program from firstcut_eval where analyst='SNQUALITY' \
                     and analyst_comment='{comment}'".format(comment=comment)
     elif pipeline =='finalcut':
-        assess_q = "SELECT distinct accepted,t_eff,program from finalcut_eval \
+        assess_q = "SELECT distinct accepted,t_eff,b_eff,c_eff,f_eff,program from finalcut_eval \
                     WHERE pfw_attempt_id={pfwid}".format(pfwid=pfw_attempt_id)
     elif pipeline =='firstcut':
-        assess_q = "SELECT distinct accepted,t_eff,program \
+        assess_q = "SELECT distinct accepted,t_eff,b_eff,c_eff,f_effprogram \
                     FROM firstcut_eval where pfw_attempt_id={pfwid}".format(pfwid=pfw_attempt_id)
     else:
-        assess_q = "SELECT distinct accepted,t_eff,program \
+        assess_q = "SELECT distinct accepted,t_eff,b_eff,c_eff,f_eff,program \
                     FROM firstcut_eval where pfw_attempt_id={pfwid}".format(pfwid=pfw_attempt_id)
     cur.execute(assess_q)
     return cur.fetchall()

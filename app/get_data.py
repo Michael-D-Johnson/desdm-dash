@@ -247,13 +247,23 @@ def processing_detail(db,reqnum,df=None,updated=None):
                                                       group.pfw_attempt_id.unique()[0],pipeline)
 
             try:
-                assess,t_eff,program = assess_query_results[0][0],assess_query_results[0][1],assess_query_results[0][2]
+                assess,t_eff,b_eff,c_eff,f_eff, program = assess_query_results[0][0],assess_query_results[0][1],\
+                                                          assess_query_results[0][2],assess_query_results[0][3],\
+                                                          assess_query_results[0][4],assess_query_results[0][5]
             except:
-                assess,t_eff,program = 'None','None','None'
+                assess,t_eff,b_eff,c_eff,f_eff, program = 'None','None','None','None','None','None'
 
             df.loc[index,('assessment')] = assess
-            try: df.loc[index,('t_eff')] = round(float(t_eff),4)
-            except: df.loc[index,('t_eff')] = t_eff
+            try:
+                df.loc[index,('t_eff')] = round(float(t_eff),4)
+                df.loc[index,('b_eff')] = round(float(b_eff/t_eff),4)
+                df.loc[index,('c_eff')] = round(float(c_eff/t_eff), 4)
+                df.loc[index,('f_eff')] = round(float(f_eff/t_eff),4)
+            except:
+                df.loc[index,('t_eff')] = t_eff
+                df.loc[index,('b_eff')] = b_eff
+                df.loc[index,('c_eff')] = c_eff
+                df.loc[index,('f_eff')] = f_eff
             df.loc[index,('program')] = program
 
         return (df,columns,reqnum,updated)
