@@ -86,7 +86,7 @@ def assess_query(cur,df,index,triplet,pfw_attempt_id,pipeline):
         assess_q = "SELECT distinct accepted,t_eff,b_eff,c_eff,f_eff,program from finalcut_eval \
                     WHERE pfw_attempt_id={pfwid}".format(pfwid=pfw_attempt_id)
     elif pipeline =='firstcut':
-        assess_q = "SELECT distinct accepted,t_eff,b_eff,c_eff,f_effprogram \
+        assess_q = "SELECT distinct accepted,t_eff,b_eff,c_eff,f_eff,program \
                     FROM firstcut_eval where pfw_attempt_id={pfwid}".format(pfwid=pfw_attempt_id)
     else:
         assess_q = "SELECT distinct accepted,t_eff,b_eff,c_eff,f_eff,program \
