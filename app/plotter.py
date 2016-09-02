@@ -42,7 +42,7 @@ def plot_status_per_host(dataframe):
 
 def plot_t_eff(dataframe):
     def create_data_source(df):
-        return ColumnDataSource(data=dict(t_eff=df['t_eff'],expnum=df['expnum'],program=df['program'],attnum=df['attnum'],band=df['band'],b_eff=df['b_eff'],c_eff=df['c_eff'],f_eff=df['f_eff']))
+        return ColumnDataSource(data=dict(t_eff=df['t_eff'],expnum=df['expnum'],program=df['program'],attnum=df['attnum'],band=df['band'],b_eff=(df['c_eff']*df['f_eff'])**-1,c_eff=(df['b_eff']*df['f_eff'])**-1,f_eff=(df['b_eff']*df['c_eff'])**-1))
     line_colors = ['black','blue','yellow','pink']
     plots = []
     # Creating scatter plot
