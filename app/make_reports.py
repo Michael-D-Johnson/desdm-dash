@@ -60,7 +60,7 @@ def make_reports(db=None,reqnums=None):
         try:
             df_test_expnum = pandas.DataFrame(
                 query.get_expnum_info(query.connect_to_db('db-destest')[1],','.join(test_reqnums)),
-                columns = ['unitname','reqnum','attnum','expnum','band'])
+                columns = ['unitname','reqnum','attnum','pfw_attempt_id','expnum','band'])
         except: 
             df_test_expnum = pandas.DataFrame()
             df_test_expnum.insert(len(df_test_expnum.columns),'unitname',None)
