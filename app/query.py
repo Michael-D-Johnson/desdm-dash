@@ -79,6 +79,8 @@ def batch_size_query(cur,nitelist,reqnum,pipeline):
 def assess_query(cur,df,index,triplet,pfw_attempt_id,pipeline):
     if 'DES' in triplet[0].split('_')[0]:
         pipeline = 'multiepoch'
+    if 'D00' in triplet[0].split('_')[0]:
+        pipeline = 'firstcut'
     if pipeline=='sne':
         camsym,field,band,seq = triplet[0].split('_')
         comment = field.strip('SN-') + band + ' ' + str(df.loc[index,('nite')])
