@@ -143,7 +143,7 @@ def processing_summary(db,project,df=None):
                 orig_nitelist_cp.remove(-99)
                 if orig_nitelist_cp:
                     if len(orig_nitelist_cp) >1:
-                        nitelist = str('NA' + ', ' + str(int(orig_nitelist_cp[0])) + ' - ' + int(orig_nitelist_cp[-1]))
+                        nitelist = str('NA' + ', ' + str(int(orig_nitelist_cp[0])) + ' - ' + str(int(orig_nitelist_cp[-1])))
                     else:
                         nitelist = str('NA' + ', ' + str(int(orig_nitelist_cp[-1])))
             else:
