@@ -86,7 +86,7 @@ def plot_exec_wall_time(dataframe):
              HoverTool(tooltips = [('pfw_attempt_id','@pfw_attempt_id'),('exec_host','@exec_host')])]
     Colors = ['red', 'navy', 'olive', 'firebrick', 'lightskyblue', 'yellowgreen', 'lightcoral', 'yellow', 'green',
               'blue', 'gold', 'red']
-    Colors += Colors
+    Colors = Colors + Colors + Colors + Colors
 
     pd.to_datetime(dataframe['start_time'])
     pd.to_datetime(dataframe['end_time'])
@@ -111,7 +111,7 @@ def plot_exec_wall_time(dataframe):
                 start = row.start_time.unique()[0]
                 end = row.end_time.unique()[0]
                 y = count + (0.1*(c))
-                p.line(x = [start,end],y=[y,y],color=color, source = create_data_source(row))
+                p.line(x = [start,end],y=[y,y],color=color, source = create_data_source(group))
             except:
                 pass
             c +=1
