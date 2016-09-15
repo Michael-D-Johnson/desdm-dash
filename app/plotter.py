@@ -108,8 +108,8 @@ def plot_exec_wall_time(dataframe):
         for attempt,row in group.groupby(by=['unitname','attnum']):
             i = row.index.values[0]
             try:
-                start = datetime.strptime(row.start_time.unique()[0], '%Y-%m-%d %H:%M:%S')
-                end = datetime.strptime(str(row.end_time.unique()[0]), '%Y-%m-%d %H:%M:%S')
+                start = row.start_time.unique()[0]
+                end = row.end_time.unique()[0]
                 y = count + (0.1*(c))
                 p.line(x = [start,end],y=[y,y],color=color, source = create_data_source(row))
             except:
