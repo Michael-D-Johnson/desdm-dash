@@ -220,7 +220,7 @@ def make_system_plots(sys_df, res, des_df):
 
 def make_coadd_html():
     try:
-        all_df, processed_df, band_df = get_data.create_coadd_map('db-destest',"Y3A1_COADD")
+        all_df, processed_df, band_df = get_data.create_coadd_map('db-desoper',"Y3A1_COADD")
         p = plotter.plot_coadd(all_df, processed_df, band_df, "Y3A1_COADD")
     except:
         pass    
