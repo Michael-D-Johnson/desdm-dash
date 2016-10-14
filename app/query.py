@@ -134,7 +134,7 @@ def query_all_tiles(cur):
 
 def query_processed_tiles(dbh,cur,tag):
     query = "SELECT a.reqnum, a.unitname, a.attnum, a.id, t.status \
-            FROM prodbeta.task t, prodbeta.pfw_attempt a, mjohns44.destiles c, prodbeta.proctag p \
+            FROM prod.task t, prod.pfw_attempt a, mjohns44.destiles c, prod.proctag p \
             WHERE t.id=a.task_id and a.unitname=c.tilename and a.id=p.pfw_attempt_id \
             and p.tag={tag}".format(tag= dbh.get_named_bind_string('tag'))
     params = {'tag': tag}
