@@ -85,10 +85,15 @@ def make_reports(db=None,reqnums=None):
         df_oper_nites = pandas.DataFrame(
                 query.get_nites(query.connect_to_db('db-desoper')[1],','.join(oper_reqnums)),
                 columns = ['unitname','reqnum','attnum','pfw_attempt_id','nite'])
-        df_oper_expnum = pandas.DataFrame(
+        try:
+            df_oper_unitname = pandas.DataFrame(
                 query.get_expnum_info(query.connect_to_db('db-desoper')[1],','.join(oper_reqnums)),
                 columns = ['unitname','reqnum','attnum','pfw_attempt_id','expnum','band'])
-        for df in [df_oper_status,df_oper_expnum,df_oper_nites]:
+        except:
+            df_oper_unitname = pandas.DataFrame(
+                query.get_tilename_info(query.connect_to_db('db-desoper')[1], ','.join(oper_reqnums)),
+                columns=['unitname', 'reqnum', 'attnum', 'pfw_attempt_id'])
+        for df in [df_oper_status,df_oper_unitname,df_oper_nites]:
             df_oper = pandas.merge(df_oper,df,on=['unitname','reqnum','attnum','pfw_attempt_id'],how='left',
                                    suffixes=('_orig',''))
         df_oper['db'] ='db-desoper'

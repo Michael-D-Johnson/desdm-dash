@@ -104,6 +104,17 @@ def get_status(cur,reqnums):
     cur.execute(query)
     return cur.fetchall()
 
+def get_tilename_info(cur,reqnums):
+    query = "SELECT distinct a.unitname,a.reqnum,a.attnum,a.id from pfw_request r, \
+            pfw_attempt a\
+            WHERE a.reqnum in ({reqnums}) and r.reqnum=a.reqnum \
+            and r.pipeline in ('multiepoch','coadd')".format(reqnums=reqnums)
+    try:
+        cur.execute(query)
+        return cur.fetchall()
+    except:
+        return None
+
 def get_expnum_info(cur,reqnums):
     query = "SELECT distinct a.unitname,a.reqnum,a.attnum,a.id, e.expnum,e.band from pfw_request r,exposure e, \
             pfw_attempt a\
