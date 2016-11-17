@@ -2,6 +2,7 @@
 import os
 from opstoolkit import jiracmd
 from despydb import DesDbi
+import pandas
 
 def connect_to_db(section):
     dbh = DesDbi(os.getenv("DES_SERVICES"),section)
@@ -184,3 +185,87 @@ def query_dts_delay(cur, stime, etime):
     #print query
     cur.execute(query)
     return cur.fetchall()
+
+def update_column_df(con,df,name):
+#    data = pandas.read_csv('/home/ycchen/'+file,skiprows=1)
+    dbh = con[0]
+    cur = con[1]
+    data = df
+    data.reset_index(inplace=True,drop=True)
+#    pandas.DatetimeIndex(data['start_time']).to_native_types()
+#    pandas.DatetimeIndex(data['created_date']).to_native_types()
+#    pandas.DatetimeIndex(data['end_time']).to_native_types()
+    data['start_time']=data['start_time'].values.astype('<M8[s]').astype(str)
+    data['created_date']=data['created_date'].values.astype('<M8[s]').astype(str)
+    data['end_time']=data['end_time'].values.astype('<M8[s]').astype(str)
+    data['status']=data['status'].fillna(-99.0).astype(int)
+    data['status_orig']=data['status_orig'].fillna(-99.0).astype(int)
+    data.rename(columns={"total time": "total_time"},inplace=True)
+    data['total_time']=data['total_time'].astype(float)
+    data['t_eff']=data['t_eff'].astype(str)
+    data['b_eff']=data['b_eff'].astype(str)
+    data['c_eff']=data['c_eff'].astype(str)
+    data['f_eff']=data['f_eff'].astype(str)
+
+    for column in data.columns:
+    
+        if 'int' in data[column].dtypes.name or 'float' in data[column].dtypes.name:
+            data[column] = data[column].fillna(-99)
+        else:
+            data[column] = data[column].fillna('None')
+#    data = data.reindex(range(0,len(data)),method='ffill')
+#    for i in range(0,len(data)):
+#        data=data.rename(index={data.index.values[i]:i})
+# ignore total_time,assessment,t_eff,b_eff,c_eff,f_eff,program
+
+    list_check = ['pfw_attempt_id','status','data_state','end_time','total_time','assessment','t_eff','b_eff','c_eff','f_eff']
+    query_pfw = "select "
+    for column in list_check:
+        if column == 'pfw_attempt_id':
+            query_pfw = query_pfw +  column
+        else:
+            query_pfw = query_pfw + "," + column
+    query_pfw = query_pfw + " from " + name
+    cur.execute(query_pfw)
+    result = cur.fetchall()
+    if result == []:
+        data_db = pandas.DataFrame(columns=list_check)
+    else: data_db = pandas.DataFrame(result,columns=list_check)
+    data['expnum']=data['expnum'].astype(str)
+    num = len(data)
+    num_db = len(data_db)
+    i = 0
+#    print data_db.info()
+#    print data.info()
+    while (i<num):
+        j = 0
+        found = 0
+        while (j<num_db):
+            if (data_db.loc[j,'pfw_attempt_id']==data.loc[i,'pfw_attempt_id']):
+                up_dict = {}
+                for column in list_check:
+                    if 'float' in data[column].dtype.name:
+                        if (round(data_db.loc[j,column],4) != round(data.loc[i,column],4)):
+                            up_dict.update({column:round(data.loc[i,column],3)})
+                    else:
+                        if (data_db.loc[j,column] != data.loc[i,column]):
+                            up_dict.update({column:data.loc[i,column]})
+                found = 1
+                if up_dict != {}:
+                    dbh.basic_update_row(name,up_dict,{'pfw_attempt_id' : data.loc[i,'pfw_attempt_id']})
+                    dbh.commit()
+                    print "Updating for " + str(data.loc[i,'pfw_attempt_id'])+" :"
+                    print up_dict
+                else: print "Already up to date for ID:" + str(data.loc[i,'pfw_attempt_id'])
+            j=j+1
+        if (found == 0):
+            print " Append pfw_attempt_id: "+str(data.loc[i,'pfw_attempt_id'])
+            row = dict(zip(list(data.columns),map(list,data.values)[i]))
+#            print row
+            dbh.basic_insert_row (name, row)
+            dbh.commit()
+#        else: print str(data.loc[i,'pfw_attempt_id'])+" Exist !! "
+        i=i+1
+    return 0
+
+

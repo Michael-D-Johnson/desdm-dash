@@ -24,6 +24,8 @@ def create_args():
     args = parser.parse_args()
     return args
 
+
+
 def make_reports(db=None,reqnums=None):
     if db is None and reqnums is None: 
         #1. get reqnums from last four days
@@ -105,12 +107,16 @@ def make_reports(db=None,reqnums=None):
     with open(csv_path,'w') as csv:
         csv.write('%s\n' % updated)
     df_master.to_csv(csv_path,index=False,mode='a')
+    
 
     # Make plots html
     for name,group in df_master.groupby(by=['reqnum','db']):
         reqnum = name[0]
         db = name[1]
         df,columns,reqnum,updated = get_data.processing_detail(group.db.unique()[0],reqnum,group,updated=updated)
+        print "start:",str(datetime.now())
+        query.update_column_df(query.connect_to_db('db-destest'),df,'test_dash')
+        print "end:",str(datetime.now())
         df2 = df.dropna()
         df_pass = df[df.status==0]
 
