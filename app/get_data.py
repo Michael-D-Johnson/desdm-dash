@@ -183,7 +183,7 @@ def processing_summary(db,project,df=None):
         if len(orig_nitelist) == 1:
             nitelist = int(orig_nitelist[0])
             if nitelist == -99: nitelist = 'NA'
-        req_dict = {'remaining':remaining,'operator':group.operator.unique()[0],
+        req_dict = {'remaining':remaining,'operator':', '.join(group.operator.unique()),
                     'batch size':total_batch_size,
                     'reqnum':req,'passed':passed,'failed':failed,'unknown':unknown,
                     'nite':nitelist,
