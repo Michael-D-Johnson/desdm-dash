@@ -3,6 +3,7 @@ import os
 import pandas
 from datetime import datetime, timedelta, date
 
+from bokeh.charts import save
 from bokeh.plotting import output_file
 from bokeh.resources import CDN,INLINE
 from bokeh.embed import file_html
@@ -277,6 +278,7 @@ def make_dts_plot():
 
     static_path = os.path.join(app.config["STATIC_PATH"],"dts_plot.html")
     output_file(static_path, title='Dts graph')
+    save(p)
 
 if __name__ =='__main__':
     args = create_args()
