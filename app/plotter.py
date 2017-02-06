@@ -9,6 +9,7 @@ from bokeh.models import (HoverTool, BoxSelectTool, BoxZoomTool,FixedTicker,
                           PanTool, ResetTool,WheelZoomTool, ResizeTool,
                           glyphs,Legend,NumeralTickFormatter)
 from bokeh.charts import Scatter,Bar,Histogram,color
+from bokeh.io import vplot
 
 def plot_times(dataframe):
     dataframe = dataframe.fillna(-1)
