@@ -277,6 +277,7 @@ def make_dts_plot():
 
     static_path = os.path.join(app.config["STATIC_PATH"],"dts_plot.html")
     output_file(static_path, title='Dts graph')
+    save(p)
 
 if __name__ =='__main__':
     args = create_args()
