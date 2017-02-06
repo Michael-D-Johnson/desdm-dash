@@ -245,6 +245,37 @@ def make_coadd_html():
         h.write(html)
         h.write('</center>\n')
 
+def make_dts_plot():
+
+    etime = datetime.combine(date.today(), datetime.min.time())
+    stime = etime - timedelta(14)
+
+    ### Fetch Data ###
+    accept_df = get_data.get_accept_time()
+    ingest_df = get_data.get_ingest_time()
+    sispi_df = pd.DataFrame(query.query_exptime(query.connect_to_db('db-sispi')[1], etime, datetime.now()), columns = ['sispi_time','filename'])
+    db_df = pd.DataFrame(query.query_dts_delay(query.connect_to_db('db-destest')[1], stime, etime), columns = ['total_time', 'ncsa_time', 'noao_time', 'xtime'])
+
+    ### Standardize file names for merge ###
+    trimed_fn = []
+    for i, line in sispi_df.iterrows():
+        trimed_fn.append(os.path.basename(line['filename'].split(':')[1]))
+    sispi_df['filename']=trimed_fn
+
+    ### Merge data ###
+    log_df = pd.merge(accept_df, ingest_df, how='inner', on=['filename'])
+    live_df = pd.merge(log_df, sispi_df, how='inner', on=['filename'])
+
+    live_df = get_data.convert_timezones(live_df)
+
+    ### Smooth plot ###
+    db_df = get_data.smooth_dts(db_df)
+
+    ### Plot Data ###
+    p = plotter.plot_dts(db_df, live_df)
+
+    output_file("static/dts_plot.html", title='Dts graph')
+
 if __name__ =='__main__':
     args = create_args()
     if args.reqnums:
@@ -261,6 +292,7 @@ if __name__ =='__main__':
         csv_path = os.path.join(app.config["STATIC_PATH"],"processing.csv")
 
     make_reports(db=db,reqnums=reqnums)
+    make_dts_plot()
     #print 'Making coadds'
     #st = datetime.now() 
     #make_coadd_html() 

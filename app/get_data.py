@@ -32,34 +32,23 @@ def create_system_data(section, section2):
     return df, res, desdf_df
 
 ### Live Render version of get_ingest_time for dts plot ###
-def get_ingest_time(stime, etime):
+def get_ingest_time():
 
     times, filenames = [],[]
+    curdate = datetime.now()
 
-    ### Defined time range ###
-    maxrng = etime - stime
-    for i in range(0,maxrng.days):
-        curdate = stime + timedelta(days=int(i))
-
-    ### Past 2 weeks ###
-    #now = datetime.now()
-    #for i in range(0,14):
-    #    curdate = now - timedelta(days=int(i))
-
-        ### Desar3 ###
-        permlocation = "/local/dts_desdm/logs/dts_file_handler_logs/%s/%s/%s-handle_file_from_dts.log" % (curdate.year, curdate.strftime('%m'), str(curdate.year)+str(curdate.strftime('%m'))+str(curdate.strftime('%d')))
-        ### Testing on Deslogin ###
-        templocation = "/work/devel/abode/logs/dts_logs/dts_file_handler_logs/%s/%s/%s-handle_file_from_dts.log" % (curdate.year, curdate.strftime('%m'), str(curdate.year)+str(curdate.strftime('%m'))+str(curdate.strftime('%d')))
-        try:
-            with open(permlocation) as fh:
-                for line in fh:
-                    if "move_file_to_archive" in line:
-                        contents = line.split(' ')
-                        times.append(datetime.strptime(contents[0]+" "+contents[1], '%Y/%m/%d %H:%M:%S'))
-                        filenames.append(os.path.basename(contents[5].rstrip(':')))
-        except:
-            print "No ingest log for: " + str(curdate)
-            pass
+    ### Desar3 ###
+    permlocation = "/local/dts_desdm/logs/dts_file_handler_logs/%s/%s/%s-handle_file_from_dts.log" % (curdate.year, curdate.strftime('%m'), str(curdate.year)+str(curdate.strftime('%m'))+str(curdate.strftime('%d')))
+    try:
+        with open(testlocation) as fh:
+            for line in fh:
+                if "move_file_to_archive" in line:
+                    contents = line.split(' ')
+                    times.append(datetime.strptime(contents[0]+" "+contents[1], '%Y/%m/%d %H:%M:%S'))
+                    filenames.append(os.path.basename(contents[5].rstrip(':')))
+    except:
+        print "No ingest log for: " + str(curdate)
+        pass
 
     df = pd.DataFrame()
     df['ingest_time'] = times
@@ -68,41 +57,119 @@ def get_ingest_time(stime, etime):
     return df
 
 ### Live Render version of get_accept_time for dts plot ###
-def get_accept_time(stime, etime):
+def get_accept_time():
 
-    times, filenames = [], []
+    times, filenames = [],[]
+    curdate = datetime.now()
 
-    ### Defined time range ###
-    maxrng = etime - stime
-    for i in range(0,maxrng.days):
-        curdate = stime + timedelta(days=int(i))
-
-    ### Past 2 weeks ###
-    #now = datetime.now()
-    #for i in range(0,14):
-    #    curdate = now - timedelta(days=int(i))        
-
-        ### Desar3 ###
-        permlocation = "/local/dts_desdm/logs/accept_dts_delivery_logs/%s/%s/%s_dts_accept.log" % (curdate.year, curdate.strftime('%m'), str(curdate.year)+str(curdate.strftime('%m'))+str(curdate.strftime('%d')))
-        ### Testing on deslogin ###
-        templocation = "/work/devel/abode/logs/dts_logs/accept_dts_delivery_logs/%s/%s/%s_dts_accept.log" % (curdate.year, curdate.strftime('%m'), str(curdate.year)+str(curdate.strftime('%m'))+str(curdate.strftime('%d')))
-        try:
-            with open(permlocation) as fh:
-                for line in fh:
-                    if "accept file" in line:
-                        contents = line.split(' ')
-                        if os.path.basename(contents[6].rstrip('\n')) not in filenames:
-                            times.append(datetime.strptime(contents[0]+" "+contents[1], '%Y/%m/%d %H:%M:%S'))
-                            filenames.append(os.path.basename(contents[6].rstrip('\n')))
-        except:
-            print "No accept log for: " + str(curdate)
-            pass
+    ### Desar3 ###
+    permlocation = "/local/dts_desdm/logs/accept_dts_delivery_logs/%s/%s/%s_dts_accept.log" % (curdate.year, curdate.strftime('%m'), str(curdate.year)+str(curdate.strftime('%m'))+str(curdate.strftime('%d')))
+    try:
+        with open(testlocation) as fh:
+            for line in fh:
+                if "accept file" in line:
+                    contents = line.split(' ')
+                    if os.path.basename(contents[6].rstrip('\n')) not in filenames:
+                        times.append(datetime.strptime(contents[0]+" "+contents[1], '%Y/%m/%d %H:%M:%S'))
+                        filenames.append(os.path.basename(contents[6].rstrip('\n')))
+    except:
+        print "No accept log for: " + str(curdate)
+        pass
 
     df = pd.DataFrame()
     df['accept_time'] = times
     df['filename'] = filenames
 
     return df
+
+def convert_timezones(df):
+
+    localtz = pytz.timezone('US/Central')
+    noaodiff, ncsadiff, totaldiff, xtime = [],[],[],[]
+                                                        # Sort is depreciated as of 0.17.0
+    df.sort(['sispi_time'], inplace=True)               # 0.16.0 and earilier
+    #df.sort_values(['sispi_time'], inplace=True)       # 0.17.0
+
+    for i,line in df.iterrows():
+        accept_time = localtz.localize(line['accept_time'])
+        ingest_time = localtz.localize(line['ingest_time'])
+        try:
+            totaldiff.append((ingest_time.astimezone (pytz.utc) - line['sispi_time'].astimezone (pytz.utc)).total_seconds()/60)
+            if ((accept_time.astimezone (pytz.utc) - line['sispi_time'].astimezone (pytz.utc)).total_seconds()/60) < 0:
+                print "##### WARNING: NEGITIVE NOAO TIME #####"
+                print line['filename']
+                print "Accept: ", accept_time
+                print "Ingest: ", ingest_time
+                print "Sispi:  ", line['sispi_time']
+            noaodiff.append((accept_time.astimezone (pytz.utc) - line['sispi_time'].astimezone (pytz.utc)).total_seconds()/60)
+            if ((ingest_time.astimezone (pytz.utc) - accept_time.astimezone (pytz.utc)).total_seconds()/60) < 0:
+                print "##### WARNING: NEGITIVE NCSA TIME #####"
+                print line['filename']
+                print "Accept: ", accept_time
+                print "Ingest: ", ingest_time
+                print "Sispi:  ", line['sispi_time']
+            ncsadiff.append((ingest_time.astimezone (pytz.utc) - accept_time.astimezone (pytz.utc)).total_seconds()/60)
+            xtime.append(line['sispi_time'])
+        except:
+            print "##### WARNING: FILE FAILED TO BE ADDED TO PLOT #####"
+            print line['filename']
+            print "Accept: ", accept_time
+            print "Ingest: ", ingest_time
+            print "Sispi:  ", line['sispi_time']
+            pass
+
+    fn_df = pd.DataFrame()
+    fn_df['total_time'] = totaldiff
+    fn_df['ncsa_time'] = ncsadiff
+    fn_df['noao_time'] = noaodiff
+    fn_df['xtime'] = xtime
+
+    return fn_df
+
+def smooth_dts(df):
+                                                   # Sort is depreciated as of 0.17.0
+    df.sort(['xtime'], inplace=True)               # 0.16.0 and earilier
+    #df.sort_values(['xtime'], inplace=True)       # 0.17.0
+
+    current_time = df['xtime'].iloc[0]
+    current_total,current_ncsa,current_noao,current_i = 0,0,0,0
+    noaotime, ncsatime, totaltime, xtime = [],[],[],[]
+    for i,x in df.iterrows():
+        if (x['xtime'] - current_time).total_seconds() < 300:
+            current_total += x['total_time']
+            current_ncsa += x['ncsa_time']
+            current_noao += x['noao_time']
+        else:
+            totaltime.append(current_total/(i - current_i))
+            ncsatime.append(current_ncsa/(i - current_i))
+            noaotime.append(current_noao/(i - current_i))
+            xtime.append(current_time)
+
+            if (x['xtime'] - current_time).total_seconds() > 900:
+                totaltime.append(0)
+                ncsatime.append(0)
+                noaotime.append(0)
+                xtime.append(current_time + timedelta(0,300))
+
+                totaltime.append(0)
+                ncsatime.append(0)
+                noaotime.append(0)
+                xtime.append(x['xtime'] - timedelta(0,300))
+
+            current_time = x['xtime']
+            current_total = x['total_time']
+            current_ncsa = x['ncsa_time']
+            current_noao = x['noao_time']
+            current_i = i
+
+
+    fn_df = pd.DataFrame()
+    fn_df['total_time'] = totaltime
+    fn_df['ncsa_time'] = ncsatime
+    fn_df['noao_time'] = noaotime
+    fn_df['xtime'] = xtime
+
+    return fn_df
 
 def processing_archive():
     reqnums = os.listdir(templates)
