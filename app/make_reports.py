@@ -253,8 +253,8 @@ def make_dts_plot():
     ### Fetch Data ###
     accept_df = get_data.get_accept_time()
     ingest_df = get_data.get_ingest_time()
-    sispi_df = pd.DataFrame(query.query_exptime(query.connect_to_db('db-sispi')[1], etime, datetime.now()), columns = ['sispi_time','filename'])
-    db_df = pd.DataFrame(query.query_dts_delay(query.connect_to_db('db-destest')[1], stime, etime), columns = ['total_time', 'ncsa_time', 'noao_time', 'xtime'])
+    sispi_df = pandas.DataFrame(query.query_exptime(query.connect_to_db('db-sispi')[1], etime, datetime.now()), columns = ['sispi_time','filename'])
+    db_df = pandas.DataFrame(query.query_dts_delay(query.connect_to_db('db-destest')[1], stime, etime), columns = ['total_time', 'ncsa_time', 'noao_time', 'xtime'])
 
     ### Standardize file names for merge ###
     trimed_fn = []
@@ -263,8 +263,8 @@ def make_dts_plot():
     sispi_df['filename']=trimed_fn
 
     ### Merge data ###
-    log_df = pd.merge(accept_df, ingest_df, how='inner', on=['filename'])
-    live_df = pd.merge(log_df, sispi_df, how='inner', on=['filename'])
+    log_df = pandas.merge(accept_df, ingest_df, how='inner', on=['filename'])
+    live_df = pandas.merge(log_df, sispi_df, how='inner', on=['filename'])
 
     live_df = get_data.convert_timezones(live_df)
 

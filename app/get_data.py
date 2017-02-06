@@ -50,7 +50,7 @@ def get_ingest_time():
         print "No ingest log for: " + str(curdate)
         pass
 
-    df = pd.DataFrame()
+    df = pandas.DataFrame()
     df['ingest_time'] = times
     df['filename'] = filenames
 
@@ -76,7 +76,7 @@ def get_accept_time():
         print "No accept log for: " + str(curdate)
         pass
 
-    df = pd.DataFrame()
+    df = pandas.DataFrame()
     df['accept_time'] = times
     df['filename'] = filenames
 
@@ -118,7 +118,7 @@ def convert_timezones(df):
             print "Sispi:  ", line['sispi_time']
             pass
 
-    fn_df = pd.DataFrame()
+    fn_df = pandas.DataFrame()
     fn_df['total_time'] = totaldiff
     fn_df['ncsa_time'] = ncsadiff
     fn_df['noao_time'] = noaodiff
@@ -163,7 +163,7 @@ def smooth_dts(df):
             current_i = i
 
 
-    fn_df = pd.DataFrame()
+    fn_df = pandas.DataFrame()
     fn_df['total_time'] = totaltime
     fn_df['ncsa_time'] = ncsatime
     fn_df['noao_time'] = noaotime
