@@ -274,7 +274,8 @@ def make_dts_plot():
     ### Plot Data ###
     p = plotter.plot_dts(db_df, live_df)
 
-    output_file("static/dts_plot.html", title='Dts graph')
+    static_path = os.path.join(app.config["STATIC_PATH"],"dts_plot.html")
+    output_file(static_path, title='Dts graph')
 
 if __name__ =='__main__':
     args = create_args()

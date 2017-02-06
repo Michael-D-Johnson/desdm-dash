@@ -4,7 +4,7 @@ import os
 import sys
 import pandas
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import math
 import query
 
