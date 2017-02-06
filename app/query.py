@@ -197,8 +197,8 @@ def query_dts_delay(cur, stime, etime):
 ####################
 
 def get_stat_data(cur):
-    query = "SELECT * from test_dash "
-    #query = "SELECT * from test_dash where rownum < 1000"
+    query = "SELECT * from ycchen.test_dash "
+    #query = "SELECT * from ycchen.test_dash where rownum < 1000"
     cur.execute(query)
     return cur.fetchall()
 
