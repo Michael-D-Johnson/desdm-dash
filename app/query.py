@@ -203,6 +203,6 @@ def get_stat_data(cur):
     return cur.fetchall()
 
 def get_stat_columns(cur):
-    query = "select column_name from USER_TAB_COLUMNS WHERE table_name = 'TEST_DASH'"
+    query = "select column_name from USER_TAB_COLUMNS WHERE table_name = 'ycchen.TEST_DASH'"
     cur.execute(query)
     return cur.fetchall()
