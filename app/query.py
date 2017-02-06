@@ -77,15 +77,22 @@ def batch_size_query(cur,nitelist,reqnum,pipeline):
     return results
 
 def assess_query(cur,df,index,triplet,pfw_attempt_id,pipeline):
-    if 'DES' in triplet[0].split('_')[0]:
+    unitname_0 = triplet[0].split('_')[0]
+    if 'DES' in unitname_0:
         pipeline = 'multiepoch'
-    if 'D00' in triplet[0].split('_')[0]:
+    if 'D00' in unitname_0:
         pipeline = 'firstcut'
+    if unitname_0.startswith("201") and "t" in unitname_0:
+        pipeline = "supercal"
+    if unitname_0.startswith("201"):
+        pipeline = "precal"
     if pipeline=='sne':
-        camsym,field,band,seq = triplet[0].split('_')
-        comment = field.strip('SN-') + band + ' ' + str(df.loc[index,('nite')])
-        assess_q = "select distinct accepted,t_eff,b_eff,c_eff,f_eff,program from firstcut_eval where analyst='SNQUALITY' \
-                    and analyst_comment='{comment}'".format(comment=comment)
+        if 'missinginfile' in triplet[0].split('_'):
+            assess_q = "select distinct accepted,t_eff,b_eff,c_eff,f_eff,program from firstcut_eval where analyst='SNQUALITY' and analyst_comment='None'"
+        else:
+            camsym,field,band,seq = triplet[0].split('_')
+            comment = field.strip('SN-') + band + ' ' + str(df.loc[index,('nite')])
+            assess_q = "select distinct accepted,t_eff,b_eff,c_eff,f_eff,program from firstcut_eval where analyst='SNQUALITY' and analyst_comment='{comment}'".format(comment=comment)
     elif pipeline =='finalcut':
         assess_q = "SELECT distinct accepted,t_eff,b_eff,c_eff,f_eff,program from finalcut_eval \
                     WHERE pfw_attempt_id={pfwid}".format(pfwid=pfw_attempt_id)
