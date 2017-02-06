@@ -378,3 +378,32 @@ def plot_dts(df):
     p.legend.location = "top_left"      ### Bokeh 0.11.0 ###
     
     return p
+
+####################
+# added by ycchen
+##################
+def mk_stat_plot(df):
+    p1 = Bar(df, label='TARGET_SITE', values='TOTAL_TIME', agg='mean', group='PIPELINE', 
+         title="Mean Processing for each site grouped by Pipeline"+"(Data Size:"+str(len(df.index))+")",
+         legend='top_right',height=500,width=1000)
+    df_camp_firstcut = df[ (df.TARGET_SITE == "descampuscluster") & (df.PIPELINE == "firstcut") ]
+    df_fermi_firstcut = df[ (df.TARGET_SITE == "fermigrid") & (df.PIPELINE == "firstcut") ]
+    df_camp_multi = df[ (df.TARGET_SITE == "descampuscluster") & (df.PIPELINE == "multiepoch") ]
+    df_fermi_multi = df[ (df.TARGET_SITE == "fermigrid") & (df.PIPELINE == "multiepoch") ]
+    p2 = Bar(df_camp_firstcut, label='EXEC_HOST', 
+         values='TOTAL_TIME', agg='mean', title="Mean Processing of firstcut in Campuscluster for each Exac_host"+"(Data Size:"+str(len(df_camp_firstcut.index))+")",
+         height=500, width=1000)
+    p3 = Bar(df_fermi_firstcut, label='EXEC_HOST', values='TOTAL_TIME',
+         agg='mean', title="Mean Processing of firstcut in Fermigrid for each Exac_host"+"(Data Size:"+str(len(df_fermi_firstcut.index))+")",
+         height=500,width=1000)
+    p4 = Bar(df_camp_multi, label='EXEC_HOST', values='TOTAL_TIME',
+         agg='mean', title="Mean Processing of multiepoch in Campuscluster for each Exac_host"+"(Data Size:"+str(len(df_camp_multi.index))+")",
+         height=500,width=1000)
+    p5 = Bar(df_fermi_multi, label='EXEC_HOST', values='TOTAL_TIME',
+         agg='mean', title="Mean Processing of multiepoch in Fermigrid for each Exac_host"+"(Data Size:"+str(len(df_fermi_multi.index))+")",
+         height=500,width=1000)
+    p6 = Bar(df, label='TARGET_SITE', values='TOTAL_TIME', stack='PIPELINE',
+         title="Total time used by each Target site", legend='top_right',
+         height=500,width=1000)
+    p = vplot(p1,p2,p3,p4,p5,p6)
+    return p

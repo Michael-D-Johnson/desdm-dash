@@ -269,3 +269,21 @@ def processing_detail(db,reqnum,df=None,updated=None):
             df.loc[index,('program')] = program
 
         return (df,columns,reqnum,updated)
+
+####################
+# added by ycchen
+###################
+
+def generate_stat_df():
+    columns = [i[0] for i in query.get_stat_columns(query.connect_to_db("db-destest")[1])]
+    df = pandas.DataFrame(query.get_stat_data(query.connect_to_db("db-destest")[1]), columns = columns)
+    updated = '#{time}'.format(time=datetime.now())
+    return (df,updated)
+
+def select_useful_data(df):
+    df = df[df.TOTAL_TIME > 0]
+    df = df[df.STATUS == 0]
+    df = df[ (df.TARGET_SITE != "iforge-dev") & (df.TARGET_SITE != "fermigrid-sl6") & (df.TARGET_SITE != "fermigrid-ce") & (df.TARGET_SITE != "CampusClusterPrecal") ]
+    df = df[df.PROJECT == "OPS"]
+    df = df[ (df.PIPELINE == "firstcut") | (df.PIPELINE == "multiepoch") | (df.PIPELINE == "sne")]
+    return df

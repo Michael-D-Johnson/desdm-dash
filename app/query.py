@@ -184,3 +184,18 @@ def query_dts_delay(cur, stime, etime):
     #print query
     cur.execute(query)
     return cur.fetchall()
+
+#####################
+# added by ycchen
+####################
+
+def get_stat_data(cur):
+    query = "SELECT * from test_dash "
+    #query = "SELECT * from test_dash where rownum < 1000"
+    cur.execute(query)
+    return cur.fetchall()
+
+def get_stat_columns(cur):
+    query = "select column_name from USER_TAB_COLUMNS WHERE table_name = 'TEST_DASH'"
+    cur.execute(query)
+    return cur.fetchall()
