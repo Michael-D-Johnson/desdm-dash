@@ -3,6 +3,7 @@ import os
 import pandas
 from datetime import datetime, timedelta, date
 
+from bokeh.plotting import output_file
 from bokeh.resources import CDN,INLINE
 from bokeh.embed import file_html
 from bokeh.io import vplot
