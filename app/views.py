@@ -44,7 +44,9 @@ def processing_detail(reqnum):
 
 @app.route('/dts')
 def dts():
-    return render_template('dts_monitor.html',title='DTS')
+    
+    name = 'dts_plot.html'
+    return render_template('dts_monitor.html', name=name,title='DTS')
 
 @app.route('/system')
 def backups():

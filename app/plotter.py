@@ -364,19 +364,31 @@ def plot_system_transfer_rates(tdate,tsize,tav):
 
     return p
 
-def plot_dts(df):
-    
+def plot_dts(df, live_df):
+
     TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
 
-    p = figure(plot_height=500, plot_width=1000, x_axis_type="datetime", x_range=((datetime.now()-timedelta(days=int(14))), datetime.now()), x_axis_label="Date", y_axis_label="Time difference in minutes", tools=TOOLS, title='DTS times')
+    p = figure(plot_height=500, plot_width=1000, x_axis_type="datetime", x_range=((datetime.now()-timedelta(days=int(14))), datetime.now()), y_range=(0, df['total_time'].max()), x_axis_label="Date", y_axis_label="Time difference in minutes", tools=TOOLS, title='DTS times')
 
-    p.line(x=df['xtime'], y=df['total_time'],legend="Total", color='black', line_width=3)
+    ### Data that has been put into database ###
+    p.line(x=df['xtime'], y=df['total_time'],legend="Total", color="black", line_width=3)
     p.line(x=df['xtime'], y=df['noao_time'], legend="NOAO Delay", color="navy", line_width=3)
     p.line(x=df['xtime'], y=df['ncsa_time'], legend="NCSA Delay", color="firebrick", line_width=3)
 
-    #p.legend.orientation = "top_left"  ### Bokeh 0.10.0 ###
-    p.legend.location = "top_left"      ### Bokeh 0.11.0 ###
-    
+    if not live_df.empty:
+        ### Connecting line between data types ###
+        p.line(x=[df['xtime'].iloc[-1],live_df['xtime'].iloc[0]], y=[df['total_time'].iloc[-1],live_df['totaldiff'].iloc[0]],legend="Total", color="black", line_width=3)
+        p.line(x=[df['xtime'].iloc[-1],live_df['xtime'].iloc[0]], y=[df['noao_time'].iloc[-1],live_df['noaodiff'].iloc[0]], legend="NOAO Delay", color="navy", line_width=3)
+        p.line(x=[df['xtime'].iloc[-1],live_df['xtime'].iloc[0]], y=[df['ncsa_time'].iloc[-1],live_df['ncsadiff'].iloc[0]], legend="NCSA Delay", color="firebrick", line_width=3)
+
+        ### Data that has been accepted but not but into database ###
+        p.line(x=live_df['xtime'], y=live_df['totaldiff'], color="black", line_dash='dashed', line_width=3)
+        p.line(x=live_df['xtime'], y=live_df['noaodiff'], color="navy", line_dash='dashed', line_width=3)
+        p.line(x=live_df['xtime'], y=live_df['ncsadiff'], color="firebrick", line_dash='dashed', line_width=3)
+
+    p.legend.orientation = "top_left"  ### Bokeh 0.10.0 ###
+    #p.legend.location = "top_left"      ### Bokeh 0.11.0 ###
+
     return p
 
 ####################

@@ -30,7 +30,6 @@ def main():
     send_df['filename']=trimed_fn
 
     ### Merge Dataframes ###
-    # will need to be changed to outer and put nan handling in.
     tmp_df = pd.merge(ingest_df, accept_df, how='inner', on=['filename'])
     merge_df = pd.merge(tmp_df, send_df, how='left', on=['filename'])
 
@@ -51,9 +50,9 @@ def main():
 
     ### Add Delivered column ###
     fn_df['delivered'] = cf.create_delivered(fn_df)
+    fn_df.dropna(inplace=True)
 
     ### Insert to db ###
-    # issues with insert statement currently.
     cf.submit_dts_logs(query.connect_to_db('db-destest'), fn_df)
 
 if __name__=='__main__':

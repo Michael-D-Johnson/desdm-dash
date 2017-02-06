@@ -1,6 +1,6 @@
 #!/bin/bash
 # This code submits the desdf info to db
-# Crontab to submit data 0,0,1 * * * /work/devel/abode/projects/desdm-dash/desdf_submit.sh
+# Crontab to submit data 0 0 * * * /work/devel/abode/projects/desdm-dash/desdf_submit.sh
 source /work/apps/RHEL6/dist/eups/desdm_eups_setup.sh
 
 setup -r /work/devel/abode/projects/desdm-dash --nolocks
