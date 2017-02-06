@@ -386,7 +386,7 @@ def plot_dts(df, live_df):
         p.line(x=live_df['xtime'], y=live_df['noaodiff'], color="navy", line_dash='dashed', line_width=3)
         p.line(x=live_df['xtime'], y=live_df['ncsadiff'], color="firebrick", line_dash='dashed', line_width=3)
 
-    #p.legend.orientation = "top_left"  ### Bokeh 0.10.0 ###
-    p.legend.location = "top_left"      ### Bokeh 0.11.0 ###
+    p.legend.orientation = "top_left"  ### Bokeh 0.10.0 ###
+    #p.legend.location = "top_left"      ### Bokeh 0.11.0 ###
 
     return p
