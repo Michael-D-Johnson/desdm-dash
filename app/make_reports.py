@@ -261,4 +261,7 @@ if __name__ =='__main__':
         csv_path = os.path.join(app.config["STATIC_PATH"],"processing.csv")
 
     make_reports(db=db,reqnums=reqnums)
-    make_coadd_html() 
+    #print 'Making coadds'
+    #st = datetime.now() 
+    #make_coadd_html() 
+    #print datetime.now() - st
