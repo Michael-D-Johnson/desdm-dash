@@ -2,7 +2,7 @@
 import subprocess
 import os
 import sys
-import pandas
+import pandas as pd
 import time
 import pytz
 from datetime import datetime, timedelta, date
@@ -13,9 +13,9 @@ csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
 templates = '/work/devel/mjohns44/git/desdm-dash/app/static/reports'
 
 def create_coadd_map(section, tag):
-    all_df = pandas.DataFrame(query.query_all_tiles(query.connect_to_db(section)[1]), columns = ['tilename','decc1','rac1','decc2','rac2','decc3','rac3','decc4','rac4'])
-    processed_df = pandas.DataFrame(query.query_processed_tiles(query.connect_to_db(section)[0], query.connect_to_db(section)[1],','.join([tag])), columns = ['reqnum','tilename','attnum','id','status'])
-    band_df = pandas.DataFrame(query.query_band_info(query.connect_to_db('db-desoper')[1]), columns = ['tilename','band','dmedian'])
+    all_df = pd.DataFrame(query.query_all_tiles(query.connect_to_db(section)[1]), columns = ['tilename','decc1','rac1','decc2','rac2','decc3','rac3','decc4','rac4'])
+    processed_df = pd.DataFrame(query.query_processed_tiles(query.connect_to_db(section)[0], query.connect_to_db(section)[1],','.join([tag])), columns = ['reqnum','tilename','attnum','id','status'])
+    band_df = pd.DataFrame(query.query_band_info(query.connect_to_db('db-desoper')[1]), columns = ['tilename','band','dmedian'])
     return all_df, processed_df, band_df
 
 ### Gets data for all plots on system plots page ###
@@ -23,13 +23,13 @@ def create_system_data(section, section2):
     ### Length of graph (Defult 14 days) ###
     start = datetime.now() - timedelta(days=int(14))
     cur, cur2 = query.get_system_info(start, query.connect_to_db(section)[1], query.connect_to_db(section2)[1])
-    res = pandas.DataFrame(cur, columns = ['tdate','tsize','tav'])
-    df = pandas.DataFrame(cur2, columns = ['number_transferred','number_not_transferred','size_transferred','size_to_be_transferred','number_deprecated','size_deprecated','pipe_processed','pipe_to_be_processed','raw_processed','raw_to_be_processed','run_time'])
+    res = pd.DataFrame(cur, columns = ['tdate','tsize','tav'])
+    df = pd.DataFrame(cur2, columns = ['number_transferred','number_not_transferred','size_transferred','size_to_be_transferred','number_deprecated','size_deprecated','pipe_processed','pipe_to_be_processed','raw_processed','raw_to_be_processed','run_time'])
 
     ### Change from GB to TB ### 
     df['size_transferred'] /= math.pow(1024,4)
     df['size_to_be_transferred'] /= math.pow(1024,4)
-    desdf_df = pandas.DataFrame(query.query_desdf(query.connect_to_db(section2)[1]), columns = ['filesystem','total_size','used','available','use_percent','mounted','submittime'])
+    desdf_df = pd.DataFrame(query.query_desdf(query.connect_to_db(section2)[1]), columns = ['filesystem','total_size','used','available','use_percent','mounted','submittime'])
     return df, res, desdf_df
 
 ### Live Render version of get_ingest_time for dts plot ###
@@ -51,7 +51,7 @@ def get_ingest_time():
         print "No ingest log for: " + str(curdate)
         pass
 
-    df = pandas.DataFrame()
+    df = pd.DataFrame()
     df['ingest_time'] = times
     df['filename'] = filenames
 
@@ -77,7 +77,7 @@ def get_accept_time():
         print "No accept log for: " + str(curdate)
         pass
 
-    df = pandas.DataFrame()
+    df = pd.DataFrame()
     df['accept_time'] = times
     df['filename'] = filenames
 
@@ -119,7 +119,7 @@ def convert_timezones(df):
             print "Sispi:  ", line['sispi_time']
             pass
 
-    fn_df = pandas.DataFrame()
+    fn_df = pd.DataFrame()
     fn_df['total_time'] = totaldiff
     fn_df['ncsa_time'] = ncsadiff
     fn_df['noao_time'] = noaodiff
@@ -164,7 +164,7 @@ def smooth_dts(df):
             current_i = i
 
 
-    fn_df = pandas.DataFrame()
+    fn_df = pd.DataFrame()
     fn_df['total_time'] = totaltime
     fn_df['ncsa_time'] = ncsatime
     fn_df['noao_time'] = noaotime
@@ -179,12 +179,12 @@ def processing_archive():
 def processing_summary(db,project,df=None):
     if df is None:
         try: 
-            df = pandas.read_csv(csv_path,skiprows=1)
+            df = pd.read_csv(csv_path,skiprows=1)
             with open(csv_path,'r') as csvfile:
                 updated = csvfile.readlines()[0]
         except (ValueError,IOError):
             updated = '#{time}'.format(time=datetime.now())
-            df = pandas.DataFrame(columns=['created_date','project','campaign','pfw_attempt_id','reqnum','unitname','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_site','exec_host','db']) 
+            df = pd.DataFrame(columns=['created_date','project','campaign','pfw_attempt_id','reqnum','unitname','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_site','exec_host','db']) 
     else:
         updated = '#{time}'.format(time=datetime.now()) 
 
@@ -193,7 +193,7 @@ def processing_summary(db,project,df=None):
     if project =='TEST':
         df_oper = df[(df.project != 'OPS') & (df.db=='db-desoper')] 
         df_test = df[(df.db=='db-destest')]
-        df = pandas.concat([df_test,df_oper])
+        df = pd.concat([df_test,df_oper])
     else:
         df = df[(df.project == 'OPS') & (df.db =='db-desoper')]
     columns = ['operator','project','campaign','pipeline','submit_site','target_site','reqnum','nite','batch size','passed','failed','unknown','remaining']
@@ -269,19 +269,19 @@ def processing_summary(db,project,df=None):
     except: rest_dict = []
     try: columns
     except: columns = []
-    return (current_dict,rest_dict,columns,updated,pandas.DataFrame(current_dict),pandas.DataFrame(rest_dict))
+    return (current_dict,rest_dict,columns,updated,pd.DataFrame(current_dict),pd.DataFrame(rest_dict))
 
 def processing_detail(db,reqnum,df=None,updated=None):
     if df is None:
         try: 
-            df = pandas.read_csv(csv_path,skiprows=1)
+            df = pd.read_csv(csv_path,skiprows=1)
             with open(csv_path,'r') as csvfile:
                 updated = csvfile.readlines()[0]
         except IOError: 
             sys.exit()
     df = df[df.reqnum==int(reqnum)]
     if not len(df):
-        df = pandas.DataFrame(columns=['project','campaign','pipeline','pfw_attempt_id','reqnum','unitname','attnum','status','data_state','operator','target_site','submit_site','exec_host','start_time','end_time','total time','assessment','t_eff',
+        df = pd.DataFrame(columns=['project','campaign','pipeline','pfw_attempt_id','reqnum','unitname','attnum','status','data_state','operator','target_site','submit_site','exec_host','start_time','end_time','total time','assessment','t_eff',
                                        'b_eff','c_eff','f_eff','program'])
     else:
         columns = ['project','campaign','pipeline','pfw_attempt_id','reqnum','unitname','attnum','status','data_state','operator','target_site','submit_site','exec_host','start_time','end_time','total time','assessment','t_eff','b_eff',
@@ -308,7 +308,7 @@ def processing_detail(db,reqnum,df=None,updated=None):
                 start = datetime.strptime(str(group['start_time'].min())[:19],'%Y-%m-%d %H:%M:%S')
                 end = datetime.strptime(str(group['end_time'].max())[:19],'%Y-%m-%d %H:%M:%S')
 
-                total_time = (end - start)/pandas.Timedelta(hours=1)
+                total_time = (end - start)/pd.Timedelta(hours=1)
                 df.loc[index,('total time')] = round(total_time,3)
             except:
                 pass
@@ -344,7 +344,7 @@ def processing_detail(db,reqnum,df=None,updated=None):
 
 def generate_stat_df():
     columns = [i[0] for i in query.get_stat_columns(query.connect_to_db("db-destest")[1])]
-    df = pandas.DataFrame(query.get_stat_data(query.connect_to_db("db-destest")[1]), columns = columns)
+    df = pd.DataFrame(query.get_stat_data(query.connect_to_db("db-destest")[1]), columns = columns)
     updated = '#{time}'.format(time=datetime.now())
     return (df,updated)
 

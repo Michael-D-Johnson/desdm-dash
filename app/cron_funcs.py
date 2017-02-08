@@ -3,7 +3,7 @@ import subprocess
 import os
 import sys
 import pytz
-import pandas
+import pandas as pd
 import time
 from datetime import datetime, timedelta
 import math
@@ -53,7 +53,7 @@ def get_cron_accept_time():
         print "No accept log for: " + str(curdate)
         pass
 
-    df = pandas.DataFrame()
+    df = pd.DataFrame()
     df['accept_time'] = times
     df['filename'] = filenames
 
@@ -82,7 +82,7 @@ def get_cron_ingest_time():
         print "No ingest log for: " + str(curdate)
         pass
 
-    df = pandas.DataFrame()
+    df = pd.DataFrame()
     df['ingest_time'] = times
     df['filename'] = filenames
 
@@ -104,7 +104,7 @@ def create_delivered(df):
 ### Gets data from the cmd line desdf ###
 ### Run evey 12 hours at noon and midnight ###
 def get_desdf():
-    df = pandas.DataFrame()
+    df = pd.DataFrame()
     for column in range(1,7):
         p1 = subprocess.Popen( "/usr/local/bin/desdf | awk {\'print $%i\'}" % column, stdout=subprocess.PIPE, shell=True)
         output = p1.stdout.read().split('\n')
