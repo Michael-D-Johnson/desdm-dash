@@ -159,26 +159,27 @@ def plot_coadd(all_df, processed_df, band_df, tag):
     new_all_df['y']=ylist
     new_all_df['tilename']=tilelist 
 
-    ### Avg_df data prep ###
-    avg_band_df = band_df.groupby(by = ['tilename'])
+    # Band_df data prep
+    band_df = band_df.groupby(by = ['tilename'])
 
-    new_avg_band_df = pd.DataFrame()
+    new_band_df = pd.DataFrame()
     maxdepth=20
     tilelist, depthlist, alphalist = [],[],[]
-    for tile,group in avg_band_df:
-        tilelist.append(tile)
+    for tile,group in band_df:
         depth,count = 0,0
         for i,row in group.iterrows():
             count += 1
             depth += row['dmedian']
         depth = depth/count
+        #if depth > 3:
+        tilelist.append(tile)
         alphalist.append(depth/maxdepth)
         depthlist.append(depth)
 
-    new_avg_band_df['tilename'] = tilelist
-    new_avg_band_df['dmedian'] = depthlist
-    new_avg_band_df['alphas'] = alphalist
-    
+    new_band_df['tilename'] = tilelist
+    new_band_df['dmedian'] = depthlist
+    new_band_df['alphas'] = alphalist   
+ 
     # Merge all dfs
     new_all_df = pd.merge(new_all_df, new_band_df, how='outer', on=['tilename'])
     new_all_df.fillna(0, inplace=True)
