@@ -191,3 +191,18 @@ def query_dts_delay(cur, stime, etime):
     #print query
     cur.execute(query)
     return cur.fetchall()
+
+#####################
+# added by ycchen
+####################
+
+def get_stat_data(cur):
+    query = "SELECT * from ycchen.test_dash "
+    #query = "SELECT * from ycchen.test_dash where rownum < 1000"
+    cur.execute(query)
+    return cur.fetchall()
+
+def get_stat_columns(cur):
+    query = "select column_name from ALL_TAB_COLUMNS WHERE table_name = 'TEST_DASH' and owner ='YCCHEN'"
+    cur.execute(query)
+    return cur.fetchall()

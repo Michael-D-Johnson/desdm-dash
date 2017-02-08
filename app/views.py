@@ -63,3 +63,12 @@ def supernova_summary():
 def coadd_map():
     name = 'reports/coadd/coadd_map_save.html'
     return render_template('coadd_map.html', name=name, title='Coadd Map')
+
+@app.route('/statistics')
+def statistics():
+    df,updated = get_data.generate_stat_df()
+    df = get_data.select_useful_data(df)
+    plot = plotter.mk_stat_plot(df)
+    figscript,figdiv = components(plot)
+    return render_template('statistics.html',df = df, columns = df.columns, updated=updated, figscript=figscript, figdiv=figdiv)
+
