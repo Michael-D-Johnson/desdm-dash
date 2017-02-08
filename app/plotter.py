@@ -346,7 +346,7 @@ def plot_dts(df, live_df):
 
     if not live_df.empty:
         ### Connecting line between data types ###
-	p.line(x=[df['xtime'].iloc[-1], (df['xtime'].iloc[-1] + timedelta(0,300)), (live_df['xtime'].iloc[0] - timedelta(0,300)), live_df['xtime'].iloc[0]], y=[df['total_time'].iloc[-1],0,0,live_df['total_time'].iloc[0]],legend="Total", color="black", line_width=3)
+	    p.line(x=[df['xtime'].iloc[-1], (df['xtime'].iloc[-1] + timedelta(0,300)), (live_df['xtime'].iloc[0] - timedelta(0,300)), live_df['xtime'].iloc[0]], y=[df['total_time'].iloc[-1],0,0,live_df['total_time'].iloc[0]],legend="Total", color="black", line_width=3)
         p.line(x=[df['xtime'].iloc[-1], (df['xtime'].iloc[-1] + timedelta(0,300)), (live_df['xtime'].iloc[0] - timedelta(0,300)), live_df['xtime'].iloc[0]], y=[df['noao_time'].iloc[-1],0,0,live_df['noao_time'].iloc[0]], legend="NOAO Delay", color="navy", line_width=3)
         p.line(x=[df['xtime'].iloc[-1], (df['xtime'].iloc[-1] + timedelta(0,300)), (live_df['xtime'].iloc[0] - timedelta(0,300)), live_df['xtime'].iloc[0]], y=[df['ncsa_time'].iloc[-1],0,0,live_df['ncsa_time'].iloc[0]], legend="NCSA Delay", color="firebrick", line_width=3)
 
