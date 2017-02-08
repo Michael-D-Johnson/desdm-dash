@@ -377,14 +377,14 @@ def plot_dts(df, live_df):
 
     if not live_df.empty:
         ### Connecting line between data types ###
-        p.line(x=[df['xtime'].iloc[-1],live_df['xtime'].iloc[0]], y=[df['total_time'].iloc[-1],live_df['totaldiff'].iloc[0]],legend="Total", color="black", line_width=3)
-        p.line(x=[df['xtime'].iloc[-1],live_df['xtime'].iloc[0]], y=[df['noao_time'].iloc[-1],live_df['noaodiff'].iloc[0]], legend="NOAO Delay", color="navy", line_width=3)
-        p.line(x=[df['xtime'].iloc[-1],live_df['xtime'].iloc[0]], y=[df['ncsa_time'].iloc[-1],live_df['ncsadiff'].iloc[0]], legend="NCSA Delay", color="firebrick", line_width=3)
+	p.line(x=[df['xtime'].iloc[-1], (df['xtime'].iloc[-1] + timedelta(0,300)), (live_df['xtime'].iloc[0] - timedelta(0,300)), live_df['xtime'].iloc[0]], y=[df['total_time'].iloc[-1],0,0,live_df['total_time'].iloc[0]],legend="Total", color="black", line_width=3)
+        p.line(x=[df['xtime'].iloc[-1], (df['xtime'].iloc[-1] + timedelta(0,300)), (live_df['xtime'].iloc[0] - timedelta(0,300)), live_df['xtime'].iloc[0]], y=[df['noao_time'].iloc[-1],0,0,live_df['noao_time'].iloc[0]], legend="NOAO Delay", color="navy", line_width=3)
+        p.line(x=[df['xtime'].iloc[-1], (df['xtime'].iloc[-1] + timedelta(0,300)), (live_df['xtime'].iloc[0] - timedelta(0,300)), live_df['xtime'].iloc[0]], y=[df['ncsa_time'].iloc[-1],0,0,live_df['ncsa_time'].iloc[0]], legend="NCSA Delay", color="firebrick", line_width=3)
 
         ### Data that has been accepted but not but into database ###
-        p.line(x=live_df['xtime'], y=live_df['totaldiff'], color="black", line_dash='dashed', line_width=3)
-        p.line(x=live_df['xtime'], y=live_df['noaodiff'], color="navy", line_dash='dashed', line_width=3)
-        p.line(x=live_df['xtime'], y=live_df['ncsadiff'], color="firebrick", line_dash='dashed', line_width=3)
+	p.line(x=live_df['xtime'], y=live_df['total_time'], color="black", line_dash='dashed', line_width=3)
+        p.line(x=live_df['xtime'], y=live_df['noao_time'], color="navy", line_dash='dashed', line_width=3)
+        p.line(x=live_df['xtime'], y=live_df['ncsa_time'], color="firebrick", line_dash='dashed', line_width=3)
 
     p.legend.orientation = "top_left"  ### Bokeh 0.10.0 ###
     #p.legend.location = "top_left"      ### Bokeh 0.11.0 ###
