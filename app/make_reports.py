@@ -230,6 +230,7 @@ def make_coadd_html():
         all_df, processed_df, band_df = get_data.create_coadd_map('db-desoper',"Y3A1_COADD")
         p = plotter.plot_coadd(all_df, processed_df, band_df, "Y3A1_COADD")
     except:
+        print 'Coadd plot not rendered!'
         pass    
 
     # Creating output path
