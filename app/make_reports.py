@@ -297,7 +297,4 @@ if __name__ =='__main__':
 
     make_reports(db=db,reqnums=reqnums)
     make_dts_plot()
-    #print 'Making coadds'
-    #st = datetime.now() 
-    #make_coadd_html() 
-    #print datetime.now() - st
+    make_coadd_html() 
