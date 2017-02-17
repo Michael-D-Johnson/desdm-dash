@@ -217,7 +217,10 @@ def processing_summary(db,project,df=None):
             else:
                 nitelist = str(int(orig_nitelist[0])) + ' - ' + str(int(orig_nitelist[-1]))
         else:
-            nitelist = int(orig_nitelist[0])
+            try:
+                nitelist = int(orig_nitelist[0])
+            except:
+                nitelist = str(orig_nitelist[0])
         if pipeline =='supercal':
             nites = orig_nitelist[0].split('t')
             nite1,nite2 = nites[0],nites[0][:4]+nites[1]
