@@ -132,6 +132,8 @@ def create_tab(df, band, hover, tag, tab_name):
     return tab
 
 def plot_coadd(all_df, processed_df, band_df, tag):
+    def create_processed_data_source(df):
+        return ColumnDataSource(data=dict(tilename=df['tilename'],status=df['status'],attnum=df['attnum'],reqnum=df['reqnum'],id=df['id'],dmedian=df['dmedian']))
     def create_all_data_source(df):
         return ColumnDataSource(data=dict(tilename=df['tilename'],dmedian=df['dmedian'])) 
 
@@ -196,10 +198,10 @@ def plot_coadd(all_df, processed_df, band_df, tag):
     p.patches(xs=new_all_df['x'], ys=new_all_df['y'], source=create_all_data_source(new_all_df), name='all', fill_color='blue', fill_alpha=new_all_df['alphas'], line_color='black')
 
     ### Add each unitname to plot ### 
-    p.patches(xs=fn_df['x'], ys=fn_df['y'], fill_color='green', fill_alpha=0.95, line_color='black')
+    p.patches(xs=fn_df['x'], ys=fn_df['y'], source=create_processed_data_source(fn_df), name='all', fill_color='green', fill_alpha=0.95, line_color='black')
 
     all_hover.point_policy = "follow_mouse"
-    all_hover.tooltips = [("Tilename", "@tilename"),("Depth","@dmedian")]
+    all_hover.tooltips = [("Tilename", "@tilename"),('Pfw_attempt_id','@id'),("Depth","@dmedian")]
 
     return p
 
