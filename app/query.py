@@ -66,7 +66,7 @@ def batch_size_query(cur,nitelist,reqnum,pipeline):
         batch_size_query = "select count(distinct expnum) from exposure where obstype in ('standard','object') \
                             and object not like '%%pointing%%' and object not like '%%focus%%' \
                             and object not like '%%donut%%' and object not like '%%test%%' \
-                            and object not like '%%junk%%' and nite in ({nitelist})
+                            and object not like '%%junk%%' and nite in ({nitelist}) \
                             and propid in ('2012B-0001','2017A-0260')".format(nitelist=nitelist)
     cur.execute(batch_size_query)
     results = cur.fetchone()[0]
