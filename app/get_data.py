@@ -213,7 +213,7 @@ def processing_summary(db,project,df=None):
                     if len(orig_nitelist_cp) >1:
                         nitelist = str('NA' + ', ' + str(int(orig_nitelist_cp[0])) + ' - ' + str(int(orig_nitelist_cp[-1])))
                     else:
-                        nitelist = str('NA' + ', ' + str(int(orig_nitelist_cp[-1])))
+                        nitelist = str('NA' + ', ' + str(orig_nitelist_cp[-1]))
             else:
                 nitelist = str(int(orig_nitelist[0])) + ' - ' + str(int(orig_nitelist[-1]))
         else:
@@ -222,7 +222,7 @@ def processing_summary(db,project,df=None):
             except:
                 nitelist = str(orig_nitelist[0])
         if pipeline =='supercal':
-            nites = orig_nitelist[0].split('t')
+            nites = str(orig_nitelist_cp[0]).split('t')
             nite1,nite2 = nites[0],nites[0][:4]+nites[1]
             nitelist = str(int(nite1)) + ' - ' + str(int(nite2))
         if project =='TEST':
