@@ -223,9 +223,10 @@ def processing_summary(db,project,df=None):
                 nitelist = str(orig_nitelist[0])
         if pipeline =='supercal':
             try:
-                nites = str(orig_nitelist_cp[0]).split('t')
-            except:
                 nites = str(orig_nitelist[0]).split('t')
+            except:
+                nites = str(orig_nitelist_cp[0]).split('t')
+            if project =='TEST': nites = str(orig_nitelist_cp[0]).split('t')
             nite1,nite2 = nites[0],nites[0][:4]+nites[1]
             nitelist = str(int(nite1)) + ' - ' + str(int(nite2))
         if project =='TEST':
@@ -321,6 +322,7 @@ def processing_detail(db,reqnum,df=None,updated=None):
                 df.loc[index,('total time')] = round(total_time,3)
             except:
                 pass
+
             pipeline = group.pipeline.unique()
             assess_query_results = query.assess_query(query.connect_to_db(db)[1],df,index,name,
                                                       group.pfw_attempt_id.unique()[0],pipeline)

@@ -29,7 +29,7 @@ def processing_basic(cur,reqnum):
 
 def processing_summary(cur,reqnums):
     query = "SELECT distinct a.created_date,r.project,r.campaign,a.unitname, a.reqnum,a.attnum,a.id,t1.status,\
-            a.data_state,a.operator, r.pipeline,t2.start_time,t2.end_time,b.target_site,t1.exec_host,t2.exec_host \
+            a.data_state,a.operator, r.pipeline,t1.start_time,t2.end_time,b.target_site,t1.exec_host,t2.exec_host \
             FROM pfw_job j,pfw_attempt a,task t1, task t2,pfw_request r,pfw_block b \
             WHERE a.reqnum=r.reqnum and a.id=j.pfw_attempt_id and b.pfw_attempt_id=a.id and j.task_id = t2.id \
             and a.task_id=t1.id and a.reqnum in ({reqnums}) ".format(reqnums=reqnums)
@@ -67,7 +67,7 @@ def batch_size_query(cur,nitelist,reqnum,pipeline):
                             and object not like '%%pointing%%' and object not like '%%focus%%' \
                             and object not like '%%donut%%' and object not like '%%test%%' \
                             and object not like '%%junk%%' and nite in ({nitelist}) \
-                            and propid in ('2012B-0001','2017A-0260')".format(nitelist=nitelist)
+                            and propid in ('2012B-0001','2017A-0260','2016A-0366')".format(nitelist=nitelist)
     cur.execute(batch_size_query)
     results = cur.fetchone()[0]
     if not results:
