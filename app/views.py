@@ -49,7 +49,7 @@ def error_summary(reqnum):
     error_dict = get_data.find_errors(message_dict)
     plot = plotter.plot_qcf_bar(error_dict, reqnum)
     script, div = components(plot)
-    return render_template('error_summary.html', scripts=script, div=div, columns=columns, error_dict=error_dict, title='Error Summary')
+    return render_template('error_summary.html', scripts=script, div=div, columns=[i for i in error_dict.iterkeys()], error_dict=error_dict, title='Error Summary')
 
 @app.route('/dts')
 def dts():    
