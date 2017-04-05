@@ -350,19 +350,18 @@ def processing_detail(db,reqnum,df=None,updated=None):
         return (df,columns,reqnum,updated)
 
 def find_errors(message_dict):
-    ''' Finds patterns dynamicly by the : delimiter for the error summary plot'''
+    ''' Finds patterns dynamically by the : delimiter for the error summary plot'''
 
-    pattern_info = {}
+    error_info = {}
     for message in message_dict['message']:
-        #print message
         message_contents = message.split(':')
 
-        if message_contents[0] not in pattern_info:
-            pattern_info[message_contents[0]] = [message]
+        if message_contents[0] not in error_info:
+            error_info[message_contents[0]] = [message]
         else:
-            pattern_info[message_contents[0]].append(message)
+            error_info[message_contents[0]].append(message)
 
-    return pattern_info
+    return error_info
 
 ####################
 # added by ycchen
