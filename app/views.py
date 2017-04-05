@@ -42,9 +42,16 @@ def processing_detail(reqnum):
     reportname = 'reports/{reqnum}/report_{reqnum}.html'.format(reqnum=reqnum)
     return render_template('processing_detail_include.html',reportname=reportname,title='Report {reqnum}'.format(reqnum=reqnum))
 
+@app.route('/error_summary/<reqnum>')
+def error_summary(reqnum):
+    message_dict = query.query_qcf_messages(query.connect_to_db('db-desoper')[1], reqnum)
+    error_dict = get_data.find_errors(message_dict)
+    plot = plotter.plot_qcf_bar(error_dict, reqnum)
+    script, div = components(plot)
+    return render_template('error_summary.html', scripts=script, div=div, columns=columns, error_dict=error_dict, title='Error Summary')
+
 @app.route('/dts')
-def dts():
-    
+def dts():    
     name = 'dts_plot.html'
     return render_template('dts_monitor.html', name=name,title='DTS')
 

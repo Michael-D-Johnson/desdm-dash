@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<h5> Last updated on: {{updated.split('#')[1]}}</h5>
+<center>
+
+{{ scripts|safe }}
+{{ div|safe }}
+
+<table class='display black' cellspacing="0" width="100%" border="1">
+<thead>
+  <tr>
+  {% for col in columns %}
+    <th>
+        {{ col }}
+    </th>
+  {% endfor %}
+  </tr>
+</thead>
+
+<tbody>
+{% for di in dict %}
+<tr>
+{% for col in columns %}
+  {% if col == 'dsc' %}
+    <td>
+      {% for i in col %}
+        {{ i }} <BR> 
+      {% endfor %}
+    </td>
+  {% else %}
+    <td> {{ di[col] }}  </td>
+  {% endif%}
+{% endfor %}
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</center>
+{% endblock %}

@@ -28,6 +28,8 @@
 {% for col in columns %}
     {% if col == 'reqnum' %}
     <td> <a href="{{ url_for('processing_detail',db='db-desoper',reqnum =di[col])}}"><strong>{{ di[col] }}</strong></a></td>
+    {% elif col == 'failed' %}
+    <td> <a href="{{ url_for('error_summary',db='db-desoper',reqnum=di[reqnum])}}"><strong>{{ di[col] }}</strong></a></td>
     {% else %}
     <td> {{ di[col] }} </td> 
     {% endif %}
