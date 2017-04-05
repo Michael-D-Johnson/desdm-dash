@@ -9,29 +9,23 @@
 <table class='display black' cellspacing="0" width="100%" border="1">
 <thead>
   <tr>
-  {% for col in columns %}
-    <th>
-        {{ col }}
-    </th>
-  {% endfor %}
+    <th>Error type</th>
+    <th>Discription</th>
+    <th>Count</th>
   </tr>
 </thead>
 
 <tbody>
-{% for di in [error_dict] %}
-<tr>
-{% for col in columns %}
-  {% if col == 'dsc' %}
-    <td>
-      {% for i in col %}
-        {{ i }} <BR> 
-      {% endfor %}
-    </td>
-  {% else %}
-    <td> {{ di[col] }}  </td>
-  {% endif%}
-{% endfor %}
-</tr>
+{% for col in error_dict.iterkeys() %}
+  <tr>
+  <td> {{ col }} </td>
+  <td>
+  {% for error in  error_dict[col] %}
+    {{ error }} <BR> 
+  {% endfor %}
+  </td>
+  <td> {{ len(error_dict[col]) }} </td>
+  </tr>
 {% endfor %}
 </tbody>
 </table>
