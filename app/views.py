@@ -3,6 +3,7 @@ from flask import render_template
 import query
 import get_data
 import plotter
+from datetime import datetime
 from make_reports import make_system_plots
 from app import app
 from bokeh.embed import components
@@ -49,7 +50,7 @@ def error_summary(reqnum):
     error_dict = get_data.find_errors(message_dict)
     plot = plotter.plot_qcf_bar(error_dict, reqnum)
     script, div = components(plot)
-    return render_template('error_summary.html', scripts=script, div=div, columns=[i for i in error_dict.iterkeys()], error_dict=error_dict, title='Error Summary')
+    return render_template('error_summary.html', scripts=script, div=div, columns=[i for i in error_dict.iterkeys()], error_dict=error_dict, updated='#{time}'.format(time=datetime.now()) title='Error Summary')
 
 @app.route('/dts')
 def dts():    
