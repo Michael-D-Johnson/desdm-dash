@@ -24,7 +24,7 @@
     {{ error }} <BR> 
   {% endfor %}
   </td>
-  <td> {{ len(error_dict[col]) }} </td>
+  <td> {{ error_dict[col].__len__() }} </td>
   </tr>
 {% endfor %}
 </tbody>
