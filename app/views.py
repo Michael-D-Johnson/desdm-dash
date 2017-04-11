@@ -48,7 +48,6 @@ def processing_detail(reqnum):
 def error_summary(reqnum):
     message_dict = query.query_qcf_messages(query.connect_to_db('db-desoper')[1], reqnum)
     error_dict = get_data.find_errors(message_dict)
-    print error_dict
     plot = plotter.plot_qcf_bar(error_dict, reqnum)
     script, div = components(plot)
     return render_template('error_summary.html', scripts=script, div=div, columns=[i for i in error_dict.iterkeys()], error_dict=error_dict, updated='#{time}'.format(time=datetime.now()), title='Error Summary')
