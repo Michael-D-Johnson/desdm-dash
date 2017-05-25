@@ -367,7 +367,7 @@ def plot_dts(df, live_df):
 def plot_qcf_bar(error_info, reqnum):
 
     graph_info = {}
-    graph_info['values'] = [len(error_info[i]) for i in error_info.iterkeys()]
+    graph_info['values'] = [error_info[i][1] for i in error_info.iterkeys()]
     graph_info['labels'] = [i for i in error_info.iterkeys()]
 
     p = Bar(graph_info, values='values', label='labels', title='QCF plot {}'.format(reqnum))
