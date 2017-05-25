@@ -20,12 +20,11 @@
   <tr>
   <td> {{ col }} </td>
   <td>
-  {% for error in  error_dict[col] %}
+  {% for error in  error_dict[col][0] %}
     {{ error }} <BR> 
   {% endfor %}
   </td>
   <td> {{ error_dict[col]|length}} </td>
-
   </tr>
 {% endfor %}
 </tbody>

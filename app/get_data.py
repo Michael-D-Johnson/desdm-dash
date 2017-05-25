@@ -357,9 +357,10 @@ def find_errors(message_dict):
         message_contents = message.split(':')
 
         if message_contents[0] not in error_info:
-            error_info[message_contents[0]] = [message]
+            error_info[message_contents[0]] = [set([message]), 1]
         else:
-            error_info[message_contents[0]].append(message)
+            error_info[message_contents[0]][0].update([message])
+            error_info[message_contents[0]][1] = error_info[message_contents[0]][1] + 1
 
     return error_info
 
