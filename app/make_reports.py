@@ -292,7 +292,7 @@ def make_dts_plot():
     ### Plot Data ###
     plots.append(plotter.plot_realtime_dts(sm_df, live_df))
     plots.append(plotter.plot_monthly_dts(av_df, days))
-    plots.append(plotter.plot_average_dts(all_time_df, days))
+    plots.append(plotter.plot_average_dts(alltime_df, days))
 
     ### Writing plots to HTML ###    
     html = file_html(vplot(*plots),INLINE,'dts')
