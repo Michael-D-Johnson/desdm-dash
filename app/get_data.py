@@ -10,8 +10,11 @@ from dateutil.relativedelta import *
 import math
 import query
 
-csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
-templates = '/work/devel/mjohns44/git/desdm-dash/app/static/reports'
+from app import app
+csv_path = os.path.join(app.config["STATIC_PATH"],'processing.csv')
+templates = os.path.join(app.config["STATIC_PATH"],'reports')
+#csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
+#templates = '/work/devel/mjohns44/git/desdm-dash/app/static/reports'
 
 def create_coadd_map(section, tag):
     all_df = pd.DataFrame(query.query_all_tiles(query.connect_to_db(section)[1]), columns = ['tilename','decc1','rac1','decc2','rac2','decc3','rac3','decc4','rac4'])

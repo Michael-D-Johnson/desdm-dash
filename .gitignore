@@ -4,3 +4,4 @@
 /app/static/reports/*
 /app/static/dts_plot.html
 .idea
+settings.sh

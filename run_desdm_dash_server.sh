@@ -1,7 +1,8 @@
 #!/bin/bash
 # This code runs the server
 # Crontab to create data/csv: 0,15 * * * * /work/devel/mjohns44/git/desdm-dash/app/get_data.py
-source /work/apps/RHEL6/dist/eups/desdm_eups_setup.sh
+source $HOME/.desdm_dash_settings.sh
+source $EUPS_SETUP
 setup -r .
 setup pandas 0.15.2+1
 setup jinja2 2.6+8
