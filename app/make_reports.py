@@ -285,7 +285,7 @@ def make_dts_plot():
 
     ### Smooth plot ###
     sm_df = get_data.smooth_dts(db_df)
-    av_df = get_data.average_dts(db_df, graphtime, days)
+    av_df = get_data.average_dts(db_df, graphstime, days)
 
     ### Plot Data ###
     plots.append(plotter.plot_realtime_dts(sm_df, live_df))
