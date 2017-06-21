@@ -404,7 +404,7 @@ def plot_average_dts(df, hours):
     xlist = []
     for i in range(1,10):
         tmp = 0
-        for item in fn_d['noao_time']:
+        for item in df['noao_time']:
             if item > lasti and item < i:
                 tmp = tmp + 1
         tmplist.append(tmp)
@@ -412,7 +412,7 @@ def plot_average_dts(df, hours):
         lasti = i
     for i in range(10,100,10):
         tmp = 0
-        for item in fn_d['noao_time']:
+        for item in df['noao_time']:
             if item > lasti and item < i:
                 tmp = tmp + 1
         tmplist.append(tmp)
@@ -420,7 +420,7 @@ def plot_average_dts(df, hours):
         lasti = i
     for i in range(100,1000,100):
         tmp = 0
-        for item in fn_d['noao_time']:
+        for item in df['noao_time']:
             if item > lasti and item < i:
                 tmp = tmp + 1
         tmplist.append(tmp)
