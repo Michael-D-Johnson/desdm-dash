@@ -335,7 +335,7 @@ def plot_system_transfer_rates(tdate,tsize,tav):
 
     return p
 
-def plot_dts(df, live_df):
+def plot_realtime_dts(df, live_df):
 
     TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
 
@@ -360,6 +360,78 @@ def plot_dts(df, live_df):
     p.legend.orientation = "top_left"  ### Bokeh 0.10.0 ###
     #p.legend.location = "top_left"      ### Bokeh 0.11.0 ###
 
+    return p
+
+def plot_monthly_dts(df, days):
+
+    ### Start time of graph ###
+    stime = datetime.strptime('01-01-15 00:00:00', '%m-%d-%y %H:%M:%S')
+    TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
+
+    p = figure(plot_height=500, plot_width=1000, x_axis_type='datetime', y_axis_label='Time in minutes', tools=TOOLS, title='DTS average plot')
+
+    ### Setting the second y axis range name and range ###
+    p.extra_y_ranges = {"extrema": Range1d(start=0, end=max(df['extrema']+100))}
+    p.y_range = Range1d(0, max(df['total_time']+50))
+    ### Adding the second axis to the plot. ###  
+    p.add_layout(LinearAxis(y_range_name="extrema",axis_label="Number of Extrema"), 'right')
+
+    graph_info = {}
+    graph_info['x_pos'] = df['xtime']
+    graph_info['y_pos'] = [h/2 for h in df['total_time']]
+    graph_info['values'] = df['total_time']
+    graph_info['labels'] = [str(stime + relativedelta(months=+1*i)).replace(':','-').split(' ')[0] for i in range(0, len(df['total_time']))]
+
+    ### Average Times ###
+    p.rect(x=graph_info['x_pos'], y=graph_info['y_pos'], width=1350000000, height=graph_info['values'], color='navy')
+    ### Extrema ###
+    p.line(x=graph_info['x_pos'] , y=df['extrema'], y_range_name="extrema", legend='Extrema: >{} days'.format(days), color='black', line_width=3)
+
+    return p
+
+### Bokeh 0.11.x and lower implentation
+# note as of now only implementation pushed
+def plot_average_dts(df, hours):
+    
+    lasti = 0
+    tmp = 0
+    tmplist = []
+    ### Currently using a fixed method timeset, if there is a better way to do a log loop this could be changed. ###
+    lasti = 0
+    tmp = 0
+    tmplist = []
+    xlist = []
+    for i in range(1,10):
+        tmp = 0
+        for item in fn_d['noao_time']:
+            if item > lasti and item < i:
+                tmp = tmp + 1
+        tmplist.append(tmp)
+        xlist.append(i)
+        lasti = i
+    for i in range(10,100,10):
+        tmp = 0
+        for item in fn_d['noao_time']:
+            if item > lasti and item < i:
+                tmp = tmp + 1
+        tmplist.append(tmp)
+        xlist.append(i)
+        lasti = i
+    for i in range(100,1000,100):
+        tmp = 0
+        for item in fn_d['noao_time']:
+            if item > lasti and item < i:
+                tmp = tmp + 1
+        tmplist.append(tmp)
+        xlist.append(i)
+        lasti = i
+
+
+    graph_info = {}
+    graph_info['values'] = tmplist
+    graph_info['Time in minutes'] = xlist
+    p = Bar(graph_info, values='values', label='Time in minutes', ylabel='Number of transfers', color='navy', title='DTS time plot')
+    
     return p
 
 ### Bokeh 0.11.x and lower implentation

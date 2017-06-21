@@ -259,8 +259,10 @@ def make_coadd_html():
 
 def make_dts_plot():
 
+    plots = []
     etime = datetime.combine(date.today(), datetime.min.time())
     stime = etime - timedelta(14)
+    days = 1
 
     ### Fetch Data ###
     accept_df = get_data.get_accept_time()
@@ -284,11 +286,19 @@ def make_dts_plot():
     db_df = get_data.smooth_dts(db_df)
 
     ### Plot Data ###
-    p = plotter.plot_dts(db_df, live_df)
+    plots.append(plotter.plot_realtime_dts(db_df, live_df))
+    plots.append(plotter.plot_monthly_dts(db_df, days))
+    plots.append(plotter.plot_average_dts(db_df, days))
 
-    static_path = os.path.join(app.config["STATIC_PATH"],"dts_plot.html")
-    output_file(static_path, title='Dts graph')
-    save(p)
+    ### Writing plots to HTML ###    
+    html = file_html(vplot(*plots),INLINE,'dts')
+    filename = 'dts_plot.html'
+    filepath = os.path.join(app.config["STATIC_PATH"],filename)
+    with open(filepath,'w') as h:
+        h.write('<h5> Last updated on: %s </h5>' % "{0}".format(datetime.now()))
+        h.write('<center>\n')
+        h.write(html)
+        h.write('</center>\n')
 
 if __name__ =='__main__':
     args = create_args()

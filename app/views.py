@@ -55,7 +55,7 @@ def error_summary(reqnum):
 @app.route('/dts')
 def dts():    
     name = 'dts_plot.html'
-    return render_template('dts_monitor.html', name=name,title='DTS')
+    return render_template('dts_monitor.html', name=name, title='DTS')
 
 @app.route('/system')
 def backups():
