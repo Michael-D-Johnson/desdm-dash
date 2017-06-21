@@ -269,7 +269,9 @@ def make_dts_plot():
     accept_df = get_data.get_accept_time()
     ingest_df = get_data.get_ingest_time()
     sispi_df = pd.DataFrame(query.query_exptime(query.connect_to_db('db-sispi')[1], etime, datetime.now()), columns = ['sispi_time','filename'])
-    db_df = pd.DataFrame(query.query_dts_delay(query.connect_to_db('db-destest')[1], stime, etime), columns = ['total_time', 'ncsa_time', 'noao_time', 'xtime'])
+    weekly_df = pd.DataFrame(query.query_dts_delay(query.connect_to_db('db-destest')[1], stime, etime), columns = ['total_time', 'ncsa_time', 'noao_time', 'xtime'])
+    alltime_df = pd.DataFrame(query.query_dts_delay(query.connect_to_db('db-destest')[1], graphstime, etime), columns = ['total_time', 'ncsa_time', 'noao_time', 'xtime']) 
+
 
     ### Standardize file names for merge ###
     trimed_fn = []
@@ -284,13 +286,13 @@ def make_dts_plot():
     live_df = get_data.convert_timezones(live_df)
 
     ### Smooth plot ###
-    sm_df = get_data.smooth_dts(db_df)
-    av_df = get_data.average_dts(db_df, graphstime, days)
+    sm_df = get_data.smooth_dts(weekly_df)
+    av_df = get_data.average_dts(alltime_df, graphstime, days)
 
     ### Plot Data ###
     plots.append(plotter.plot_realtime_dts(sm_df, live_df))
     plots.append(plotter.plot_monthly_dts(av_df, days))
-    plots.append(plotter.plot_average_dts(db_df, days))
+    plots.append(plotter.plot_average_dts(all_time_df, days))
 
     ### Writing plots to HTML ###    
     html = file_html(vplot(*plots),INLINE,'dts')
