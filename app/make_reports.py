@@ -262,6 +262,7 @@ def make_dts_plot():
     plots = []
     etime = datetime.combine(date.today(), datetime.min.time())
     stime = etime - timedelta(14)
+    graphstime = datetime.strptime('01-01-15 00:00:00', '%m-%d-%y %H:%M:%S')
     days = 1
 
     ### Fetch Data ###
@@ -283,11 +284,12 @@ def make_dts_plot():
     live_df = get_data.convert_timezones(live_df)
 
     ### Smooth plot ###
-    db_df = get_data.smooth_dts(db_df)
+    sm_df = get_data.smooth_dts(db_df)
+    av_df = get_data.average_dts(db_df, graphtime, days)
 
     ### Plot Data ###
-    plots.append(plotter.plot_realtime_dts(db_df, live_df))
-    plots.append(plotter.plot_monthly_dts(db_df, days))
+    plots.append(plotter.plot_realtime_dts(sm_df, live_df))
+    plots.append(plotter.plot_monthly_dts(av_df, days))
     plots.append(plotter.plot_average_dts(db_df, days))
 
     ### Writing plots to HTML ###    

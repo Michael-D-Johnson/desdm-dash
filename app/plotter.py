@@ -7,7 +7,7 @@ from bokeh.plotting import figure,ColumnDataSource
 from bokeh.models.widgets import Panel, Tabs
 from bokeh.models import (HoverTool, BoxSelectTool, BoxZoomTool,FixedTicker,
                           PanTool, ResetTool,WheelZoomTool, ResizeTool,
-                          glyphs,Legend,NumeralTickFormatter)
+                          glyphs,Legend,NumeralTickFormatter, LinearAxis, Range1d)
 from bokeh.charts import Scatter,Bar,Histogram,color
 from bokeh.io import vplot
 

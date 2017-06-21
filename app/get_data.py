@@ -172,6 +172,55 @@ def smooth_dts(df):
 
     return fn_df
 
+def average_dts(df, stime, days):
+                                                   # Sort is depreciated as of 0.17.0
+    df.sort(['xtime'], inplace=True)               # 0.16.0 and earilier
+    #df.sort_values(['xtime'], inplace=True)       # 0.17.0
+
+    graphtime = stime
+    current_time = df['xtime'].iloc[0]
+    current_total,current_ncsa,current_noao,current_i,current_extrema = 0,0,0,0,0
+    noaotime, ncsatime, totaltime, xtime, extrema = [],[],[],[],[]
+    for i,x in df.iterrows():
+        if (graphtime - x['xtime']).total_seconds() > 0:
+            if x['total_time'] < 1440*days:
+                current_total += x['total_time']
+                current_ncsa += x['ncsa_time']
+                current_noao += x['noao_time']
+            else:
+                current_extrema = current_extrema + 1
+        else:
+            totaltime.append(current_total/(i - current_i))
+            ncsatime.append(current_ncsa/(i - current_i))
+            noaotime.append(current_noao/(i - current_i))
+            xtime.append(current_time)
+            extrema.append(current_extrema)
+            graphtime = graphtime + relativedelta(months=+1)
+
+            if x['total_time'] < 1440*days:
+                current_time = x['xtime']
+                current_total = x['total_time']
+                current_ncsa = x['ncsa_time']
+                current_noao = x['noao_time']
+                current_i = i
+                current_extrema = 0
+            else:
+                current_time = x['xtime']
+                current_total = 0
+                current_ncsa = 0
+                current_noao = 0
+                current_i = i
+                current_extrema = 0
+
+    fn_df = pd.DataFrame()
+    fn_df['total_time'] = totaltime
+    fn_df['ncsa_time'] = ncsatime
+    fn_df['noao_time'] = noaotime
+    fn_df['xtime'] = xtime
+    fn_df['extrema'] = extrema
+    
+    return fn_df
+
 def processing_archive():
     reqnums = os.listdir(templates)
     return reqnums
