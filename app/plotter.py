@@ -433,6 +433,9 @@ def plot_average_dts(df, hours):
     graph_info['Time in minutes'] = xlist
     p = Bar(graph_info, values='values', label='Time in minutes', ylabel='Number of transfers', color='navy', title='DTS time plot')
     
+    p.plot_height = 1000
+    p.plot_width = 1000   
+
     return p
 
 ### Bokeh 0.11.x and lower implentation
