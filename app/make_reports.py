@@ -320,5 +320,5 @@ if __name__ =='__main__':
         csv_path = os.path.join(app.config["STATIC_PATH"],"processing.csv")
 
     make_reports(db=db,reqnums=reqnums)
-    make_dts_plot()
+    #make_dts_plot()
     make_coadd_html() 

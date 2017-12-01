@@ -67,7 +67,7 @@ def batch_size_query(cur,nitelist,reqnum,pipeline):
                             and object not like '%%pointing%%' and object not like '%%focus%%' \
                             and object not like '%%donut%%' and object not like '%%test%%' \
                             and object not like '%%junk%%' and nite in ({nitelist}) \
-                            and propid in ('2012B-0001','2017A-0260','2016A-0366')".format(nitelist=nitelist)
+                            and propid in ('2017B-0110','2012B-0001','2017A-0260','2016A-0366')".format(nitelist=nitelist)
     cur.execute(batch_size_query)
     results = cur.fetchone()[0]
     if not results:
@@ -202,8 +202,9 @@ def query_qcf_messages(curs, reqnum):
     tmp = []
     for line in curs:
         d = dict(zip(desc, line))
-        tmp.append(d['message'].read()) # convert clob into string
-    d['message'] = tmp
+        tmp.append(d['MESSAGE'].read()) # convert clob into string
+  
+    d['MESSAGE'] = tmp
 
     return d
 

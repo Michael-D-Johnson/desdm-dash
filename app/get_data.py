@@ -9,6 +9,7 @@ from datetime import datetime, timedelta, date
 from dateutil.relativedelta import *
 import math
 import query
+from difflib import SequenceMatcher
 
 from app import app
 csv_path = os.path.join(app.config["STATIC_PATH"],'processing.csv')
@@ -401,6 +402,21 @@ def processing_detail(db,reqnum,df=None,updated=None):
             df.loc[index,('program')] = program
 
         return (df,columns,reqnum,updated)
+
+def similar(a, b):
+    matcher = SequenceMatcher(None, a, b)
+    ratio = matcher.ratio()
+    longest_match = matcher.find_longest_match(0,len(a),0,len(b))
+    matching_blocks = matcher.get_matching_blocks()
+    string = []
+    for i,match in enumerate(matching_blocks):
+        m = a[match[0]:match[0]+match[2]]
+        string.append(m)
+        if i == len(match)-1:
+            continue
+        else:
+            string.append(' <---> ')
+    return ''.join(string)
 
 def find_errors(message_dict):
     ''' Finds patterns dynamically by the : delimiter for the error summary plot'''

@@ -30,11 +30,15 @@ def plot_accepted(dataframe):
     return p
 
 def plot_exec_time(dataframe):
+    for i,row in dataframe.iterrows():
+        dataframe.loc[i,'exec_host'] = row['exec_host'].split('-0-')[1]
     p = Bar(dataframe, values='total time', label='exec_host', agg='mean', color='blue',
         title='Mean Processing Time for Each Exec Host',height=500,width=1000)
     return p
 
 def plot_status_per_host(dataframe):
+    for i,row in dataframe.iterrows():
+        dataframe.loc[i,'exec_host'] = row['exec_host'].split('-0-')[1]
     mycolors = ['green','red','blue','orange','yellow','purple','black']
     p = Bar(dataframe, label='exec_host',values='exec_host', agg='count', group='status',
         title="Status per Exec Host", legend='top_right',color=color('status', palette=mycolors),
@@ -118,7 +122,7 @@ def plot_exec_wall_time(dataframe):
             except:
                 pass
             c +=1
-
+    print "Done with plot"
     return p
 
 def create_tab(df, band, hover, tag, tab_name):
