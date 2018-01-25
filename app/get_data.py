@@ -269,7 +269,10 @@ def processing_summary(db,project,df=None):
                     else:
                         nitelist = str('NA' + ', ' + str(orig_nitelist_cp[-1]))
             else:
-                nitelist = str(int(orig_nitelist[0])) + ' - ' + str(int(orig_nitelist[-1]))
+                try:
+                    nitelist = str(int(orig_nitelist[0])) + ' - ' + str(int(orig_nitelist[-1]))
+                except:
+                    nitelist = str(orig_nitelist[0]) + ' - ' + str(orig_nitelist[-1])
         else:
             try:
                 nitelist = int(orig_nitelist[0])
