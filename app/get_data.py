@@ -259,6 +259,7 @@ def processing_summary(db,project,df=None):
         req = int(float(req))
         orig_nitelist = sorted(group['nite'].unique())
         pipeline = group['pipeline'].unique()[0]
+        orig_nitelist_cp = list(orig_nitelist)
         if len(orig_nitelist) > 1:
             orig_nitelist_cp = list(orig_nitelist)
             if -99 in orig_nitelist_cp:
@@ -283,8 +284,12 @@ def processing_summary(db,project,df=None):
                 nites = str(orig_nitelist[0]).split('t')
             except:
                 nites = str(orig_nitelist_cp[0]).split('t')
-            if project =='TEST': nites = str(orig_nitelist_cp[0]).split('t')
-            nite1,nite2 = nites[0],nites[0][:4]+nites[1]
+            if project =='TEST': 
+                nites = str(orig_nitelist_cp[0]).split('t')
+            try:
+                nite1,nite2 = nites[0],nites[0][:4]+nites[1]
+            except:
+                nite1,nite2 = nites[0],nites[0][:4]+nites[0]
             nitelist = str(int(nite1)) + ' - ' + str(int(nite2))
         if project =='TEST':
             total_batch_size = query.basic_batch_query(query.connect_to_db(db)[1],int(req))

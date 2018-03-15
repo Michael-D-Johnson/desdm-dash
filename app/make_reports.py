@@ -101,9 +101,16 @@ def make_reports(db=None,reqnums=None):
                 query.get_expnum_info(query.connect_to_db('db-desoper')[1],','.join(oper_reqnums)),
                 columns = ['unitname','reqnum','attnum','pfw_attempt_id','expnum','band'])
         except:
-            df_oper_unitname = pd.DataFrame(
-                query.get_tilename_info(query.connect_to_db('db-desoper')[1], ','.join(oper_reqnums)),
-                columns=['unitname', 'reqnum', 'attnum', 'pfw_attempt_id'])
+            tile_info = query.get_tilename_info(query.connect_to_db('db-desoper')[1],
+                         ','.join(oper_reqnums))
+            if tile_info:
+                df_oper_unitname = pd.DataFrame(
+                    query.get_tilename_info(query.connect_to_db('db-desoper')[1],
+                     ','.join(oper_reqnums)),
+                    columns=['unitname', 'reqnum', 'attnum', 'pfw_attempt_id'])
+            else:
+                df_oper_unitname = pd.DataFrame(
+                    columns=['unitname', 'reqnum', 'attnum', 'pfw_attempt_id'])
         for df in [df_oper_status,df_oper_unitname,df_oper_nites]:
             df_oper = pd.merge(df_oper,df,on=['unitname','reqnum','attnum','pfw_attempt_id'],
                     how='left', suffixes=('_orig',''))
@@ -318,7 +325,7 @@ if __name__ =='__main__':
         csv_path = args.csv
     else:
         csv_path = os.path.join(app.config["STATIC_PATH"],"processing.csv")
-
     make_reports(db=db,reqnums=reqnums)
+
     #make_dts_plot()
-    make_coadd_html() 
+    #make_coadd_html() 
