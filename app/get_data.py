@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 import subprocess
+import re
 import os
 import sys
 import pandas as pd
@@ -411,33 +412,41 @@ def processing_detail(db,reqnum,df=None,updated=None):
 
         return (df,columns,reqnum,updated)
 
-def similar(a, b):
-    matcher = SequenceMatcher(None, a, b)
-    ratio = matcher.ratio()
-    longest_match = matcher.find_longest_match(0,len(a),0,len(b))
-    matching_blocks = matcher.get_matching_blocks()
-    string = []
-    for i,match in enumerate(matching_blocks):
-        m = a[match[0]:match[0]+match[2]]
-        string.append(m)
-        if i == len(match)-1:
-            continue
-        else:
-            string.append(' <---> ')
-    return ''.join(string)
+######################
+# NOT USED CURRENTLY #
+######################
+# Was for failure plot
+#def similar(a, b):
+#    matcher = SequenceMatcher(None, a, b)
+#    ratio = matcher.ratio()
+#    longest_match = matcher.find_longest_match(0,len(a),0,len(b))
+#    matching_blocks = matcher.get_matching_blocks()
+#    string = []
+#    for i,match in enumerate(matching_blocks):
+#        m = a[match[0]:match[0]+match[2]]
+#        string.append(m)
+#        if i == len(match)-1:
+#            continue
+#        else:
+#            string.append(' <---> ')
+#    return ''.join(string)
 
 def find_errors(message_dict):
     ''' Finds patterns dynamically by the : delimiter for the error summary plot'''
-
+    
     error_info = {}
-    for message in message_dict['message']:
-        message_contents = message.split(':')
+    prog = re.compile('error', flags=re.IGNORECASE)
 
-        if message_contents[0] not in error_info:
-            error_info[message_contents[0]] = [set([message]), 1]
-        else:
-            error_info[message_contents[0]][0].update([message])
-            error_info[message_contents[0]][1] = error_info[message_contents[0]][1] + 1
+    for message in message_dict['message']:
+        contents = message.split()
+        for i in contents:
+            result = prog.search(i)
+            if result is not None:
+                #print message                          # if the entire msg is needed to be displayed
+                if i not in error_info:                 # in the future, this is the place to grap it
+                    error_info[i] = 1
+                else:
+                    error_info[i] += 1
 
     return error_info
 
