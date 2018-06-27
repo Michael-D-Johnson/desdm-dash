@@ -415,7 +415,7 @@ def processing_detail(db,reqnum,df=None,updated=None):
 ######################
 # NOT USED CURRENTLY #
 ######################
-# Was for failure plot
+# Was for errors plot
 #def similar(a, b):
 #    matcher = SequenceMatcher(None, a, b)
 #    ratio = matcher.ratio()
@@ -432,8 +432,7 @@ def processing_detail(db,reqnum,df=None,updated=None):
 #    return ''.join(string)
 
 def find_errors(message_dict):
-    ''' Finds patterns dynamically by the : delimiter for the error summary plot'''
-    
+    ''' Finds patterns dynamically by the : delimiter for the error summary plot'''    
     error_info = {}
     prog = re.compile('error', flags=re.IGNORECASE)
 
@@ -442,12 +441,10 @@ def find_errors(message_dict):
         for i in contents:
             result = prog.search(i)
             if result is not None:
-                #print message                          # if the entire msg is needed to be displayed
-                if i not in error_info:                 # in the future, this is the place to grap it
-                    error_info[i] = 1
+                if i not in error_info:
+                    error_info[i] = ( message, 1 )
                 else:
-                    error_info[i] += 1
-
+                    error_info[i] = ( error_info[i][0], error_info[i][1] + 1)
     return error_info
 
 ####################

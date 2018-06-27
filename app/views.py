@@ -46,14 +46,14 @@ def processing_detail(reqnum):
 
 @app.route('/error_summary/<reqnum>')
 def error_summary(reqnum):
-    try:
-        message_dict = query.query_qcf_messages(query.connect_to_db('db-desoper')[1], reqnum)
-        error_dict = get_data.find_errors(message_dict)
-        plot = plotter.plot_qcf_bar(error_dict, reqnum)
-        script, div = components(plot)
-    except TypeError:
+    #try:
+    message_dict = query.query_qcf_messages(query.connect_to_db('db-desoper')[1], reqnum)
+    error_dict = get_data.find_errors(message_dict)
+    plot = plotter.plot_qcf_bar(error_dict, reqnum)
+    script, div = components(plot)
+    #except TypeError:
         # If there was no failures for the run
-        print "No errors were found for reqnum {}, no failure graph was produced"
+        #print "No errors were found for reqnum {}, no failure graph was produced".format(reqnum)
     return render_template('error_summary.html', scripts=script, div=div, columns=[i for i in error_dict.iterkeys()], error_dict=error_dict, updated='#{time}'.format(time=datetime.now()), title='Error Summary')
 
 @app.route('/dts')

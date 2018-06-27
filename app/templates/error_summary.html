@@ -6,6 +6,27 @@
 {{ scripts|safe }}
 {{ div|safe }}
 
+.collapsible {
+    background-color: #777;
+    color: white;
+    cursor: pointer;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size 15px;
+}
+
+.active, .collapsible:hover {
+    background-color: #555;
+}
+
+.content {
+    display: none;
+    overflow: hidden;
+    background-color: #f1f1f1;
+}
+
 <table class='display black' cellspacing="0" width="100%" border="1">
 <thead>
   <tr>
@@ -18,13 +39,21 @@
 <tbody>
 {% for col in error_dict.iterkeys() %}
   <tr>
-  <td> {{ col }} </td>
-  <td>
-  {% for error in  error_dict[col][0] %}
-    {{ error }} <BR> 
-  {% endfor %}
+  <td> 
+    <button class="collapsible button"> {{ col }} </button>
+    <div class="content">
+      <table class='message display' cellspacing="0">
+      <tbody>
+        {% for message in error_dict[col][0] %}
+        <tr>
+          {{ "{}".format(message) }} <BR>
+        </tr>
+        {% endfor %}
+      </tbody>
+      </table>
+    </div>
   </td>
-  <td> {{ error_dict[col][1]}} </td>
+  <td> {{ "{}".format(error_dict[col][1]) }} </td>
   </tr>
 {% endfor %}
 </tbody>

@@ -209,7 +209,6 @@ def query_qcf_messages(curs, reqnum):
     for line in curs:
         d = dict(zip(desc, line))
         tmp.append(d['message'].read()) # convert clob into string
-        #print d['message'].read()
     d['message'] = tmp
     return d
 

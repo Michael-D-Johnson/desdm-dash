@@ -447,7 +447,7 @@ def plot_average_dts(df, hours):
 def plot_qcf_bar(error_info, reqnum):
 
     graph_info = {}
-    graph_info['values'] = [error_info[i] for i in error_info.iterkeys()]
+    graph_info['values'] = [error_info[i][1] for i in error_info.iterkeys()]
     graph_info['labels'] = []
     # Math symbols and colons cause the plot to either silently fail or display incorrectly
     # This is to filter them out.
