@@ -202,17 +202,15 @@ def query_dts_delay(cur, stime, etime):
 def query_qcf_messages(curs, reqnum):
     query = "SELECT reqnum, unitname, attnum, wrapnum, modname, message \
              FROM qc_processed_message qpm, pfw_wrapper pw, pfw_attempt a,task t \
-             WHERE a.task_id=t.id and a.id = pw.pfw_attempt_id and pw.task_id=qpm.pfw_wrapper_id \
-             and reqnum=\'{}\' and message not like 'STATUS3BEG%EXPTIME%' and message not like 'STATUS4BEG%' \
-             and message not like 'WRAP%' and t.status!=0".format(reqnum)
+             WHERE a.task_id=t.id and a.id = pw.pfw_attempt_id and pw.task_id=qpm.pfw_wrapper_id and reqnum=\'{}\' and message not like 'STATUS3BEG%EXPTIME%' and message not like 'STATUS4BEG%' and message not like 'WRAP%' and t.status!=0".format(reqnum)
     curs.execute(query)
     desc = [d[0].lower() for d in curs.description]
     tmp = []
     for line in curs:
         d = dict(zip(desc, line))
-        tmp.append(d['MESSAGE'].read()) # convert clob into string 
-    d['MESSAGE'] = tmp
-
+        tmp.append(d['message'].read()) # convert clob into string
+        #print d['message'].read()
+    d['message'] = tmp
     return d
 
 #####################
