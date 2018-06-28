@@ -46,9 +46,9 @@ def processing_detail(reqnum):
     return render_template('processing_detail_include.html',reportname=reportname,title='Report {reqnum}'.format(reqnum=reqnum))
 
 @app.route('/error_summary/<reqnum>')
-def error_summary(reqnum):
+def error_summary(reqnum, db):
     #try:
-    message_dict = query.query_qcf_messages(query.connect_to_db('db-desoper')[1], reqnum)
+    message_dict = query.query_qcf_messages(query.connect_to_db(db)[1], reqnum)
     error_dict = get_data.find_errors(message_dict)
     plot = plotter.plot_qcf_bar(error_dict, reqnum)
     script, div = components(plot)
