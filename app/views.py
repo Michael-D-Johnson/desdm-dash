@@ -52,10 +52,11 @@ def error_summary(db,reqnum):
         error_dict = get_data.find_errors(message_dict)
         plot = plotter.plot_qcf_bar(error_dict, reqnum)
         script, div = components(plot)
+        return render_template('error_summary.html', scripts=script, div=div, columns=[i for i in error_dict.iterkeys()], error_dict=error_dict, updated='#{time}'.format(time=datetime.now()), title='Error Summary')
     except TypeError:
         # If there was no failures for the run
         print "No errors were found for reqnum {}, no failure graph was produced".format(reqnum)
-    return render_template('error_summary.html', scripts=script, div=div, columns=[i for i in error_dict.iterkeys()], error_dict=error_dict, updated='#{time}'.format(time=datetime.now()), title='Error Summary')
+        return render_template('error_summary.html', scripts=None, div=None, columns=None, error_dict=None, updated='#{time}'.format(time=datetime.now()), title='Error Summary')
 
 @app.route('/dts')
 def dts():    
