@@ -6,6 +6,7 @@
 {{ scripts|safe }}
 {{ div|safe }}
 
+<style>
 .collapsible {
     background-color: #777;
     color: white;
@@ -21,11 +22,26 @@
     background-color: #555;
 }
 
+.collapsible:after {
+    content: '\002B';
+    color: white;
+    font-weight: bold;
+    float: right;
+    margin-left: 5px;
+}
+
+.active:after {
+    content: "\2212";
+}
+
 .content {
     display: none;
+    max-height: 0;
     overflow: hidden;
+    transition: max-height 0.2s ease-out;
     background-color: #f1f1f1;
 }
+</style>
 
 <table class='display black' cellspacing="0" width="100%" border="1">
 <thead>
@@ -44,9 +60,9 @@
     <div class="content">
       <table class='message display' cellspacing="0">
       <tbody>
-        {% for message in error_dict[col][0] %}
+        {% for message in error_dict[col] %}
         <tr>
-          {{ "{}".format(message) }} <BR>
+          {{ "{}".format(message[0]) }} <BR>
         </tr>
         {% endfor %}
       </tbody>
@@ -60,3 +76,22 @@
 </table>
 </center>
 {% endblock %}
+
+</style>
+
+<script>
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    if (content.style.maxHeight){
+      content.style.maxHeight = null;
+    } else {
+      content.style.maxHeight = content.scrollHeight + "px";
+    } 
+  });
+}
+</script>
