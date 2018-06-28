@@ -5,7 +5,7 @@
 {% for db in ['db-desoper','db-destest'] %}
 <div class="styleme">
 <hr>
-<h1> {{ db}} </h1>
+<h1> {{db}} </h1>
 <hr>
 </div>
 {% if db=='db-desoper' %}
@@ -38,9 +38,9 @@
 <tr>
 {% for col in columns %}
     {% if col == 'reqnum' %}
-    <td> <a href="{{ url_for('processing_detail',db=db,reqnum = row['reqnum']) }}"><strong>{{ row['reqnum'] }}</strong></a></td>
+    <td> <a href="{{ url_for('processing_detail',reqnum = row['reqnum']) }}"><strong>{{ row['reqnum'] }}</strong></a></td>
     {% elif col == 'failed' %}
-    <td> <a href="{{ url_for('error_summary',db=db,reqnum=row['reqnum']) }}"><strong>{{ row['failed'] }}</strong></a></td>
+    <td> <a href="{{ url_for('error_summary',db=db, reqnum=row['reqnum']) }}"><strong>{{ row['failed'] }}</strong></a></td>
     {% else %}
     <td> {{ row[col]}} </td> 
     {% endif %}
