@@ -62,7 +62,7 @@
     <div class="panel">
       <table class='display black' cellspacing="0" width"100%" border = "1">
       <tbody>
-        {% for message in error_dict[col] %}
+        {% for message in error_dict[col][0] %}
         <tr>
           {{ "{}".format(message) }} <BR>
         </tr>
