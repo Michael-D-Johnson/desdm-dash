@@ -3,6 +3,7 @@ from flask import render_template
 import query
 import get_data
 import plotter
+import pandas as pd
 from datetime import datetime
 from make_reports import make_system_plots
 from app import app
@@ -47,7 +48,8 @@ def processing_detail(reqnum):
 @app.route('/error_summary/<reqnum>')
 def error_summary(reqnum):
     #try:
-    message_dict = query.query_qcf_messages(query.connect_to_db('db-desoper')[1], reqnum)
+    message_dict = pd.read_csv('/Users/Albert/software/desdm-dash/desdm-dash/3484.csv')
+    #message_dict = query.query_qcf_messages(query.connect_to_db('db-desoper')[1], reqnum)
     error_dict = get_data.find_errors(message_dict)
     plot = plotter.plot_qcf_bar(error_dict, reqnum)
     script, div = components(plot)

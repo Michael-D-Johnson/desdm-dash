@@ -442,9 +442,9 @@ def find_errors(message_dict):
             result = prog.search(i)
             if result is not None:
                 if i not in error_info:
-                    error_info[i] = ( message, 1 )
+                    error_info[i] = ( [ message ], 1 )
                 else:
-                    error_info[i] = ( error_info[i][0], error_info[i][1] + 1)
+                    error_info[i] = ( [ error_info[i][0], message], error_info[i][1] + 1)
     return error_info
 
 ####################
