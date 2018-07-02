@@ -65,7 +65,7 @@ def dts():
 
 @app.route('/system')
 def backups():
-    sys_df, res, desdf_df = get_data.create_system_data('db-databot','db-destest')
+    sys_df, res, desdf_df = get_data.create_system_data('db-databot')
     plots = make_system_plots(sys_df, res, desdf_df)
     script,div = components(plots)
     return render_template('system.html', scripts=script, div=div, title='System')

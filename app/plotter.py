@@ -125,6 +125,37 @@ def plot_exec_wall_time(dataframe):
     print "Done with plot"
     return p
 
+# plot jobs running over time
+def plot_exec_job_time(passed_df):
+
+    trimmed_df = passed_df[['start_time','end_time','exec_host']]
+    df, start_time = get_data.get_exec_job_data(trimmed_df)
+
+    TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
+    Colors=['red','navy','olive','firebrick','lightskyblue','yellowgreen','lightcoral','yellow', 'green','blue','gold','red']
+
+    # Setup bokeh plot
+    p = figure(plot_height=500, plot_width=1000, x_axis_type="datetime", tools=TOOLS,title='Exec Job Time')
+
+    lasthost = []
+    x_values = []
+    # Setup x_axis data
+    for i in range(0,len(df[df.keys()[0]])):
+        x_values.append(start_time)
+        lasthost.append(0)
+        start_time += timedelta(minutes=10)
+    j=0
+    # Generate y_axis data while ploting
+    for host in df.keys():
+        y_values = []
+        for i in range(0, len(df[host])):
+            y_values.append(lasthost[i] + df[host][i])
+            lasthost[i] = lasthost[i] + df[host][i]
+        p.line(x=x_values , y=y_values , legend=host,color=Colors[j], alpha=0.8,line_width=1.5)
+        j = (j + 1) % len(Colors)
+
+    return p
+
 def create_tab(df, band, hover, tag, tab_name):
     def create_all_data_source(df):
        return ColumnDataSource(data=dict(tilename=df['tilename'],dmedian=df['dmedian']))

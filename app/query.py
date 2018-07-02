@@ -177,13 +177,15 @@ def query_desdf(cur):
     cur.execute(query)
     return cur.fetchall()
 
-def get_system_info(start, cur, cur2):
+def get_system_info(start, cur):
     query = "select number_transferred,number_not_transferred,size_transferred,size_to_be_transferred,number_deprecated,size_deprecated,pipe_processed,pipe_to_be_processed,raw_processed,raw_to_be_processed,run_time from friedel.backup_monitor where run_time >= TO_DATE('%s', 'YYYY-MM-DD HH24:MI:SS') order by run_time desc" % (start.strftime('%Y-%m-%d %H:%M:%S'))
-    cur2.execute(query)
+    cur.execute(query)
+    res = pd.DataFrame(cur.fetchall(), columns = ['tdate','tsize','tav'])
 
     query2 = "select transfer_date,(tar_size/(1024*1024*1024)),(tar_size/(transfer_time*1024*1024*1024)) from prod.backup_tape where transfer_date is not null and transfer_date >= TO_DATE('%s', 'YYYY-MM-DD HH24:MI:SS') order by transfer_date desc" % (start.strftime('%Y-%m-%d %H:%M:%S'))
     cur.execute(query2)
-    return cur.fetchall(), cur2.fetchall()
+    df = pd.DataFrame(cur.fetchall(), columns = ['number_transferred','number_not_transferred','size_transferred','size_to_be_transferred','number_deprecated','size_deprecated','pipe_processed','pipe_to_be_processed','raw_processed','raw_to_be_processed','run_time'])
+    return res, df
 
 def query_exptime(cur, stime, etime):
     format = "%Y-%m-%d %H:%M:%S"

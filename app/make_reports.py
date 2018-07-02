@@ -157,6 +157,12 @@ def make_reports(db=None,reqnums=None):
         except:
             pass
         try:
+            if not df_pass.empty:
+                exec_job = plotter.plot_exec_job_time(df_pass)
+                plots.append(exec_job)
+        except:
+            pass
+        try:
             fails = plotter.plot_status_per_host(df)
             plots.append(fails)
         except:

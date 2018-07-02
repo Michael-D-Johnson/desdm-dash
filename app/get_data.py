@@ -25,12 +25,10 @@ def create_coadd_map(section, tag):
     return all_df, processed_df, band_df
 
 ### Gets data for all plots on system plots page ###
-def create_system_data(section, section2):
+def create_system_data(section):
     ### Length of graph (Defult 14 days) ###
     start = datetime.now() - timedelta(days=int(14))
-    cur, cur2 = query.get_system_info(start, query.connect_to_db(section)[1], query.connect_to_db(section2)[1])
-    res = pd.DataFrame(cur, columns = ['tdate','tsize','tav'])
-    df = pd.DataFrame(cur2, columns = ['number_transferred','number_not_transferred','size_transferred','size_to_be_transferred','number_deprecated','size_deprecated','pipe_processed','pipe_to_be_processed','raw_processed','raw_to_be_processed','run_time'])
+    res, df = query.get_system_info(start, query.connect_to_db(section)[1])
 
     ### Change from GB to TB ### 
     df['size_transferred'] /= math.pow(1024,4)
@@ -448,6 +446,44 @@ def find_errors(message_dict):
                     msg_list.append(message)
                     error_info[i] = ( msg_list, error_info[i][1] + 1)
     return error_info
+
+def get_exec_job_data(data_df):
+    ''' Change start and end time data into count of jobs running at any point '''
+    pd.to_datetime(data_df['start_time'])
+    pd.to_datetime(data_df['end_time'])
+    data_df = data_df.sort('start_time')
+
+    start_queue = deque([row for row in data_df.iterrows()])
+    end_times = []
+    cur_hostname_count = dict((hostname, 0) for hostname in set(data_df['exec_host']))
+    final_hostname_count = dict((hostname, []) for hostname in set(data_df['exec_host']))
+    cur_time = start_queue[0][1][0]
+    start_time = start_queue[0][1][0]
+    time_segment = timedelta(minutes=10)
+
+    # Just for in case somebody needs to edit this in the future.
+    # Data format is   [0]       [1][0]     [1][1]   [1][2] 
+    #               (df_num, (start_time, end_time, exec_host))
+    while len(start_queue) != 0 or len(end_times) != 0:
+        # Check start_times
+        while len(start_queue) != 0 and start_queue[0][1][0] < cur_time:
+            cur_hostname_count[start_queue[0][1][2]] += 1
+            end_times.append(start_queue.popleft())
+        # Log counts
+        for host in cur_hostname_count.keys():
+            final_hostname_count[host].append(cur_hostname_count[host])
+        # Check end_times
+        if len(end_times) != 0:
+            new_end_times = []
+            for time in end_times:
+                if time[1][1] < cur_time:
+                    cur_hostname_count[time[1][2]] -= 1
+                else:
+                    new_end_times.append(time)
+            end_times = new_end_times
+        cur_time += time_segment
+
+    return final_hostname_count, start_time
 
 ####################
 # added by ycchen
