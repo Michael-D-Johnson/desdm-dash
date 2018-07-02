@@ -25,7 +25,7 @@ def create_coadd_map(section, tag):
     return all_df, processed_df, band_df
 
 ### Gets data for all plots on system plots page ###
-def create_system_data(section):
+def create_system_data(section, section2):
     ### Length of graph (Defult 14 days) ###
     start = datetime.now() - timedelta(days=int(14))
     res, df = query.get_system_info(start, query.connect_to_db(section)[1])
