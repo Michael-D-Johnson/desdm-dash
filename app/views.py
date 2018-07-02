@@ -56,7 +56,7 @@ def error_summary(db,reqnum):
     except TypeError:
         # If there was no failures for the run
         print "No errors were found for reqnum {}, no failure graph was produced".format(reqnum)
-        return render_template('error_summary.html', scripts=None, div=None, columns=None, error_dict=None, updated='#{time}'.format(time=datetime.now()), title='Error Summary')
+        return render_template('error_summary.html', scripts=None, div=None, columns=None, error_dict={}, updated='#{time}'.format(time=datetime.now()), title='Error Summary')
 
 @app.route('/dts')
 def dts():    

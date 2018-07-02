@@ -3,8 +3,10 @@
 <h5> Last updated on: {{updated.split('#')[1]}}</h5>
 <center>
 
+{% if error_dict %}
 {{ scripts|safe }}
 {{ div|safe }}
+{% endif %}
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
@@ -46,6 +48,7 @@
 }
 </style>
 
+{% if error_dict %}
 <table class='display black' cellspacing="0" width="100%" border="1">
 <thead>
   <tr>
@@ -77,7 +80,9 @@
 </tbody>
 </table>
 </center>
-
+{% else %}
+<h1> No errors were found for this run!</h1>
+{% endif %}
 <script>
 var acc = document.getElementsByClassName("accordion");
 var i;
