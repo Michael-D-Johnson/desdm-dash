@@ -126,10 +126,7 @@ def plot_exec_wall_time(dataframe):
     return p
 
 # plot jobs running over time
-def plot_exec_job_time(passed_df):
-
-    trimmed_df = passed_df[['start_time','end_time','exec_host']]
-    df, start_time = get_data.get_exec_job_data(trimmed_df)
+def plot_exec_job_time(df, start_time):
 
     TOOLS=[BoxZoomTool(),PanTool(),ResetTool(),WheelZoomTool()]
     Colors=['red','navy','olive','firebrick','lightskyblue','yellowgreen','lightcoral','yellow', 'green','blue','gold','red']

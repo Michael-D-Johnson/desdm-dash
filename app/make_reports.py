@@ -150,17 +150,22 @@ def make_reports(db=None,reqnums=None):
             plots.append(exechost)
         except:
             pass
+# Wall time not used
+#        try:
+#            if not df_pass.empty:
+#                exec_time = plotter.plot_exec_wall_time(df_pass)
+#                plots.append(exec_time)
+#        except:
+#            pass
         try:
             if not df_pass.empty:
-                exec_time = plotter.plot_exec_wall_time(df_pass)
-                plots.append(exec_time)
-        except:
-            pass
-        try:
-            if not df_pass.empty:
-                exec_job = plotter.plot_exec_job_time(df_pass)
+                trimmed_df = df_pass[['start_time','end_time','exec_host']]
+                job_df, start_time = get_data.get_exec_job_data(trimmed_df)
+                exec_job = plotter.plot_exec_job_time(job_df, start_time)
                 plots.append(exec_job)
-        except:
+        except BaseException as e:
+            print datetime.now()
+            print e
             pass
         try:
             fails = plotter.plot_status_per_host(df)
