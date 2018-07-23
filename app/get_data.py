@@ -324,17 +324,19 @@ def processing_summary(db,project,df=None):
             if nitelist == -99: nitelist = 'NA'
         max_delta = timedelta(hours=0) 
         for rownum,item in pd.DataFrame(group).iterrows():
-            try:
-                end_time = datetime.strptime(item['end_time'],'%Y-%m-%d %H:%M:%S.%f')
-            except:
-                end_time = datetime.strptime(item['end_time'],'%Y-%m-%d %H:%M:%S')
-            try:
-                start_time = datetime.strptime(item['start_time'],'%Y-%m-%d %H:%M:%S.%f')
-            except:
-                start_time = datetime.strptime(item['start_time'],'%Y-%m-%d %H:%M:%S')    
-            cur_delta = end_time - start_time
-            if cur_delta > max_delta:
-                max_delta = cur_delta
+            if type(item['end_time']) != int:
+                try:
+                    end_time = datetime.strptime(item['end_time'],'%Y-%m-%d %H:%M:%S.%f')
+                except:
+                    end_time = datetime.strptime(item['end_time'],'%Y-%m-%d %H:%M:%S')
+                try:
+                    start_time = datetime.strptime(item['start_time'],'%Y-%m-%d %H:%M:%S.%f')
+                except:
+                    start_time = datetime.strptime(item['start_time'],'%Y-%m-%d %H:%M:%S')    
+                cur_delta = end_time - start_time
+                if cur_delta > max_delta:
+                    max_delta = cur_delta
+        ### Hours determines how long a run has to go to get flagged as red ###
         if max_delta > timedelta(hours=7):
             redflag = 1
         else:
