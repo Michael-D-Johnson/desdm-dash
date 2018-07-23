@@ -241,7 +241,6 @@ def processing_summary(db,project,df=None):
             df = pd.DataFrame(columns=['created_date','project','campaign','pfw_attempt_id','reqnum','unitname','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_site','exec_host','db']) 
     else:
         updated = '#{time}'.format(time=datetime.now()) 
-
     df = df.sort(columns=['reqnum','unitname','attnum'],ascending=False)
     df = df.fillna(-99)
     if project =='TEST':
@@ -323,6 +322,23 @@ def processing_summary(db,project,df=None):
             except:
                 nitelist = str(orig_nitelist[0])
             if nitelist == -99: nitelist = 'NA'
+        max_delta = timedelta(hours=0) 
+        for rownum,item in pd.DataFrame(group).iterrows():
+            try:
+                end_time = datetime.strptime(item['end_time'],'%Y-%m-%d %H:%M:%S.%f')
+            except:
+                end_time = datetime.strptime(item['end_time'],'%Y-%m-%d %H:%M:%S')
+            try:
+                start_time = datetime.strptime(item['start_time'],'%Y-%m-%d %H:%M:%S.%f')
+            except:
+                start_time = datetime.strptime(item['start_time'],'%Y-%m-%d %H:%M:%S')    
+            cur_delta = end_time - start_time
+            if cur_delta > max_delta:
+                max_delta = cur_delta
+        if max_delta > timedelta(hours=7):
+            redflag = 1
+        else:
+            redflag = 0
         req_dict = {'remaining':remaining,'operator':', '.join(group.operator.unique()),
                     'batch size':total_batch_size,
                     'reqnum':req,'passed':passed,'failed':failed,'unknown':unknown,
@@ -332,7 +348,8 @@ def processing_summary(db,project,df=None):
                     'campaign':group.campaign.unique()[0],
                     'project':group.project.unique()[0],
                     'pipeline':pipeline,
-                    'db':db}
+                    'db':db,
+                    'redflag':redflag}
         if unknown: current_dict.append(req_dict)
         else: rest_dict.append(req_dict)
     try: current_dict
