@@ -16,9 +16,11 @@
     <thead>
     <tr>
     {% for col in columns %}
+      {% if col != 'redflag' %}
       <th>
         {{ col }}
       </th>
+      {% endif %}
     {% endfor %}
     </tr>
     </thead>
@@ -26,19 +28,21 @@
     {% for di in dict %}
       <tr> 
       {% for col in columns %}
-        {% if di[redflag] == 1 %}
-          <td bgcolor="#FFAAAA">
-        {% else %}
-          <td>
-        {% endif %}
-        {% if col == 'reqnum' %}
-          <a href="{{ url_for('processing_detail',db='db-desoper',reqnum =di[col])}}"><strong>{{ di[col] }}</strong></a></td>
-        {% elif col == 'failed' %}
-          <a href="{{ url_for('error_summary',db='db-desoper',reqnum=di['reqnum'])}}"><strong>{{ di[col] }}</strong></a></td>
-        {% elif col == 'redflag' %}
+        {% if col != 'redflag' %}
+          {% if di[redflag] == 1 %}
+            <td bgcolor="#FFAAAA">
+          {% else %}
+            <td>
+          {% endif %}
+          {% if col == 'reqnum' %}
+            <a href="{{ url_for('processing_detail',db='db-desoper',reqnum =di[col])}}"><strong>{{ di[col] }}</strong></a></td>
+          {% elif col == 'failed' %}
+            <a href="{{ url_for('error_summary',db='db-desoper',reqnum=di['reqnum'])}}"><strong>{{ di[col] }}</strong></a></td>
+          {% elif col == 'redflag' %}
           <!-- Don't display the redflag column, just for adding red color to table -->
-        {% else %}
-          {{ di[col] }} </td> 
+          {% else %}
+            {{ di[col] }} </td> 
+          {% endif %}
         {% endif %}
       {% endfor %}
       </tr>
