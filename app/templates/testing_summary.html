@@ -36,11 +36,11 @@
 </tr>
 </thead>
 <tbody>
-{% for i,row in df.iterrows() %}
+{% for j,row in df.iterrows() %}
 <tr>
 {% for col in columns %}
   {% if col != 'redflag' %}
-    {% if di[redflag] == 1 %}
+    {% if row['redflag'] == 1 and i==0%}
       <td bgcolor="#FFAAAA">
     {% else %}
       <td>
