@@ -138,17 +138,26 @@ def make_reports(db=None,reqnums=None):
         try:
             times = plotter.plot_times(df_pass)
             plots.append(times)
-        except:
+        except BaseException as e:
+            print "PLOT FAILED: times"
+            print datetime.now()
+            print e
             pass
         try:
             assess = plotter.plot_accepted(df_pass)
             plots.append(assess)
-        except:
+        except BaseException as e:
+            print "PLOT FAILED: accepted status"
+            print datetime.now()
+            print e
             pass
         try:
             exechost = plotter.plot_exec_time(df_pass)
             plots.append(exechost)
-        except:
+        except BaseException as e:
+            print "PLOT FAILED: Exec time"
+            print datetime.now()
+            print e
             pass
 # Wall time not used
 #        try:
@@ -164,19 +173,26 @@ def make_reports(db=None,reqnums=None):
                 exec_job = plotter.plot_exec_job_time(job_df, start_time)
                 plots.append(exec_job)
         except BaseException as e:
+            print "PLOT FAILED: Exec job time"
             print datetime.now()
             print e
             pass
         try:
             fails = plotter.plot_status_per_host(df)
             plots.append(fails)
-        except:
+        except BaseException as e:
+            print "PLOT FAILED: Host Status"
+            print datetime.now()
+            print e
             pass
         try:
             if len(df_teff.t_eff):
                 teff =plotter.plot_t_eff(df_teff[(df_teff.t_eff !='None')])
                 for p in teff: plots.append(p)
-        except:
+        except BaseException as e:
+            print "PLOT FAILED: T_eff"
+            print datetime.now()
+            print e
             pass
         
         # Creating output path
