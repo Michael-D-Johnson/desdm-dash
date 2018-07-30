@@ -80,8 +80,8 @@ def batch_size_query(cur,nitelist,reqnum,pipeline):
 
 def assess_query(cur,df,index,triplet,pfw_attempt_id,pipeline):
     unitname_0 = triplet[0].split('_')[0]
-    print triplet
-    print unitname_0
+    # print triplet
+    # print unitname_0
     if 'DES' in unitname_0:
         pipeline = 'multiepoch'
     if 'D00' in unitname_0:
