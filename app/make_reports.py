@@ -249,7 +249,7 @@ def create_last4_html(reqnums):
     with open(last4path,'w') as fh:
         fh.write('<h3>Reports in the last 4 days</h3>\n<div id=\'sidebarResults\'>')
         for reqnum in last:
-            fh.write('  <button onclick="requestDoc(\'main\',\'static/reports/{req}/report_{req}.html\')">Report {req}</button><br>\n'.format(req=reqnum[1]))
+            fh.write('  <button onclick="requestDoc(\'main\',\'/static/reports/{req}/report_{req}.html\')">Report {req}</button><br>\n'.format(req=reqnum[1]))
         fh.write('</div>')
 
 def create_main_html(reqnums):
