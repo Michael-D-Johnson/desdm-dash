@@ -38,10 +38,10 @@ def processing_summary(cur,reqnums):
     cur.execute(query)
     return cur.fetchall()
 
-def get_reqnums(cur):
+def get_reqnums(cur,sch):
     query = "SELECT distinct a.reqnum \
-            FROM pfw_attempt a,task t,pfw_request r,pfw_job j \
-            WHERE a.created_date >= sysdate-4 and t.id =a.task_id and a.reqnum=r.reqnum and a.id=j.pfw_attempt_id"
+            FROM {schema}.pfw_attempt a,{schema}.task t,{schema}.pfw_request r,{schema}.pfw_job j \
+            WHERE a.created_date >= sysdate-4 and t.id =a.task_id and a.reqnum=r.reqnum and a.id=j.pfw_attempt_id".format(schema=sch)
     cur.execute(query)
     return [req[0] for req in cur.fetchall()]
 
@@ -214,6 +214,27 @@ def query_qcf_messages(curs, reqnum):
         tmp.append(d['message'].read()) # convert clob into string
     d['message'] = tmp
     return d
+
+def get_archive_reports(cur, schema):
+    path = os.path.join(app.config["STATIC_PATH"],"reports/")
+    reqnums = os.listdir(path)
+    report_dfs = []
+    i=0
+    reqstr = '\'' + reqnums[i] + '\''
+    for req in reqnums:
+        if req.isdigit():
+            reqstr += ',\'' + req + '\''
+        if i % 200 == 199 or i+1 == len(reqnums):
+            query = "SELECT min(created_date), reqnum \
+                     FROM {schema}.pfw_attempt \
+                     WHERE reqnum in ({reqnums}) group by reqnum".format(reqnums=reqstr,schema=schema)
+            cur.execute(query)
+            report_dfs.append(pd.DataFrame(cur.fetchall(),columns = ['created_date','reqnum']))
+            reqstr = '\'' + reqnums[i] + '\''
+            #print "queried at {len}".format(len=i)
+        i += 1
+
+    return pd.concat(report_dfs)
 
 #####################
 # added by ycchen

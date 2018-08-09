@@ -338,8 +338,11 @@ def processing_summary(db,project,df=None):
                     max_delta = cur_delta
         ### Hours determines how long a run has to go to get flagged as red ###
         if max_delta > timedelta(hours=7):
+            print "Group Flagged"
+            print max_delta
             redflag = 1
         else:
+            print "pass"
             redflag = 0
         req_dict = {'remaining':remaining,'operator':', '.join(group.operator.unique()),
                     'batch size':total_batch_size,

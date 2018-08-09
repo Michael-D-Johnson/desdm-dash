@@ -2,6 +2,7 @@
 import os
 import pandas as pd
 from datetime import datetime, timedelta, date
+from math import trunc
 
 from bokeh.charts import save
 from bokeh.plotting import output_file
@@ -30,8 +31,8 @@ def make_reports(db=None,reqnums=None):
     if db is None and reqnums is None: 
         #1. get reqnums from last four days
         #2. create dataframe for all reqnums in both databases
-        test_reqnums = [str(r) for r in query.get_reqnums(query.connect_to_db('db-destest')[1])]
-        oper_reqnums = [str(r) for r in query.get_reqnums(query.connect_to_db('db-desoper')[1])]
+        test_reqnums = [str(r) for r in query.get_reqnums(query.connect_to_db('db-destest')[1],'prodbeta')]
+        oper_reqnums = [str(r) for r in query.get_reqnums(query.connect_to_db('db-desoper')[1],'prod')]
     else:
         if db=='db-destest':
             test_reqnums = reqnums
@@ -222,6 +223,69 @@ def make_reports(db=None,reqnums=None):
         reportpath = os.path.join(path,reportfile)
         with open(reportpath, "wb") as fh:
             fh.write(output_from_parsed_template)
+
+        update_report_archive()
+
+def update_report_archive():
+    oper_df = query.get_archive_reports(query.cursor('db-desoper'), 'prod')
+    test_df = query.get_archive_reports(query.cursor('db-destest'), 'prodbeta')
+
+    report_df = pd.DataFrame(pd.concat([oper_df,test_df]))
+
+    create_main_html(report_df)
+    create_last4_html(report_df)
+
+def create_last4_html(reqnums):
+    last = []
+    for i,row in reqnums.iterrows():
+        date = datetime.strptime(str(row[0]),'%Y-%m-%d %H:%M:%S.%f')
+        if date > datetime.now() - timedelta(days=4):
+            reqnum = trunc(row[1])
+            last.append((date,reqnum))
+
+    path = app.config["STATIC_PATH"]
+    last4file = "last4days.html"
+    last4path = os.path.join(path,last4file)
+    with open(last4path,'w') as fh:
+        fh.write('<h3>Reports in the last 4 days</h3>\n<div id=\'sidebarResults\'>')
+        for reqnum in last:
+            fh.write('  <button onclick="requestDoc(\'main\',\'static/reports/{req}/report_{req}.html\')">Report {req}</button><br>\n'.format(req=reqnum[1]))
+        fh.write('</div>')
+
+def create_main_html(reqnums):
+    month_data = {}
+    lastmonth = 'none'
+    for i,row in reqnums.iterrows():
+        date = datetime.strptime(str(row[0]),'%Y-%m-%d %H:%M:%S.%f')
+        reqnum = trunc(row[1])
+        if date.strftime('%B_%Y') not in month_data.keys():
+            month_data[date.strftime('%B_%Y')] = [(date,reqnum)]
+        else:
+            month_data[date.strftime('%B_%Y')].append((date,reqnum))
+
+    tmp = []
+    iter = []
+    for month in month_data.keys():
+        iter.append(datetime.strptime(month,'%B_%Y'))
+    iter.sort()
+    for month in iter:
+        tmp.append(month.strftime('%B_%Y'))
+    iter = tmp
+
+    path = app.config["STATIC_PATH"]
+    archivefile = "report_archive_default.html"
+    archivepath = os.path.join(path,archivefile)
+    with open(archivepath,'w') as fh:
+        firsttime = 1
+        for month in reversed(iter):
+            if firsttime == 1:
+                fh.write("<div id='month'><h3>{month}</h3>\n".format(month=month_data[month][0][0].strftime('%B %Y')))
+                firsttime = 0
+            else:
+                fh.write("</div><br>\n<div id='month'><h3>{month}</h3>\n".format(month=month_data[month][0][0].strftime('%B %Y')))
+            for row in month_data[month]:
+                fh.write("  <button onclick=\"requestDoc('main','static/reports/{rq}/report_{rq}.html')\">Report {rq}</button>\n".format(rq=row[1]))
+        fh.write('</div>')
 
 def make_system_plots(sys_df, res, des_df):
     

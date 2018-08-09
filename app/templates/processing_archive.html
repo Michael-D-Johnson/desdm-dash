@@ -1,8 +1,30 @@
 {% extends "base.html" %}
 {% block content %}
-<center>
-{% for req in reqnums %}
-    <a href="{{url_for('processing_detail',reqnum=req)}}">{{'report_{reqnum}.html'.format(reqnum=req)}}</a><br>
-{% endfor %}
-</center>
+<!-- Local Page -->
+<link href="{{ url_for('static',filename='archive.css')}}" rel="stylesheet" type="text/css">
+<script src="{{ url_for('static',filename='archive.js')}}"></script>
+
+<body onload='initDoc()'>
+<div class="row">
+
+  <div class="sidebar">
+    <center>
+    <h2>Report Archive</h2>
+    <button onclick="requestDoc('main','static/reports/report_archive_default.html')">Return to Archive</button>
+    <input type="text" id="archiveSearch" oninput="searchArchive()" placeholder="Search for Reqnum">
+    <div id="sidebarContents">
+    </div>
+    <div id="hiddenReqData">
+    {% for req in reqnums %}
+        {{ req + ',' }}
+    {% endfor %}
+    </div>
+    </center>
+  </div>
+
+  <div class="main" id="main">
+  </div>
+
+</div>
+</body>
 {% endblock %}
