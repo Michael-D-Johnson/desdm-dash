@@ -228,8 +228,8 @@ def make_reports(db=None,reqnums=None):
         update_report_archive()
 
 def update_report_archive():
-    oper_df = query.get_archive_reports(query.connect_to_db('db-desoper'), 'prod')
-    test_df = query.get_archive_reports(query.connect_to_db('db-destest'), 'prodbeta')
+    oper_df = query.get_archive_reports(query.connect_to_db('db-desoper')[1], 'prod')
+    test_df = query.get_archive_reports(query.connect_to_db('db-destest')[1], 'prodbeta')
 
     report_df = pd.DataFrame(pd.concat([oper_df,test_df]))
 
