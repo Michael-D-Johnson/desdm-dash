@@ -1,6 +1,10 @@
-function initDoc() {
-    requestDoc('main','report_archive_default.html');
-    requestDoc('sidebarContents','last4days.html');
+var last4_file;
+var main_file;
+function initDoc(report_archive_default, last4days) {
+    last4_file = last4days;
+    main_file = report_archive_default;
+    requestDoc('main',main_file);
+    requestDoc('sidebarContents',last4_file);
 }
 
 function searchArchive() {
@@ -25,7 +29,7 @@ function searchArchive() {
     document.getElementById('sidebarContents').innerHTML = searchresults;
     }
     else {
-        requestDoc('sidebarContents','last4days.html');
+        requestDoc('sidebarContents',last4_file);
     }
 }
 
