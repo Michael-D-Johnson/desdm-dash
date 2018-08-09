@@ -3,6 +3,7 @@ import os
 import pandas as pd
 from opstoolkit import jiracmd
 from despydb import DesDbi
+from app import app
 
 def connect_to_db(section):
     dbh = DesDbi(os.getenv("DES_SERVICES"),section)

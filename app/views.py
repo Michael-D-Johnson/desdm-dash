@@ -87,3 +87,6 @@ def statistics():
     figscript,figdiv = components(plot)
     return render_template('statistics.html',df = df, columns = df.columns, updated=updated, figscript=figscript, figdiv=figdiv)
 
+@app.route('/hung_jobs')
+def hung_jobs():
+    return render_template('hung_jobs.html', title='Hung Jobs')
