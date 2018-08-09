@@ -16,7 +16,7 @@ function searchArchive() {
     for (var i=0; i < reqnums.length;i++) {
         if (reqnums[i].search(searchterm) != -1) {
             if (curItems < maxItems) {
-                searchresults += "<button onclick=\"requestDoc('main','static/reports/" + reqnums[i] + "/report_" + reqnums[i] +".html')\">Report " + reqnums[i] + "</button>";
+                searchresults += "<button onclick=\"requestDoc('main','app/static/reports/" + reqnums[i] + "/report_" + reqnums[i] +".html')\">Report " + reqnums[i] + "</button>";
                 curItems++;
             }
         }

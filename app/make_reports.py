@@ -14,6 +14,7 @@ import plotter
 import get_data
 import query
 
+from flask import url_for
 from app import app
 
 # Creating command-line arguments
@@ -249,7 +250,7 @@ def create_last4_html(reqnums):
     with open(last4path,'w') as fh:
         fh.write('<h3>Reports in the last 4 days</h3>\n<div id=\'sidebarResults\'>')
         for reqnum in last:
-            fh.write('  <button onclick="requestDoc(\'main\',\'static/reports/{req}/report_{req}.html\')">Report {req}</button><br>\n'.format(req=reqnum[1]))
+            fh.write('  <button onclick="requestDoc(\'main\',\'{url}\')">Report {req}</button><br>\n'.format(req=reqnum[1]),url=url_for('processing_detail',reqnum=reqnum[1]))
         fh.write('</div>')
 
 def create_main_html(reqnums):
@@ -284,7 +285,7 @@ def create_main_html(reqnums):
             else:
                 fh.write("</div><br>\n<div id='month'><h3>{month}</h3>\n".format(month=month_data[month][0][0].strftime('%B %Y')))
             for row in month_data[month]:
-                fh.write("  <button onclick=\"requestDoc('main','static/reports/{rq}/report_{rq}.html')\">Report {rq}</button>\n".format(rq=row[1]))
+                fh.write("  <button onclick=\"requestDoc('main','{url}')\">Report {rq}</button>\n".format(rq=row[1],url=url_for('processing_detail',reqnum=row[1])))
         fh.write('</div>')
 
 def make_system_plots(sys_df, res, des_df):
