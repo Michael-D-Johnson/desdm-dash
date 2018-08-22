@@ -450,21 +450,26 @@ def processing_detail(db,reqnum,df=None,updated=None):
 #    return ''.join(string)
 
 def find_errors(message_dict):
-    ''' Finds patterns dynamically by the : delimiter for the error summary plot'''    
+    ''' Finds patterns dynamically by the : delimiter for the error summary plot'''
     error_info = {}
     prog = re.compile('error', flags=re.IGNORECASE)
 
     for message in message_dict['message']:
-        contents = message.split()
-        for i in contents:
-            result = prog.search(i)
-            if result is not None:
-                if i not in error_info:
-                    error_info[i] = ( [ message ], 1 )
-                else:
-                    msg_list = list(error_info[i][0])
-                    msg_list.append(message)
-                    error_info[i] = ( msg_list, error_info[i][1] + 1)
+        result = prog.search(message)
+        if result is not None:
+            contents = message.split()
+            for i in contents:
+                result = prog.search(i)
+                if result is not None:
+                    if i not in error_info:
+                        error_info[i] = ( message, 1 )
+                    else:
+                        error_info[i] = ( error_info[i][0], error_info[i][1] + 1)
+        else:
+            if message not in error_info:
+                error_info[message] = ( message , 1 )
+            else:
+                error_info[message] = ( error_info[message][0], error_info[message][1] + 1)
     return error_info
 
 def get_exec_job_data(data_df):
