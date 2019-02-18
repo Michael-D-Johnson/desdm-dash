@@ -39,6 +39,20 @@ def processing_summary(cur,reqnums):
     cur.execute(query)
     return cur.fetchall()
 
+def get_decade_reqnums(cur,sch):
+    query = "SELECT distinct a.reqnum \
+            FROM {schema}.pfw_attempt a,{schema}.task t,{schema}.pfw_request r,{schema}.pfw_job j \
+            WHERE t.id =a.task_id and a.reqnum=r.reqnum and a.id=j.pfw_attempt_id".format(schema=sch)
+    cur.execute(query)
+    return [req[0] for req in cur.fetchall()]
+
+def basic_propid_size(cur,propid):
+    query = "select count(distinct expnum) from exposure where obstype in ('standard','object') and propid='%s'" % propid
+    cur.execute(query)
+
+    return cur.fetchone()[0]
+
+
 def get_reqnums(cur,sch):
     query = "SELECT distinct a.reqnum \
             FROM {schema}.pfw_attempt a,{schema}.task t,{schema}.pfw_request r,{schema}.pfw_job j \
@@ -46,6 +60,11 @@ def get_reqnums(cur,sch):
     cur.execute(query)
     return [req[0] for req in cur.fetchall()]
 
+def basic_propid_size(cur,propid):
+    query = "select count(distinct expnum) from exposure where obstype in ('standard','object') and propid='%s'" % propid
+    cur.execute(query)
+
+    return cur.fetchone()[0]
 def basic_batch_query(cur,reqnum):
     query = "select count(distinct unitname) from pfw_attempt where reqnum=%s" % reqnum
     cur.execute(query)
@@ -132,7 +151,7 @@ def get_tilename_info(cur,reqnums):
         return None
 
 def get_expnum_info(cur,reqnums):
-    query = "SELECT distinct a.unitname,a.reqnum,a.attnum,a.id, e.expnum,e.band from pfw_request r,exposure e, \
+    query = "SELECT distinct a.unitname,a.reqnum,a.attnum,a.id,e.propid,e.expnum,e.band from pfw_request r,exposure e, \
             pfw_attempt a\
             WHERE a.reqnum in ({reqnums}) and e.expnum= substr(a.unitname,4) and r.reqnum=a.reqnum \
             and r.pipeline in ('firstcut','finalcut') and a.unitname not like 'DES%%'".format(reqnums=reqnums)
@@ -202,6 +221,25 @@ def query_dts_delay(cur, stime, etime):
     #print query
     cur.execute(query)
     return cur.fetchall()
+
+def query_task_messages(curs, reqnum):
+    query = "SELECT reqnum, unitname, attnum, message \
+             FROM task_message tm, pfw_attempt a, \
+             WHERE tm.pfw_attempt_id = a.id \
+             AND pfw_attempt_id in (select distinct id from pfw_attempt where reqnum=\'{}\') \
+             AND message not like '%Warn%' and message not like 'STATUS3BEG%' \
+             AND message not like 'STATUS4BEG%' and message not like '%WARN%' \
+             AND message not like 'WRAP%' and message not like '%warn%' \
+             AND message not like '%sql%' and message not like '%run_exec%' \
+             AND message not like 'IMMASK%' and message not like '%Check log%'".format(reqnum)
+    curs.execute(query)
+    desc = [d[0].lower() for d in curs.description]
+    tmp = []
+    for line in curs:
+        d = dict(zip(desc, line))
+        tmp.append(d['message'].read()) # convert clob into string
+    d['message'] = tmp
+    return d
 
 def query_qcf_messages(curs, reqnum):
     query = "SELECT reqnum, unitname, attnum, wrapnum, modname, message \

@@ -1,10 +1,8 @@
 var last4_file;
-var main_file;
 function initDoc(report_archive_default, last4days) {
     last4_file = last4days;
-    main_file = report_archive_default;
-    requestDoc('main',main_file);
-    requestDoc('sidebarContents',last4_file);
+    requestDoc('main', report_archive_default);
+    requestDoc('sidebarContents',last4days);
 }
 
 function searchArchive() {
@@ -20,7 +18,7 @@ function searchArchive() {
     for (var i=0; i < reqnums.length;i++) {
         if (reqnums[i].search(searchterm) != -1) {
             if (curItems < maxItems) {
-                searchresults += "<button onclick=\"requestDoc('main','app/static/reports/" + reqnums[i] + "/report_" + reqnums[i] +".html')\">Report " + reqnums[i] + "</button>";
+                searchresults += "<button onclick=\"requestDoc('main','/static/reports/" + reqnums[i] + "/report_" + reqnums[i] +".html')\">Report " + reqnums[i] + "</button>";
                 curItems++;
             }
         }

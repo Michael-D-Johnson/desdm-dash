@@ -25,6 +25,19 @@ def processing_summary():
     current_dict,rest_dict,columns,updated,curr_df,rest_df = get_data.processing_summary('db-desoper','OPS')
     return render_template('processing_summary.html',columns=columns,current_dict=current_dict,rest_dict=rest_dict,updated=updated,title='Processing Summary')
 
+@app.route('/decade_overview')
+def decade_overview():
+    current_dict,rest_dict,columns,updated,curr_df,rest_df = get_data.decade_overview('db-decade')
+    return render_template('decade_overview.html',columns=columns,current_dict=current_dict,rest_dict=rest_dict,updated=updated,title='DECADE Summary')
+
+@app.route('/decade_summary/<propid>')
+def decade_summary(propid):
+    current_dict,rest_dict,columns,updated,curr_df,rest_df = get_data.processing_summary('db-decade','DECADE')
+    curr_df = curr_df[curr_df.propid==propid].sort(['nite'])
+    rest_df = rest_df[rest_df.propid==propid].sort(['nite'],ascending=False)
+    return render_template('decade_summary.html',columns=columns,current_dict=current_dict,rest_dict=rest_dict,updated=updated,title='{propid} Summary'.format(propid=propid))
+
+
 @app.route('/testing_summary')
 def testing_summary():
     current_dict,rest_dict,columns,updated,curr_df,rest_df = get_data.processing_summary('db-desoper','TEST')
@@ -48,7 +61,10 @@ def processing_detail(reqnum):
 @app.route('/error_summary/<db>/<reqnum>')
 def error_summary(db,reqnum):
     try:
-        message_dict = query.query_qcf_messages(query.connect_to_db(db)[1], reqnum)
+        if db=='db-desoper' or db=='db-decade':
+            message_dict = query.query_task_messages(query.connect_to_db(db)[1], reqnum)
+        else:
+            message_dict = query.query_qcf_messages(query.connect_to_db(db)[1], reqnum)
         error_dict = get_data.find_errors(message_dict)
         plot = plotter.plot_qcf_bar(error_dict, reqnum)
         script, div = components(plot)

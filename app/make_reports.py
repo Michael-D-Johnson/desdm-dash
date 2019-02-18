@@ -1,5 +1,7 @@
 #! /usr/bin/env python
 import os
+import sys
+
 import pandas as pd
 from datetime import datetime, timedelta, date
 from math import trunc
@@ -33,13 +35,80 @@ def make_reports(db=None,reqnums=None):
         #2. create dataframe for all reqnums in both databases
         test_reqnums = [str(r) for r in query.get_reqnums(query.connect_to_db('db-destest')[1],'prodbeta')]
         oper_reqnums = [str(r) for r in query.get_reqnums(query.connect_to_db('db-desoper')[1],'prod')]
+        decade_reqnums = [str(r) for r in query.get_decade_reqnums(query.connect_to_db('db-decade')[1],'decade')]
+
     else:
         if db=='db-destest':
             test_reqnums = reqnums
             oper_reqnums = None
+            decade_reqnums=None
         elif db=='db-desoper':
             oper_reqnums = reqnums
             test_reqnums = None
+            decade_reqnums = None
+        elif db=='db-decade':
+            oper_reqnums= None
+            test_reqnums= None
+            decade_reqnums = reqnums
+    if decade_reqnums:
+        df_decade = pd.DataFrame(
+                query.processing_summary(query.connect_to_db('db-decade')[1],','.join(decade_reqnums)),
+                columns = ['created_date','project','campaign','unitname','reqnum','attnum','pfw_attempt_id','status',
+                           'data_state','operator','pipeline','start_time','end_time','target_site',
+                           'submit_site','exec_host'])
+        df_decade_status = pd.DataFrame(
+                query.get_status(query.connect_to_db('db-decade')[1],','.join(decade_reqnums)),
+                columns = ['unitname','reqnum','attnum','pfw_attempt_id','status'])
+        try:
+            df_decade_nites = pd.DataFrame(
+                query.get_nites(query.connect_to_db('db-decade')[1], ','.join(decade_reqnums)),
+                columns=['unitname', 'reqnum', 'attnum', 'pfw_attempt_id', 'nite'])
+        except:
+            df_decade_nites = pd.DataFrame()
+            df_decade_nites.insert(len(df_decade_nites.columns), 'unitname', None)
+            df_decade_nites.insert(len(df_decade_nites.columns), 'reqnum', None)
+            df_decade_nites.insert(len(df_decade_nites.columns), 'attnum', None)
+            df_decade_nites.insert(len(df_decade_nites.columns), 'pfw_attempt_id', None)
+            df_decade_nites.insert(len(df_decade_nites.columns), 'nite', None)
+        try:
+            df_decade_expnum = pd.DataFrame(
+                query.get_expnum_info(query.connect_to_db('db-decade')[1],','.join(decade_reqnums)),
+                columns = ['unitname','reqnum','attnum','pfw_attempt_id','propid','expnum','band'])
+        except:
+            df_decade_expnum = pd.DataFrame()
+            df_decade_expnum.insert(len(df_decade_expnum.columns),'unitname',None)
+            df_decade_expnum.insert(len(df_decade_expnum.columns),'reqnum',None)
+            df_decade_expnum.insert(len(df_decade_expnum.columns),'attnum',None)
+            df_decade_expnum.insert(len(df_decade_expnum.columns),'pfw_attempt_id',None)
+        for df in [df_decade_status,df_decade_expnum,df_decade_nites]:
+            df_decade = pd.merge(df_decade,df,on=['unitname','reqnum','attnum','pfw_attempt_id'],how='left',
+                                   suffixes=('_orig',''))
+        df_decade['db'] = 'db-decade'
+        """
+        # Writing influxdb file for import
+        sys.path.append(r'/work/devel/mjohns44/python')
+        dbname = 'decade'
+
+        from influxdb import DataFrameClient
+        df_decade = df_decade[(df_decade.start_time.notnull())]
+        df_decade['start_time'] = pd.to_datetime(df_decade['start_time'])
+        #df_decade['start_time'] = df_decade['start_time'].apply(lambda x: datetime.strftime(x, '%Y-%m-%dT%H:%M:%SZ'))
+        df_decade = df_decade.set_index(pd.DatetimeIndex(df_decade['start_time']).strftime('%Y-%m-%dT%H:%M:%SZ'))
+        #df_decade['start_time'] = pd.DatetimeIndex(df_decade['start_time'])
+        print df_decade[:5]
+
+        from despyserviceaccess.serviceaccess import parse
+
+        influxdict=parse(None,'db-influxdb')
+        influxuser=influxdict['user']
+        influxpasswd=influxdict['passwd']
+        influxhost=influxdict['host']
+        influxport=influxdict['port']
+        client = DataFrameClient(influxhost,influxport, influxuser,influxpasswd,dbname)
+        client.write_points(df_decade, dbname)
+        """
+    else:
+        df_decade = pd.DataFrame()
     if test_reqnums:
         df_test = pd.DataFrame(
                 query.processing_summary(query.connect_to_db('db-destest')[1],','.join(test_reqnums)),
@@ -118,7 +187,7 @@ def make_reports(db=None,reqnums=None):
         df_oper['db'] ='db-desoper'
     else:
         df_oper = pd.DataFrame()
-    dfs = [df_oper,df_test]
+    dfs = [df_oper,df_test,df_decade]
     df_master = pd.concat(dfs)
     updated = "#{0}".format(datetime.now())
     with open(csv_path,'w') as csv:
@@ -129,10 +198,9 @@ def make_reports(db=None,reqnums=None):
     for name,group in df_master.groupby(by=['reqnum','db']):
         reqnum = name[0]
         db = name[1]
+        print reqnum,db
         df,columns,reqnum,updated = get_data.processing_detail(group.db.unique()[0],reqnum,group,updated=updated)
-        df2 = df.dropna()
         df_pass = df[df.status==0]
-
         df_teff = df_pass[df_pass.t_eff != -1].dropna()
         df_teff.t_eff.replace(0,'None')
         plots = []
@@ -203,6 +271,7 @@ def make_reports(db=None,reqnums=None):
         # Writing CSV
         req_csv = '{reqnum}.csv'.format(reqnum=reqnum)
         df.to_csv(os.path.join(path,req_csv))
+        
 
         # Writing plots to HTML
         html = file_html(vplot(*plots),INLINE,'plots')
@@ -215,6 +284,7 @@ def make_reports(db=None,reqnums=None):
             h.write('</center>\n')
 
         # Writing reports to HTML
+        print "Writing reports to HTML"
         template = app.jinja_env.get_template('processing_detail_plots.html')
         output_from_parsed_template = template.render(
                         columns=columns,df=df,reqnum=reqnum,
@@ -223,12 +293,17 @@ def make_reports(db=None,reqnums=None):
         reportpath = os.path.join(path,reportfile)
         with open(reportpath, "wb") as fh:
             fh.write(output_from_parsed_template)
-
         update_report_archive()
+        print("All Done: %s" % reqnum)
+    print("All reports complete")
+    #sys.exit()
 
 def update_report_archive():
     oper_df = query.get_archive_reports(query.connect_to_db('db-desoper')[1], 'prod')
-    test_df = query.get_archive_reports(query.connect_to_db('db-destest')[1], 'prodbeta')
+    try:
+        test_df = query.get_archive_reports(query.connect_to_db('db-destest')[1], 'prodbeta')
+    except:
+        test_df = pd.DataFrame()
 
     report_df = pd.DataFrame(pd.concat([oper_df,test_df]))
 
@@ -374,7 +449,10 @@ def make_dts_plot():
     ### Standardize file names for merge ###
     trimed_fn = []
     for i, line in sispi_df.iterrows():
-        trimed_fn.append(os.path.basename(line['filename'].split(':')[1]))
+        try:
+            trimed_fn.append(os.path.basename(line['filename'].split(':')[1]))
+        except:
+            trimed_fn.append(os.path.basename(line['filename']))
     sispi_df['filename']=trimed_fn
 
     ### Merge data ###
@@ -406,6 +484,7 @@ if __name__ =='__main__':
     args = create_args()
     if args.reqnums:
         reqnums = [str(r) for r in args.reqnums.split(',')]
+        print reqnums
     else:
         reqnums = None
     if args.db_section:

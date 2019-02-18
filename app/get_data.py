@@ -230,6 +230,68 @@ def processing_archive():
     reqnums = os.listdir(templates)
     return reqnums
 
+def decade_overview(db,df=None):
+    if df is None:
+        try: 
+            df = pd.read_csv(csv_path,skiprows=1)
+            with open(csv_path,'r') as csvfile:
+                updated = csvfile.readlines()[0]
+        except (ValueError,IOError):
+            updated = '#{time}'.format(time=datetime.now())
+            df = pd.DataFrame(columns=['created_date','project','propid','campaign','pfw_attempt_id','reqnum','unitname','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_site','exec_host','db']) 
+    else:
+        updated = '#{time}'.format(time=datetime.now()) 
+    df = df.sort(columns=['reqnum','unitname','attnum'],ascending=False)
+    df = df.fillna(-99)
+    df = df[(df.db=='db-decade') & (df.propid !=-99)]
+    columns = ['operator','project','campaign','pipeline','submit_site','target_site','propid','batch size','passed','failed','unknown','remaining']
+    df_op = df.groupby(by=['propid'])
+    current_dict,rest_dict = [],[]
+    for name,group in sorted(df_op,reverse=True):
+        propid = group['propid'].unique()[0]
+        pipeline = group['pipeline'].unique()[0]
+        total_batch_size = query.basic_propid_size(query.connect_to_db('db-decade')[1],propid)
+        passed_df =  group[group.status==0].drop_duplicates(['unitname'])
+        passed = passed_df['status'].count()
+        failed_df = group[~group.status.isin([0,-99])].drop_duplicates(['unitname'])
+        failed = failed_df['status'].count()
+        try: unknown = group['status'][group.status == -99].count()
+        except: unknown = 0
+        try:
+            target_site = ', '.join(group[group.status.isin([-99])].sort(columns=['created_date'])['target_site'].unique())
+            if not target_site:
+                target_site =group.sort(columns=['created_date'])['target_site'].unique()[-1]
+        except:
+            target_site =group.sort(columns=['created_date'])['target_site'].unique()[-1]
+        try:
+            submit_site = ', '.join([site.split('.')[0] for site in group[group.status.isin([-99])].sort(columns=['created_date'])['submit_site'].unique()])
+            if not submit_site:
+                submit_site = [site.split('.')[0] for site in group.sort(columns=['created_date'])['submit_site'].unique()][-1]
+        except:
+            submit_site = [site.split('.')[0] for site in group.sort(columns=['created_date'])['submit_site'].unique()][-1]
+
+        remaining = int(total_batch_size)-int(passed) 
+        if remaining < 0:
+            remaining = 0
+        req_dict = {'remaining':remaining,'operator':', '.join(group.operator.unique()),
+                    'batch size':total_batch_size,
+                    'propid':propid,'passed':passed,'failed':failed,'unknown':unknown,
+                    'submit_site':submit_site,
+                    'target_site':target_site,
+                    'campaign':group.campaign.unique()[0],
+                    'project':group.project.unique()[0],
+                    'pipeline':pipeline,
+                    'db':db}
+        if unknown: current_dict.append(req_dict)
+        else: rest_dict.append(req_dict)
+    try: current_dict
+    except: current_dict = []
+    try: rest_dict
+    except: rest_dict = []
+    try: columns
+    except: columns = []
+    return (current_dict,rest_dict,columns,updated,pd.DataFrame(current_dict),pd.DataFrame(rest_dict))
+
 def processing_summary(db,project,df=None):
     if df is None:
         try: 
@@ -238,7 +300,7 @@ def processing_summary(db,project,df=None):
                 updated = csvfile.readlines()[0]
         except (ValueError,IOError):
             updated = '#{time}'.format(time=datetime.now())
-            df = pd.DataFrame(columns=['created_date','project','campaign','pfw_attempt_id','reqnum','unitname','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_site','exec_host','db']) 
+            df = pd.DataFrame(columns=['created_date','project','propid','campaign','pfw_attempt_id','reqnum','unitname','attnum','status','data_state','operator','pipeline','start_time','end_time','target_site','submit_site','exec_host','db']) 
     else:
         updated = '#{time}'.format(time=datetime.now()) 
     df = df.sort(columns=['reqnum','unitname','attnum'],ascending=False)
@@ -247,6 +309,8 @@ def processing_summary(db,project,df=None):
         df_oper = df[(df.project != 'OPS') & (df.db=='db-desoper')] 
         df_test = df[(df.db=='db-destest')]
         df = pd.concat([df_test,df_oper])
+    elif project =='DECADE':
+        df = df[(df.db=='db-decade')]
     else:
         df = df[(df.project == 'OPS') & (df.db =='db-desoper')]
     columns = ['operator','project','campaign','pipeline','submit_site','target_site','reqnum','nite','batch size','passed','failed','unknown','remaining']
@@ -256,6 +320,7 @@ def processing_summary(db,project,df=None):
         req = name[0]
         db = name[1]
         req = int(float(req))
+        propid = group['propid'].unique()[0]
         orig_nitelist = sorted(group['nite'].unique())
         pipeline = group['pipeline'].unique()[0]
         orig_nitelist_cp = list(orig_nitelist)
@@ -323,24 +388,6 @@ def processing_summary(db,project,df=None):
                 nitelist = str(orig_nitelist[0])
             if nitelist == -99: nitelist = 'NA'
         max_delta = timedelta(hours=0) 
-        for rownum,item in pd.DataFrame(group).iterrows():
-            if type(item['end_time']) != int:
-                try:
-                    end_time = datetime.strptime(item['end_time'],'%Y-%m-%d %H:%M:%S.%f')
-                except:
-                    end_time = datetime.strptime(item['end_time'],'%Y-%m-%d %H:%M:%S')
-                try:
-                    start_time = datetime.strptime(item['start_time'],'%Y-%m-%d %H:%M:%S.%f')
-                except:
-                    start_time = datetime.strptime(item['start_time'],'%Y-%m-%d %H:%M:%S')    
-                cur_delta = end_time - start_time
-                if cur_delta > max_delta:
-                    max_delta = cur_delta
-        ### Hours determines how long a run has to go to get flagged as red ###
-        if max_delta > timedelta(hours=7):
-            redflag = 1
-        else:
-            redflag = 0
         req_dict = {'remaining':remaining,'operator':', '.join(group.operator.unique()),
                     'batch size':total_batch_size,
                     'reqnum':req,'passed':passed,'failed':failed,'unknown':unknown,
@@ -351,7 +398,7 @@ def processing_summary(db,project,df=None):
                     'project':group.project.unique()[0],
                     'pipeline':pipeline,
                     'db':db,
-                    'redflag':redflag}
+                    'propid':propid}
         if unknown: current_dict.append(req_dict)
         else: rest_dict.append(req_dict)
     try: current_dict
