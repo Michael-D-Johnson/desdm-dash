@@ -47,7 +47,7 @@ def get_decade_reqnums(cur,sch):
     return [req[0] for req in cur.fetchall()]
 
 def basic_propid_size(cur,propid):
-    query = "select count(distinct expnum) from exposure where obstype in ('standard','object') and propid='%s'" % propid
+    query = "select count(distinct expnum) from exposure where obstype in ('standard','object') and propid='%s' and object not like '%pointing%' " % propid
     cur.execute(query)
 
     return cur.fetchone()[0]
@@ -139,6 +139,12 @@ def get_status(cur,reqnums):
     cur.execute(query)
     return cur.fetchall()
 
+def get_passed_status(cur,propid):
+    query = "select count(distinct unitname) from pfw_attempt a,task t,exposure e where t.id=a.task_id and status=0 and substr(e.expnum,1) = substr(a.unitname,4) and propid='{propid}'".format(propid=propid)
+    cur.execute(query)
+    return cur.fetchone()
+
+
 def get_tilename_info(cur,reqnums):
     query = "SELECT distinct a.unitname,a.reqnum,a.attnum,a.id from pfw_request r, \
             pfw_attempt a\
@@ -151,10 +157,11 @@ def get_tilename_info(cur,reqnums):
         return None
 
 def get_expnum_info(cur,reqnums):
-    query = "SELECT distinct a.unitname,a.reqnum,a.attnum,a.id,e.propid,e.expnum,e.band from pfw_request r,exposure e, \
-            pfw_attempt a\
-            WHERE a.reqnum in ({reqnums}) and e.expnum= substr(a.unitname,4) and r.reqnum=a.reqnum \
-            and r.pipeline in ('firstcut','finalcut') and a.unitname not like 'DES%%'".format(reqnums=reqnums)
+    query = "SELECT distinct a.unitname,a.reqnum,a.attnum,a.id,e.propid,e.expnum,e.band \
+            from pfw_request r,exposure e, pfw_attempt a\
+            WHERE a.reqnum in ({reqnums}) and substr(e.expnum,1)= substr(a.unitname,4) \
+            and r.reqnum=a.reqnum and r.pipeline in ('firstcut','finalcut') \
+            and a.unitname not like 'DES%%'".format(reqnums=reqnums)
     try: 
         cur.execute(query)
         return cur.fetchall()
@@ -259,6 +266,7 @@ def get_archive_reports(cur, schema):
     reqnums = os.listdir(path)
     report_dfs = []
     i=0
+    reqnums.remove('coadd')
     reqstr = '\'' + reqnums[i] + '\''
     for req in reqnums:
         if req.isdigit():

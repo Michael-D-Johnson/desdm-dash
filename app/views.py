@@ -15,6 +15,7 @@ from bokeh.io import vplot
 def index():
     return render_template('home.html')
 
+
 @app.route('/processing_archive')
 def processing_archive():
     reqnums = sorted(get_data.processing_archive(),reverse=True)
@@ -23,7 +24,7 @@ def processing_archive():
 @app.route('/processing_summary')
 def processing_summary():
     current_dict,rest_dict,columns,updated,curr_df,rest_df = get_data.processing_summary('db-desoper','OPS')
-    return render_template('processing_summary.html',columns=columns,current_dict=current_dict,rest_dict=rest_dict,updated=updated,title='Processing Summary')
+    return render_template('processing_summary.html',columns=columns,current_dict=current_dict,rest_dict=rest_dict,updated=updated,title='Processing Summary',cdf = curr_df, rdf = rest_df)
 
 @app.route('/decade_overview')
 def decade_overview():
@@ -33,8 +34,17 @@ def decade_overview():
 @app.route('/decade_summary/<propid>')
 def decade_summary(propid):
     current_dict,rest_dict,columns,updated,curr_df,rest_df = get_data.processing_summary('db-decade','DECADE')
-    curr_df = curr_df[curr_df.propid==propid].sort(['nite'])
-    rest_df = rest_df[rest_df.propid==propid].sort(['nite'],ascending=False)
+    print(curr_df)
+    curr_df = curr_df[curr_df.propid==str(propid)].sort(['nite'])
+    if len(curr_df):
+        current_dict = [curr_df.to_dict(orient = 'list')]
+    else:
+        current_dict = []
+    rest_df = rest_df[rest_df.propid==str(propid)].sort(['nite'],ascending=False)
+    if len(rest_df):
+        rest_dict = [rest_df.to_dict(orient='list')]
+    else:
+        rest_dict = []
     return render_template('decade_summary.html',columns=columns,current_dict=current_dict,rest_dict=rest_dict,updated=updated,title='{propid} Summary'.format(propid=propid))
 
 

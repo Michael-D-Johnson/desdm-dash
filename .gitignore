@@ -1,6 +1,7 @@
 *.pyc
 /app/static/completed_requests/*
 /app/static/processing.csv
+/app/static/processing_influx.csv
 /app/static/reports/*
 /app/static/dts_plot.html
 .idea

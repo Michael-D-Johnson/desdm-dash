@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+<h5> Last updated on: {{updated.split('#')[1] }}</h5>
+<center>
+{% for i, dict in [(0,current_dict),(1,rest_dict)] %}
+  {% if i ==0 %}
+    <h2> Currently running: </h2>
+  {% endif %}
+  {% if i == 1 %}
+    <h2> Past Runs: </h2>
+  {% endif %}
+  {% if not dict %}
+    <h5>--NA--</h5>
+  {% else %}
+    <table class='display black' cellspacing="0" width="100%" border="1">
+    <thead>
+    <tr>
+    {% for col in columns %}
+      {% if col != 'redflag' %}
+      <th>
+        {{ col }}
+      </th>
+      {% endif %}
+    {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+    {% for di in dict %}
+      <tr> 
+      {% for col in columns %}
+        {% if col != 'redflag' %}
+          {% if di['redflag'] == 1 and i==0 %}
+            <td bgcolor="#FFAAAA">
+          {% else %}
+            <td>
+          {% endif %}
+          {% if col == 'propid' %}
+            <a href="{{ url_for('decade_summary',db='db-decade',propid =di[col])}}"><strong>{{ di[col] }}</strong></a></td>
+          {% else %}
+            {{ di[col] }} </td> 
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+      </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+  {% endif %}
+{% endfor %}
+</center>
+{% endblock %}

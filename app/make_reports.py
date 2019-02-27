@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 import os
 import sys
+import shutil
 
 import pandas as pd
 from datetime import datetime, timedelta, date
@@ -84,29 +85,6 @@ def make_reports(db=None,reqnums=None):
             df_decade = pd.merge(df_decade,df,on=['unitname','reqnum','attnum','pfw_attempt_id'],how='left',
                                    suffixes=('_orig',''))
         df_decade['db'] = 'db-decade'
-        """
-        # Writing influxdb file for import
-        sys.path.append(r'/work/devel/mjohns44/python')
-        dbname = 'decade'
-
-        from influxdb import DataFrameClient
-        df_decade = df_decade[(df_decade.start_time.notnull())]
-        df_decade['start_time'] = pd.to_datetime(df_decade['start_time'])
-        #df_decade['start_time'] = df_decade['start_time'].apply(lambda x: datetime.strftime(x, '%Y-%m-%dT%H:%M:%SZ'))
-        df_decade = df_decade.set_index(pd.DatetimeIndex(df_decade['start_time']).strftime('%Y-%m-%dT%H:%M:%SZ'))
-        #df_decade['start_time'] = pd.DatetimeIndex(df_decade['start_time'])
-        print df_decade[:5]
-
-        from despyserviceaccess.serviceaccess import parse
-
-        influxdict=parse(None,'db-influxdb')
-        influxuser=influxdict['user']
-        influxpasswd=influxdict['passwd']
-        influxhost=influxdict['host']
-        influxport=influxdict['port']
-        client = DataFrameClient(influxhost,influxport, influxuser,influxpasswd,dbname)
-        client.write_points(df_decade, dbname)
-        """
     else:
         df_decade = pd.DataFrame()
     if test_reqnums:
@@ -190,9 +168,11 @@ def make_reports(db=None,reqnums=None):
     dfs = [df_oper,df_test,df_decade]
     df_master = pd.concat(dfs)
     updated = "#{0}".format(datetime.now())
+
     with open(csv_path,'w') as csv:
         csv.write('%s\n' % updated)
     df_master.to_csv(csv_path,index=False,mode='a')
+
 
     # Make plots html
     for name,group in df_master.groupby(by=['reqnum','db']):
@@ -296,7 +276,6 @@ def make_reports(db=None,reqnums=None):
         update_report_archive()
         print("All Done: %s" % reqnum)
     print("All reports complete")
-    #sys.exit()
 
 def update_report_archive():
     oper_df = query.get_archive_reports(query.connect_to_db('db-desoper')[1], 'prod')
@@ -495,7 +474,10 @@ if __name__ =='__main__':
         csv_path = args.csv
     else:
         csv_path = os.path.join(app.config["STATIC_PATH"],"processing.csv")
+
     make_reports(db=db,reqnums=reqnums)
+    shutil.copy(copy_path,csv_path)
+    sys.exit()
 
     #make_dts_plot()
     #make_coadd_html() 

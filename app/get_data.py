@@ -15,6 +15,7 @@ from difflib import SequenceMatcher
 
 from app import app
 csv_path = os.path.join(app.config["STATIC_PATH"],'processing.csv')
+
 templates = os.path.join(app.config["STATIC_PATH"],'reports')
 #csv_path = '/work/devel/mjohns44/git/desdm-dash/app/static/processing.csv'
 #templates = '/work/devel/mjohns44/git/desdm-dash/app/static/reports'
@@ -231,6 +232,7 @@ def processing_archive():
     return reqnums
 
 def decade_overview(db,df=None):
+    cur = query.connect_to_db('db-decade')[1]
     if df is None:
         try: 
             df = pd.read_csv(csv_path,skiprows=1)
@@ -250,9 +252,9 @@ def decade_overview(db,df=None):
     for name,group in sorted(df_op,reverse=True):
         propid = group['propid'].unique()[0]
         pipeline = group['pipeline'].unique()[0]
-        total_batch_size = query.basic_propid_size(query.connect_to_db('db-decade')[1],propid)
+        total_batch_size = query.basic_propid_size(cur,propid)
         passed_df =  group[group.status==0].drop_duplicates(['unitname'])
-        passed = passed_df['status'].count()
+        passed = query.get_passed_status(cur,propid)[0]
         failed_df = group[~group.status.isin([0,-99])].drop_duplicates(['unitname'])
         failed = failed_df['status'].count()
         try: unknown = group['status'][group.status == -99].count()
