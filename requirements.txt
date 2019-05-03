@@ -1,0 +1,12 @@
+flask 
+cx_oracle
+pandas
+jinja2
+configparser
+configargparse 
+jira
+easyaccess
+tornado
+bokeh
+gevent
+schedule

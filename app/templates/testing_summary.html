@@ -2,13 +2,13 @@
 {% block content %}
 <h5> Last updated on: {{updated.split('#')[1]}}</h5>
 <center>
-{% for db in ['db-desoper','db-destest'] %}
+{% for db in ['desoper','destest'] %}
 <div class="styleme">
 <hr>
 <h1> {{db}} </h1>
 <hr>
 </div>
-{% if db=='db-desoper' %}
+{% if db=='desoper' %}
 {% set df_list = [(0,curr_df),(1,rest_df)] %}
 {% else %}
 {% set df_list = [(0,tcurr_df),(1,trest_df)] %}

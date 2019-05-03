@@ -12,6 +12,50 @@ from bokeh.layouts import column
 from bokeh.palettes import d3
 from bokeh.transform import factor_cmap
 
+def get_exec_job_data(data_df):
+    from collections import deque
+    ''' Change start and end time data into count of jobs running at any point '''
+    pd.to_datetime(data_df['start_time'])
+    pd.to_datetime(data_df['end_time'])
+    data_df = data_df.sort_values('start_time')
+    data_df = data_df.replace(np.nan, None)
+    start_queue = deque([row for row in data_df.iterrows()])
+    end_times = []
+    cur_hostname_count = dict((hostname, 0) for hostname in set(data_df['exec_host']))
+    final_hostname_count = dict((hostname, []) for hostname in set(data_df['exec_host']))
+    cur_time = start_queue[0][1][0]
+    cur_time = datetime.strptime(cur_time,"%Y-%m-%d %H:%M:%S.%f") 
+    start_time = start_queue[0][1][0]
+    start_time = datetime.strptime(start_time,"%Y-%m-%d %H:%M:%S.%f") 
+    time_segment = timedelta(minutes=10)
+
+    # Just for in case somebody needs to edit this in the future.
+    # Data format is   [0]       [1][0]     [1][1]   [1][2]
+    #               (df_num, (start_time, end_time, exec_host))
+    while len(start_queue) != 0 or len(end_times) != 0:
+        # Check start_times
+        while len(start_queue) != 0 and datetime.strptime(start_queue[0][1][0],"%Y-%m-%d %H:%M:%S.%f") < cur_time:
+            cur_hostname_count[start_queue[0][1][2]] += 1
+            end_times.append(start_queue.popleft())
+        # Log counts
+        for host in cur_hostname_count.keys():
+            final_hostname_count[host].append(cur_hostname_count[host])
+        # Check end_times
+        if len(end_times) != 0:
+            new_end_times = []
+            for time in end_times:
+                if isinstance(time[1][1],str) and isinstance(time[1][2],str):
+                    if datetime.strptime(str(time[1][1]),"%Y-%m-%d %H:%M:%S.%f") < cur_time:
+                        cur_hostname_count[time[1][2]] -= 1
+                    else:
+                        new_end_times.append(time)
+                else:
+                    continue
+            end_times = new_end_times
+        cur_time += time_segment
+
+    return final_hostname_count, start_time
+
 def plot_times(dataframe):
     dataframe = dataframe.fillna(-1)
     p = figure(title="Processing Times",height=500,width=1000)
@@ -49,7 +93,7 @@ def plot_exec_time(dataframe):
     p = figure(title='Mean Processing Time for Each Exec Host',height=500,width=1000,x_range=grouped_df,
                 tooltips=[("Mean time", "@total_time_mean"), ("Exec host", "@exec_host")])
 
-    p.vbar(x='exec_host',top='total_time_mean',source = grouped_df,width=0.9)
+    p.vbar(x='exec_host',top='total_time_mean', source = grouped_df,width=0.9)
     return p
 
 def plot_status_per_host(dataframe):
@@ -143,3 +187,28 @@ def plot_exec_job_time(df, start_time):
 
 
     return p
+
+if __name__=="__main__":
+    from bokeh.io import show
+    df = pd.read_csv('4344.csv')
+    plots = []
+    p1 = plot_times(df)
+    if p1:
+        plots.append(p1)
+    p2 = plot_accepted(df)
+    if p2:
+        plots.append(p2)
+    p3 = plot_exec_time(df)
+    if p3:
+        plots.append(p3)
+    p4 = plot_status_per_host(df)
+    if p4:
+        plots.append(p4)
+    p5 = plot_t_eff(df)
+    if p5:
+        plots.append(p5[0],p5[1])
+    job_df,start_time = get_exec_job_data(df[['start_time','end_time','exec_host']])
+    p6 = plot_exec_job_time(job_df,start_time)
+    if p6:
+        plots.append(p6)
+    show(column(plots))

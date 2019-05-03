@@ -1,14 +1,14 @@
 #! /usr/bin/env python
 import os
 import pandas as pd
-from opstoolkit import jiracmd
-from despydb import DesDbi
+from jiracmd import Jira
+import easyaccess as ea 
 from app import app
 
 def connect_to_db(section):
-    dbh = DesDbi(os.getenv("DES_SERVICES"),section)
+    dbh = ea.connect(section)
     cur = dbh.cursor()
-    return (dbh,cur)
+    return cur
 
 def processing_detail(cur,reqnums):
     query = "SELECT distinct a.created_date,r.project,r.campaign,a.reqnum,a.unitname,a.attnum,a.id,v.val,t1.status,\
@@ -47,7 +47,7 @@ def get_decade_reqnums(cur,sch):
     return [req[0] for req in cur.fetchall()]
 
 def basic_propid_size(cur,propid):
-    query = "select count(distinct expnum) from exposure where obstype in ('standard','object') and propid='%s' and object not like '%pointing%' " % propid
+    query = "select count(distinct expnum) from exposure where obstype in ('standard','object') and propid='%s'" % propid
     cur.execute(query)
 
     return cur.fetchone()[0]
@@ -72,13 +72,14 @@ def basic_batch_query(cur,reqnum):
     return cur.fetchone()[0]
 
 def batch_size_query(cur,nitelist,reqnum,pipeline):
+
     if pipeline=='sne':
         batch_size_query = "SELECT count(*) \
                             FROM (SELECT distinct field,band from exposure where nite in ({nitelist}) \
                             and field like 'SN%%' group by field,band)".format(nitelist=nitelist)
     elif pipeline =='finalcut':
         key = 'DESOPS-%s' % reqnum
-        summary = jiracmd.Jira('jira-desdm').get_issue(key).fields.summary
+        summary = Jira('jira-desdm').get_issue(key).fields.summary
         batch_size_query = "select count(*) from exposuretag where tag in ('{summary}')".format(summary=summary)
     elif pipeline=='supercal' or pipeline=='precal':
         batch_size_query = "SELECT count(distinct unitname) \
@@ -100,8 +101,6 @@ def batch_size_query(cur,nitelist,reqnum,pipeline):
 
 def assess_query(cur,df,index,triplet,pfw_attempt_id,pipeline):
     unitname_0 = triplet[0].split('_')[0]
-    # print triplet
-    # print unitname_0
     if 'DES' in unitname_0:
         pipeline = 'multiepoch'
     if 'D00' in unitname_0:
@@ -139,12 +138,6 @@ def get_status(cur,reqnums):
     cur.execute(query)
     return cur.fetchall()
 
-def get_passed_status(cur,propid):
-    query = "select count(distinct unitname) from pfw_attempt a,task t,exposure e where t.id=a.task_id and status=0 and substr(e.expnum,1) = substr(a.unitname,4) and propid='{propid}'".format(propid=propid)
-    cur.execute(query)
-    return cur.fetchone()
-
-
 def get_tilename_info(cur,reqnums):
     query = "SELECT distinct a.unitname,a.reqnum,a.attnum,a.id from pfw_request r, \
             pfw_attempt a\
@@ -157,11 +150,10 @@ def get_tilename_info(cur,reqnums):
         return None
 
 def get_expnum_info(cur,reqnums):
-    query = "SELECT distinct a.unitname,a.reqnum,a.attnum,a.id,e.propid,e.expnum,e.band \
-            from pfw_request r,exposure e, pfw_attempt a\
-            WHERE a.reqnum in ({reqnums}) and substr(e.expnum,1)= substr(a.unitname,4) \
-            and r.reqnum=a.reqnum and r.pipeline in ('firstcut','finalcut') \
-            and a.unitname not like 'DES%%'".format(reqnums=reqnums)
+    query = "SELECT distinct a.unitname,a.reqnum,a.attnum,a.id,e.propid,e.expnum,e.band from pfw_request r,exposure e, \
+            pfw_attempt a\
+            WHERE a.reqnum in ({reqnums}) and e.expnum= substr(a.unitname,4) and r.reqnum=a.reqnum \
+            and r.pipeline in ('firstcut','finalcut') and a.unitname not like 'DES%%'".format(reqnums=reqnums)
     try: 
         cur.execute(query)
         return cur.fetchall()
@@ -225,7 +217,6 @@ def query_dts_delay(cur, stime, etime):
     format = "%Y-%m-%d %H:%M:%S"
     #query = "select interval_to_seconds(sispi_time), accept_time, ingest_time, delivered from abode.dts_delay where sispi_time between \'%s\' and \'%s\' order by sispi_time" % (stime.strftime(format), etime.strftime(format))
     query = "select intervalToSeconds(ingest_time - sispi_time)/60 as total_time, intervalToSeconds(ingest_time - accept_time)/60 as ncsa_time, intervalToSeconds(accept_time - sispi_time)/60 as noao_time, sispi_time as xtime from abode.dts_delay where sispi_time between TO_DATE(\'%s\', \'YYYY-MM-DD HH24:MI:SS\') and TO_DATE(\'%s\', \'YYYY-MM-DD HH24:MI:SS\') order by sispi_time" % (stime.strftime(format), etime.strftime(format))
-    #print query
     cur.execute(query)
     return cur.fetchall()
 
@@ -262,11 +253,12 @@ def query_qcf_messages(curs, reqnum):
     return d
 
 def get_archive_reports(cur, schema):
-    path = os.path.join(app.config["STATIC_PATH"],"reports/")
+    path = os.path.join(os.getenv("STATIC_PATH"),"reports/")
     reqnums = os.listdir(path)
+    reqnums.remove('make_reports.out')
+    reqnums.remove('processing.csv')
     report_dfs = []
     i=0
-    reqnums.remove('coadd')
     reqstr = '\'' + reqnums[i] + '\''
     for req in reqnums:
         if req.isdigit():
@@ -278,7 +270,6 @@ def get_archive_reports(cur, schema):
             cur.execute(query)
             report_dfs.append(pd.DataFrame(cur.fetchall(),columns = ['created_date','reqnum']))
             reqstr = '\'' + reqnums[i] + '\''
-            #print "queried at {len}".format(len=i)
         i += 1
 
     return pd.concat(report_dfs)
