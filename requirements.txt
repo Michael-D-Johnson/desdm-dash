@@ -10,3 +10,4 @@ tornado
 bokeh
 gevent
 schedule
+supervisor

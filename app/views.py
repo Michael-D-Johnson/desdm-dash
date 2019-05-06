@@ -8,22 +8,21 @@ from datetime import datetime
 from app import app
 from bokeh.embed import components
 
-@app.route('/')
-@app.route('/index')
+@app.route('/desdm-dash')
 def index():
     return render_template('home.html')
 
-@app.route('/processing_archive')
+@app.route('/desdm-dash/processing_archive')
 def processing_archive():
     reqnums = sorted(get_data.processing_archive(),reverse=True)
     return render_template('processing_archive.html',reqnums = reqnums,title='Processing Archive')
 
-@app.route('/processing_summary')
+@app.route('/desdm-dash/processing_summary')
 def processing_summary():
     current_dict,rest_dict,columns,updated,curr_df,rest_df = get_data.processing_summary('desoper','OPS')
     return render_template('processing_summary.html',columns=columns,current_dict=current_dict,rest_dict=rest_dict,updated=updated,title='Processing Summary')
 
-@app.route('/testing_summary')
+@app.route('/desdm-dash/testing_summary')
 def testing_summary():
     current_dict,rest_dict,columns,updated,curr_df,rest_df = get_data.processing_summary('desoper','TEST')
     tcurrent_dict,trest_dict,tcolumns,tupdated,tcurr_df,trest_df = get_data.processing_summary('destest','TEST')
@@ -38,13 +37,13 @@ def testing_summary():
         trest_df = trest_df[trest_df.db=='destest']
     return render_template('testing_summary.html',curr_df = curr_df, trest_df = trest_df,rest_df = rest_df, tcurr_df = tcurr_df, columns=columns,current_dict=current_dict,rest_dict=rest_dict,tcurrent_dict=tcurrent_dict,trest_dict=trest_dict,tcolumns=tcolumns,updated=updated,title='Testing Summary')
 
-@app.route('/processing_detail/<reqnum>')
+@app.route('/desdm-dash/processing_detail/<reqnum>')
 def processing_detail(reqnum):
     reportname = 'reports/{reqnum}/report_{reqnum}.html'.format(reqnum=reqnum)
     return render_template('processing_detail_include.html',reportname=reportname,title='Report {reqnum}'.format(reqnum=reqnum))
 
 
-@app.route('/error_summary/<db>/<reqnum>')
+@app.route('/desdm-dash/error_summary/<db>/<reqnum>')
 def error_summary(db,reqnum):
     try:
         if db=='desoper' or db=='decade':

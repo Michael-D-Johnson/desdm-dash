@@ -21,6 +21,9 @@ EXPOSE 5000
 RUN pip install --upgrade pip
 RUN pip install --trusted-host pypi.python.org -r requirements.txt
 
+RUN apt-get update
+RUN apt-get -y install vim
+
 # Define environment variable
 ENV NAME desdm-dash
 ENV DES_SERVICES=/desdm-dash/.desservices.ini
