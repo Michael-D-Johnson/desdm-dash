@@ -1,0 +1,48 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: desdm-dash
+  labels:
+    app: desdm-dash
+spec:
+  selector:
+    matchLabels:
+      app: desdm-dash
+  template:
+    metadata:
+      labels:
+        app: desdm-dash
+    spec:
+      containers:
+      - name: desdm-dash
+        image: docker.io/mdjohnson/desdm-dash:v1
+        ports:
+        - containerPort: 5000
+        volumeMounts:
+        - name: reports
+          mountPath: /desdm-dash/app/static/reports
+        - name: des-services
+          mountPath: /desdm-dash/.desservices.ini
+      volumes:
+      - name: reports
+        hostPath:
+          path:  /path/to/store/reports/locally
+          type: Directory
+      - name: des-services
+        hostPath:
+          path: /path/to/services/file/.desservices.ini
+          type: File 
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: desdm-dash
+spec:
+  selector:
+    app: desdm-dash
+  ports:
+  - protocol: TCP
+    port: 5000
+    targetPort: 5000
+  type: LoadBalancer
