@@ -255,7 +255,6 @@ def query_qcf_messages(curs, reqnum):
 def get_archive_reports(cur, schema):
     path = os.path.join(os.getenv("STATIC_PATH"),"reports/")
     reqnums = os.listdir(path)
-    reqnums.remove('make_reports.out')
     reqnums.remove('processing.csv')
     report_dfs = []
     i=0
