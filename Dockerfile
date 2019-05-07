@@ -15,6 +15,10 @@ WORKDIR /desdm-dash
 # Copy the current directory contents into the container
 COPY . /desdm-dash
 
+RUN groupadd -r dashuser &&\
+    useradd -r -g dashuser -d /desdm-dash -s /sbin/nologin -c "Docker image user" dashuser
+RUN chown -R dashuser:dashuser /desdm-dash
+
 # Make port available to the world outside this container
 EXPOSE 5000
 
@@ -23,6 +27,8 @@ RUN pip install --trusted-host pypi.python.org -r requirements.txt
 
 RUN apt-get update
 RUN apt-get -y install vim
+RUN apt-get install -y supervisor
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Define environment variable
 ENV NAME desdm-dash
@@ -37,5 +43,7 @@ ENV TEMPLATES_PATH=/desdm-dash/app/templates
 COPY --from=oracle /usr/lib/oracle/ /usr/lib/oracle
 COPY --from=oracle /lib64/libaio.so.1 /usr/lib
 
+USER dashuser
+
 # Run run_desdm_dash_server.sh when the container launches
-CMD ["bash", "startup.sh"]
+CMD ["/usr/bin/supervisord"]
