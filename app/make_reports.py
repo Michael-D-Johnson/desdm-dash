@@ -167,9 +167,7 @@ def make_reports(db=None,reqnums=None):
             if not df_pass.empty:
                 print("Exec Job Time")
                 trimmed_df = df[['start_time','end_time','exec_host']]
-                print("trim:%s" % trimmed_df)
                 job_df, start_time = get_data.get_exec_job_data(trimmed_df)
-                print("job:%s" % job_df)
                 exec_job = plotter.plot_exec_job_time(job_df, start_time)
                 plots.append(exec_job)
         except BaseException as e:
