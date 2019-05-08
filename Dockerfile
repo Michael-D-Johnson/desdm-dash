@@ -37,7 +37,7 @@ ENV PYTHONPATH=$PYTHONPATH:/desdm-dash/app
 ENV PATH=$PATH:/desdm-dash/app
 ENV PATH=$PATH:/usr/lib/oracle/18.3/client64/bin
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/oracle/18.3/client64/lib:/usr/lib
-ENV STATIC_PATH=/desdm-dash/app/static
+ENV STATIC_PATH=/desdm-dash/app/desdm-dash-static
 ENV TEMPLATES_PATH=/desdm-dash/app/templates
 
 COPY --from=oracle /usr/lib/oracle/ /usr/lib/oracle

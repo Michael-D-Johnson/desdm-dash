@@ -1,8 +1,8 @@
 *.pyc
-/app/static/completed_requests/*
-/app/static/processing.csv
-/app/static/processing_influx.csv
-/app/static/reports/*
-/app/static/dts_plot.html
+/app/desdm-dash-static/completed_requests/*
+/app/desdm-dash-static/processing.csv
+/app/desdm-dash-static/processing_influx.csv
+/app/desdm-dash-static/reports/*
+/app/desdm-dash-static/dts_plot.html
 .idea
 settings.sh
