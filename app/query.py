@@ -6,7 +6,7 @@ import easyaccess as ea
 from app import app
 
 def connect_to_db(section):
-    dbh = ea.connect(section)
+    dbh = ea.connect(section,quiet=True)
     cur = dbh.cursor()
     return cur
 
