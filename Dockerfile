@@ -32,7 +32,7 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Define environment variable
 ENV NAME desdm-dash
-ENV DES_SERVICES=/desdm-dash/.desservices.ini
+ENV DES_SERVICES=/desdm-dash/services/.desservices.ini
 ENV PYTHONPATH=$PYTHONPATH:/desdm-dash/app
 ENV PATH=$PATH:/desdm-dash/app
 ENV PATH=$PATH:/usr/lib/oracle/18.3/client64/bin
