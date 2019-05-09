@@ -8,7 +8,7 @@ import configparser
 class Jira:
     def __init__(self,section):
         config = configparser.ConfigParser()
-        jiradict=read_file(section)
+        jiradict=config.read_file(section)
         jirauser=jiradict['user']
         jirapasswd=jiradict['passwd']
         jiraserver=jiradict['server']
