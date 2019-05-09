@@ -45,7 +45,7 @@ spec:
   - protocol: TCP
     port: 5000
     targetPort: 5000
-  type: LoadBalancer
+  type: NodePort
 
 ---
 apiVersion: extensions/v1beta1
