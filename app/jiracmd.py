@@ -10,7 +10,7 @@ class Jira:
         parser = configparser.ConfigParser()
         with open(os.getenv('DES_SERVICES')) as configfile:
             parser.read_file(configfile)
-        jiradict=parser.[section]
+        jiradict=parser[section]
         jirauser=jiradict['user']
         jirapasswd=jiradict['passwd']
         jiraserver=jiradict['server']
