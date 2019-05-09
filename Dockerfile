@@ -15,8 +15,8 @@ WORKDIR /desdm-dash
 # Copy the current directory contents into the container
 COPY . /desdm-dash
 
-RUN groupadd -r dashuser &&\
-    useradd -r -g dashuser -d /desdm-dash -s /sbin/nologin -c "Docker image user" dashuser
+RUN groupadd -r dashuser -g 917 &&\
+    useradd -r -g dashuser -d /desdm-dash dashuser -u 917
 RUN chown -R dashuser:dashuser /desdm-dash
 
 # Make port available to the world outside this container
@@ -43,7 +43,6 @@ ENV TEMPLATES_PATH=/desdm-dash/app/templates
 COPY --from=oracle /usr/lib/oracle/ /usr/lib/oracle
 COPY --from=oracle /lib64/libaio.so.1 /usr/lib
 
-RUN useradd --create-home --shell /bin/bash dashuser --uid 999
 USER dashuser
 
 # Run run_desdm_dash_server.sh when the container launches

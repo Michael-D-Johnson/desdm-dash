@@ -46,3 +46,19 @@ spec:
     port: 5000
     targetPort: 5000
   type: LoadBalancer
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: desdm-dash
+  annotations:
+    kubernetes.io/ingress.class: deslabs
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /desdm-dash
+            backend:
+              serviceName: desdm-dash
+              servicePort: 5000
