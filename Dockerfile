@@ -15,8 +15,8 @@ WORKDIR /desdm-dash
 # Copy the current directory contents into the container
 COPY . /desdm-dash
 
-RUN groupadd -r dashuser -g 917 &&\
-    useradd -r -g dashuser -d /desdm-dash dashuser -u 917
+RUN groupadd -r dashuser -g 1001 &&\
+    useradd -r -g dashuser -d /desdm-dash dashuser -u 1001
 RUN chown -R dashuser:dashuser /desdm-dash
 
 # Make port available to the world outside this container
