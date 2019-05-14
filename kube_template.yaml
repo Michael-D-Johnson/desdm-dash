@@ -13,6 +13,9 @@ spec:
       labels:
         app: desdm-dash
     spec:
+      securityContext:
+        runAsUser: 1001
+        runAsGroup: 1001
       containers:
       - name: desdm-dash
         image: docker.io/mdjohnson/desdm-dash:version
@@ -20,7 +23,7 @@ spec:
         - containerPort: 5000
         volumeMounts:
         - name: reports
-          mountPath: /desdm-dash/app/static/reports
+          mountPath: /desdm-dash/app/desdm-dash-static/reports
         - name: des-services
           mountPath: /desdm-dash/.desservices.ini
       volumes:
