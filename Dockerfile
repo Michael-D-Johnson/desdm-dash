@@ -5,8 +5,6 @@ RUN  curl -o /etc/yum.repos.d/public-yum-ol7.repo https://yum.oracle.com/public-
      yum-config-manager --enable ol7_oracle_instantclient && \
      yum -y install oracle-instantclient18.3-basic
 
-RUN yum install libaio
-
 FROM python:3.7
 
 # Set the working directory
