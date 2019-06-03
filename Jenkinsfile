@@ -24,7 +24,7 @@ node {
     }
 
     stage('Push image') {
-        /* Finally, we'll push the image with two tags:
+        /* We'll push the image with two tags:
          * First, the incremental build number from Jenkins
          * Second, the 'latest' tag.
          * Pushing multiple tags is cheap, as all the layers are reused. */
@@ -32,5 +32,11 @@ node {
             app.push("${env.BUILD_NUMBER}")
             app.push("latest")
         }
+
+    stage('Deploy on kubernetes') {
+        /* Finally, we'll deploy latest build on kubernetes
+        kubernetesDeploy()
+        }
+
     }
 }
