@@ -306,7 +306,7 @@ if __name__ =='__main__':
     else:
         csv_path = os.path.join(os.getenv("STATIC_PATH"),"reports/processing.csv")
     scheduler = SafeScheduler()
-    scheduler.every(20).minutes.do(make_reports)
+    scheduler.every(15).minutes.do(make_reports)
 
     while True:
         scheduler.run_pending()
