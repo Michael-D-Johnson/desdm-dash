@@ -36,7 +36,6 @@ node {
 
     stage('Deploy on kubernetes') {
         /* Finally, we'll deploy latest build on kubernetes */
-        withKubeConfig([credentialsId: 'docker', serverUrl: 'https://192.168.99.121:8443']){
-        sh "kubectl set image deployment/desdm-dash desdm-dash=docker.io/mdjohnson/desdm-dash:${env.BUILD_NUMBER}" }
+        sh "kubectl set image deployment/desdm-dash desdm-dash=docker.io/mdjohnson/desdm-dash:${env.BUILD_NUMBER}" 
         }
 }
