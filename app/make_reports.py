@@ -140,7 +140,7 @@ def make_reports(db=None,reqnums=None):
         df_teff.t_eff.replace(0,'None')
         plots = []
         try:
-            times = plotter.plot_times(df)
+            times = plotter.plot_times(df_pass)
             plots.append(times)
         except BaseException as e:
             print("PLOT FAILED: times")
