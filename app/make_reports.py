@@ -182,7 +182,7 @@ def make_reports(db=None,reqnums=None):
     sys.path.append(r'/work/devel/mjohns44/python')
 
     from influxdb import DataFrameClient
-    DF_des = DF_des[(DF_des.start_time.notnull()) & (DF_dedes.status != -99)]
+    DF_des = DF_des[(DF_des.start_time.notnull()) & (DF_des.status != -99)]
 
     DF_des['start_time'] = pd.to_datetime(DF_des['start_time'])
     DF_des['end_time'] = DF_des['end_time'].apply(str)
