@@ -36,7 +36,8 @@ def make_reports(db=None,reqnums=None):
         #2. create dataframe for all reqnums in both databases
         test_reqnums = [str(r) for r in query.get_reqnums(query.connect_to_db('db-destest')[1],'prodbeta')]
         oper_reqnums = [str(r) for r in query.get_reqnums(query.connect_to_db('db-desoper')[1],'prod')]
-        decade_reqnums = [str(r) for r in query.get_decade_reqnums(query.connect_to_db('db-decade')[1],'decade')]
+        #decade_reqnums = [str(r) for r in query.get_decade_reqnums(query.connect_to_db('db-decade')[1],'decade')]
+        decade_reqnums = None
 
     else:
         if db=='db-destest':
@@ -81,6 +82,8 @@ def make_reports(db=None,reqnums=None):
             df_decade_expnum.insert(len(df_decade_expnum.columns),'reqnum',None)
             df_decade_expnum.insert(len(df_decade_expnum.columns),'attnum',None)
             df_decade_expnum.insert(len(df_decade_expnum.columns),'pfw_attempt_id',None)
+            df_decade_expnum.insert(len(df_decade_expnum.columns),'propid',None)
+
         for df in [df_decade_status,df_decade_expnum,df_decade_nites]:
             df_decade = pd.merge(df_decade,df,on=['unitname','reqnum','attnum','pfw_attempt_id'],how='left',
                                    suffixes=('_orig',''))
@@ -167,8 +170,59 @@ def make_reports(db=None,reqnums=None):
         df_oper = pd.DataFrame()
     dfs = [df_oper,df_test,df_decade]
     df_master = pd.concat(dfs)
-    updated = "#{0}".format(datetime.now())
+    DF_des = pd.concat(dfs)
+    cols = [c for c in DF_des.columns if c[-5:] != '_orig']
+    DF_des = DF_des[cols]
+    print "Done making detailed dataframes"
 
+    print "Starting influxdb insertion"
+    # Writing influxdb file for import
+    import warnings
+    warnings.filterwarnings("ignore")
+    sys.path.append(r'/work/devel/mjohns44/python')
+
+    from influxdb import DataFrameClient
+    DF_des = DF_des[(DF_des.start_time.notnull()) & (DF_dedes.status != -99)]
+
+    DF_des['start_time'] = pd.to_datetime(DF_des['start_time'])
+    DF_des['end_time'] = DF_des['end_time'].apply(str)
+    DF_des['created_date'] = DF_des['created_date'].apply(str)
+    DF_des['reqnum'] = DF_des['reqnum'].apply(str)
+    DF_des['pfw_attempt_id'] = DF_des['pfw_attempt_id'].apply(str)
+    DF_des['attnum'] = DF_des['attnum'].apply(int)
+    DF_des['attnum'] = DF_des['attnum'].apply(str)
+
+
+    DF_des['status'] = DF_des['status'].fillna(-99)
+    DF_des['status'] = DF_des['status'].apply(int)
+
+    DF_des = DF_des.set_index('start_time')
+    from despyserviceaccess.serviceaccess import parse
+    DF_des['t_eff'].replace('None', np.nan, inplace=True)
+    DF_des['t_eff'] = DF_des['t_eff'].astype(float)
+    DF_des['b_eff'].replace('None', np.nan, inplace=True)
+    DF_des['b_eff'] = DF_des['b_eff'].astype(float)
+    DF_des['c_eff'].replace('None', np.nan, inplace=True)
+    DF_des['c_eff'] = DF_des['c_eff'].astype(float)
+    DF_des['f_eff'].replace('None', np.nan, inplace=True)
+    DF_des['f_eff'] = DF_des['f_eff'].astype(float)
+    DF_des['total_time'].replace('None', np.nan, inplace=True)
+    DF_des['total_time'] = DF_des['total_time'].astype(float)
+
+    influxdict=parse(None,'db-influxdb')
+    influxuser=influxdict['user']
+    influxpasswd=influxdict['passwd']
+    influxhost=influxdict['host'].split('https://')[1]
+    influxport=int(influxdict['port'])
+    client = DataFrameClient(host = influxhost,port = influxport, username = influxuser,
+                             password = influxpasswd, database = "ops",
+                             ssl = True, verify_ssl = False)
+    #client.write_points(DF_des, "attempt", tag_columns = ['project','campaign','propid','data_state','operator','pipeline','target_site','submit_site','exec_host','status','band','db','program','assessment'])
+    client.write_points(DF_des, "attempt", tag_columns = ['reqnum','unitname','attnum','propid','data_state','pipeline','target_site','exec_host','operator','status','program','assessment'])
+
+    print "Done inserting into influx"
+
+    updated = "#{0}".format(datetime.now())
     with open(csv_path,'w') as csv:
         csv.write('%s\n' % updated)
     df_master.to_csv(csv_path,index=False,mode='a')
@@ -476,7 +530,7 @@ if __name__ =='__main__':
         csv_path = os.path.join(app.config["STATIC_PATH"],"processing.csv")
 
     make_reports(db=db,reqnums=reqnums)
-    shutil.copy(copy_path,csv_path)
+    #shutil.copy(copy_path,csv_path)
     sys.exit()
 
     #make_dts_plot()

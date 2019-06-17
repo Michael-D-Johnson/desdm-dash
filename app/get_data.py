@@ -322,7 +322,10 @@ def processing_summary(db,project,df=None):
         req = name[0]
         db = name[1]
         req = int(float(req))
-        propid = group['propid'].unique()[0]
+        try:
+            propid = group['propid'].unique()[0]
+        except:
+            propid = None
         orig_nitelist = sorted(group['nite'].unique())
         pipeline = group['pipeline'].unique()[0]
         orig_nitelist_cp = list(orig_nitelist)

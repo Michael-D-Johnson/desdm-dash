@@ -34,7 +34,6 @@ def decade_overview():
 @app.route('/decade_summary/<propid>')
 def decade_summary(propid):
     current_dict,rest_dict,columns,updated,curr_df,rest_df = get_data.processing_summary('db-decade','DECADE')
-    print(curr_df)
     curr_df = curr_df[curr_df.propid==str(propid)].sort(['nite'])
     if len(curr_df):
         current_dict = [curr_df.to_dict(orient = 'list')]

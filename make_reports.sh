@@ -3,7 +3,7 @@
 # Crontab to create data/csv: 0,15 * * * * /work/devel/mjohns44/git/desdm-dash/app/get_data.sh
 
 # Checking if script is already running
-l=$(ps aux | grep -e '/work/devel/mjohns44/git/desdm-dash/desdm-dash/make_reports.sh' | grep -v grep | grep -v vim | grep $USER | grep '>>' | wc -l)
+l=$(ps aux | grep -e '/work/devel/mjohns44/git/desdm-dash/desdm-dash/make_reports.sh' | wc -l)
 echo "Number of processes: $l"
 if [ "$l" -lt 2 ]
 then

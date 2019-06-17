@@ -52,6 +52,11 @@ def basic_propid_size(cur,propid):
 
     return cur.fetchone()[0]
 
+def basic_status(cur,propid):
+    query = "select count(distinct e.expnum) from exposure e,pfw_attempt a,task t where e.obstype in ('standard','object') and e.propid='%s' and object not like '%pointing%' and t.id=a.task_id and substr(e.expnum,1) = substr(a.unitname,4) and t.status=0" % propid
+    cur.execute(query)
+
+    return cur.fetchone()[0]
 
 def get_reqnums(cur,sch):
     query = "SELECT distinct a.reqnum \
