@@ -170,11 +170,20 @@ def make_reports(db=None,reqnums=None):
         df_oper = pd.DataFrame()
     dfs = [df_oper,df_test,df_decade]
     df_master = pd.concat(dfs)
-    DF_des = pd.concat(dfs)
+
+    DFs = []
+    import numpy as np
+    for name, group in df_master.groupby(by=['reqnum']):
+            DF_DES,columns,reqnum,updated = get_data.processing_detail(db = 'db-desoper',reqnum = group.reqnum.unique()[0],df = group)
+            DF_DES['total_time'] = DF_DES['total time']
+            cols = [c for c in DF_DES.columns if c != 'total time']
+            DF_DES = DF_DES[cols]
+            DFs.append(DF_DES)
+
+    DF_des = pd.concat(DFs)
     cols = [c for c in DF_des.columns if c[-5:] != '_orig']
     DF_des = DF_des[cols]
     print "Done making detailed dataframes"
-
     print "Starting influxdb insertion"
     # Writing influxdb file for import
     import warnings
@@ -218,7 +227,7 @@ def make_reports(db=None,reqnums=None):
                              password = influxpasswd, database = "ops",
                              ssl = True, verify_ssl = False)
     #client.write_points(DF_des, "attempt", tag_columns = ['project','campaign','propid','data_state','operator','pipeline','target_site','submit_site','exec_host','status','band','db','program','assessment'])
-    client.write_points(DF_des, "attempt", tag_columns = ['reqnum','unitname','attnum','propid','data_state','pipeline','target_site','exec_host','operator','status','program','assessment'])
+    client.write_points(DF_des, "attempt", tag_columns = ['reqnum','unitname','attnum','data_state','pipeline','target_site','exec_host','operator','status','program','assessment'])
 
     print "Done inserting into influx"
 
