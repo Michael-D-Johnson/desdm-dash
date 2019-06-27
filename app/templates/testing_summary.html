@@ -47,8 +47,6 @@
     {% endif %}
     {% if col == 'reqnum' %}
       <a href="{{ url_for('processing_detail',reqnum = row['reqnum']) }}"><strong>{{ row['reqnum'] }}</strong></a></td>
-    {% elif col == 'failed' %}
-      <a href="{{ url_for('error_summary',db=db, reqnum=row['reqnum']) }}"><strong>{{ row['failed'] }}</strong></a></td>
     {% elif col == 'redflag' %}
       <!-- Don't display the redflag column, just for adding red color to table -->
     {% else %}
