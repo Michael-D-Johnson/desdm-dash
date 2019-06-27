@@ -4,13 +4,13 @@
 <link href="{{ url_for('static',filename='archive.css')}}" rel="stylesheet" type="text/css">
 <script src="{{ url_for('static',filename='archive.js')}}"></script>
 
-<body onload="initDoc('/static/report_archive_default.html','/static/last4days.html')">
+<body onload="initDoc('/desdm-dash-static/report_archive_default.html','/desdm-dash-static/last4days.html')">
 <div class="row">
 
   <div class="sidebar">
     <center>
     <h2>Report Archive</h2>
-    <button onclick="requestDoc('main','/static/report_archive_default.html')">Return to Archive</button>
+    <button onclick="requestDoc('main','/desdm-dash-static/report_archive_default.html')">Return to Archive</button>
     <input type="text" id="archiveSearch" oninput="searchArchive()" placeholder="Search for Reqnum">
     <div id="sidebarContents">
     </div>
