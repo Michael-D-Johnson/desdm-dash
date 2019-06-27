@@ -425,10 +425,10 @@ def processing_detail(db,reqnum,df=None,updated=None):
     df = df[df.reqnum==int(reqnum)]
     if not len(df):
         df = pd.DataFrame(columns=['project','campaign','pipeline','pfw_attempt_id','reqnum','unitname','attnum','status','data_state','operator','target_site','submit_site','exec_host','start_time','end_time','total time','assessment','t_eff',
-                                       'b_eff','c_eff','f_eff','program'])
+                                       'b_eff','c_eff','f_eff','program','job_timing'])
     else:
         columns = ['project','campaign','pipeline','pfw_attempt_id','reqnum','unitname','attnum','status','data_state','operator','target_site','submit_site','exec_host','start_time','end_time','total time','assessment','t_eff','b_eff',
-                   'c_eff','f_eff','program']
+                   'c_eff','f_eff','program','job_timing']
 
         df.insert(len(df.columns),'assessment', None)
         df.insert(len(df.columns),'program', None)
@@ -436,6 +436,7 @@ def processing_detail(db,reqnum,df=None,updated=None):
             df.insert(len(df.columns),'t_eff', None)
         except: pass
         df.insert(13,'total time', None)
+        df.insert(len(df.columns),'job_time',None)
         def rename(row):
             row['submit_site'] = row['submit_site'].split('.')[0]
             return row['submit_site']
@@ -452,10 +453,12 @@ def processing_detail(db,reqnum,df=None,updated=None):
                 end = datetime.strptime(str(group['end_time'].max())[:19],'%Y-%m-%d %H:%M:%S')
 
                 total_time = (end - start)/pd.Timedelta(hours=1)
+                job_time = sum(group.job_timing.unique())/pd.Timedelta(hours=1)
                 df.loc[index,('total time')] = round(total_time,3)
+                df.loc[index,('job_time')] = job_time
             except:
                 pass
-
+    
             pipeline = group.pipeline.unique()
             assess_query_results = query.assess_query(query.connect_to_db(db)[1],df,index,name,
                                                       group.pfw_attempt_id.unique()[0],pipeline)
@@ -479,7 +482,6 @@ def processing_detail(db,reqnum,df=None,updated=None):
                 df.loc[index,('c_eff')] = c_eff
                 df.loc[index,('f_eff')] = f_eff
             df.loc[index,('program')] = program
-
         return (df,columns,reqnum,updated)
 
 ######################

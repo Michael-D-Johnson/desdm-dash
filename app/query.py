@@ -10,6 +10,14 @@ def connect_to_db(section):
     cur = dbh.cursor()
     return (dbh,cur)
 
+def job_timings(cur,reqnums):
+    query = "select j.pfw_attempt_id, max(end_time - start_time) from task t,pfw_job j \
+             where j.task_id=t.id and t.name = 'job' and j.pfw_attempt_id in (select a.id from \
+             pfw_attempt a,task t where t.id=a.task_id and a.reqnum in ({reqnums}) \
+             and t.status=0) group by j.pfw_attempt_id,pfw_block_task_id".format(reqnums=reqnums)
+    cur.execute(query)
+    return cur.fetchall()
+
 def processing_detail(cur,reqnums):
     query = "SELECT distinct a.created_date,r.project,r.campaign,a.reqnum,a.unitname,a.attnum,a.id,v.val,t1.status,\
             a.data_state,a.operator,r.pipeline,t2.start_time,t2.end_time,b.target_site,t1.exec_host,t2.exec_host \

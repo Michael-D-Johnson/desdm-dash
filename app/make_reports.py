@@ -170,16 +170,21 @@ def make_reports(db=None,reqnums=None):
         df_oper = pd.DataFrame()
     dfs = [df_oper,df_test,df_decade]
     df_master = pd.concat(dfs)
+    
+    df_job_timings = pd.DataFrame(query.job_timings(query.connect_to_db('db-desoper')[1],
+                        ','.join(oper_reqnums)),columns=['pfw_attempt_id','job_timing'])
+
+    df_master = pd.merge(df_master,df_job_timings, on=['pfw_attempt_id'], how='left',
+                         suffixes=('_orig',''))
 
     DFs = []
     import numpy as np
     for name, group in df_master.groupby(by=['reqnum']):
             DF_DES,columns,reqnum,updated = get_data.processing_detail(db = 'db-desoper',reqnum = group.reqnum.unique()[0],df = group)
             DF_DES['total_time'] = DF_DES['total time']
-            cols = [c for c in DF_DES.columns if c != 'total time']
+            cols = [c for c in DF_DES.columns if c != 'total time' and c != 'job_timing']
             DF_DES = DF_DES[cols]
             DFs.append(DF_DES)
-
     DF_des = pd.concat(DFs)
     cols = [c for c in DF_des.columns if c[-5:] != '_orig']
     DF_des = DF_des[cols]
@@ -217,6 +222,8 @@ def make_reports(db=None,reqnums=None):
     DF_des['f_eff'] = DF_des['f_eff'].astype(float)
     DF_des['total_time'].replace('None', np.nan, inplace=True)
     DF_des['total_time'] = DF_des['total_time'].astype(float)
+    DF_des['job_time'].replace('None', np.nan, inplace=True)
+    DF_des['job_time'] = DF_des['job_time'].astype(float)
 
     influxdict=parse(None,'db-influxdb')
     influxuser=influxdict['user']
@@ -227,14 +234,17 @@ def make_reports(db=None,reqnums=None):
                              password = influxpasswd, database = "ops",
                              ssl = True, verify_ssl = False)
     #client.write_points(DF_des, "attempt", tag_columns = ['project','campaign','propid','data_state','operator','pipeline','target_site','submit_site','exec_host','status','band','db','program','assessment'])
-    client.write_points(DF_des, "attempt", tag_columns = ['reqnum','unitname','attnum','data_state','pipeline','target_site','exec_host','operator','status','program','assessment'])
+    # Inserting into attempt table (tracks status as tag)
+    client.write_points(DF_des[(DF_des.status != -99)], "attempt", tag_columns = ['reqnum','unitname','attnum','data_state','pipeline','submit_site','target_site','exec_host','operator','status'])
+    # Inserting into current table (tracks status as field)
+    client.write_points(DF_des, "current", tag_columns = ['reqnum','unitname','attnum','pipeline','submit_site','target_site','operator']) #,retention_policy="one_week")
 
     print "Done inserting into influx"
 
     updated = "#{0}".format(datetime.now())
     with open(csv_path,'w') as csv:
         csv.write('%s\n' % updated)
-    df_master.to_csv(csv_path,index=False,mode='a')
+    DF_des.to_csv(csv_path,index=False,mode='a')
 
 
     # Make plots html
