@@ -82,7 +82,7 @@ def processing_summary(db,project,df=None):
         passed = passed_df['status'].count()
         failed_df = group[~group.status.isin([0,-99])].drop_duplicates(['unitname'])
         failed = failed_df['status'].count()
-        try: unknown = group['status'][group.status == -99].count()
+        try: unknown = len(group[group.status == -99].pfw_attempt_id.unique())
         except: unknown = 0
         try:
             target_site = ', '.join(group[group.status.isin([-99])].sort_values(by=['created_date'])['target_site'].unique())
