@@ -2,6 +2,7 @@
 import os
 import numpy as np
 import pandas as pd
+import math
 from datetime import datetime, timedelta
 from bokeh.plotting import figure,ColumnDataSource
 from bokeh.models.widgets import Panel, Tabs
@@ -14,6 +15,7 @@ from bokeh.transform import factor_cmap
 
 def plot_times(dataframe):
     dataframe = dataframe.fillna(-1)
+    dataframe = dataframe[dataframe["total time"] !=-1]
     p = figure(title="Processing Times",height=500,width=1000)
     hist, edges = np.histogram(dataframe["total time"],bins = 24)
     p.quad(top=hist,bottom=0, left=edges[:-1], right=edges[1:],line_color="white")
@@ -45,11 +47,13 @@ def plot_exec_time(dataframe):
         else:
             continue
     dataframe = dataframe.fillna('None')
+    dataframe = dataframe[dataframe.exec_host != 'None']
     grouped_df = dataframe.groupby('exec_host') 
     p = figure(title='Mean Processing Time for Each Exec Host',height=500,width=1000,x_range=grouped_df,
                 tooltips=[("Mean time", "@total_time_mean"), ("Exec host", "@exec_host")])
 
     p.vbar(x='exec_host',top='total_time_mean',source = grouped_df,width=0.9)
+    p.xaxis.major_label_orientation = -math.pi/3
     return p
 
 def plot_status_per_host(dataframe):
@@ -63,7 +67,9 @@ def plot_status_per_host(dataframe):
         else:
             continue
     dataframe = dataframe.replace(np.nan,'None')
+    dataframe = dataframe[(dataframe.exec_host != None) | (dataframe.exec_host !='None')]
     dataframe.status = dataframe.status.astype(str)
+    dataframe = dataframe[dataframe.status !='None']
 
     grouped_df = dataframe.groupby(by=['exec_host','status'])
     p = figure(title="Status per Exec Host", height=500,width=1000, x_range= grouped_df, tooltips = [("Count", "@pfw_attempt_id_count"), ("Exec host, Status", "@exec_host_status")])
@@ -76,7 +82,7 @@ def plot_status_per_host(dataframe):
     p.vbar(x='exec_host_status',top='pfw_attempt_id_count',source = grouped_df,width=0.9,line_color=None,
             fill_color=index_cmap)
     p.xaxis.group_label_orientation = "vertical"
-
+    p.xaxis.major_label_orientation = -math.pi/3
     return p
 
 def plot_t_eff(dataframe):
