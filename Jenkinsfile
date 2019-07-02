@@ -29,13 +29,13 @@ node {
          * Second, the 'latest' tag.
          * Pushing multiple tags is cheap, as all the layers are reused. */
         docker.withRegistry('https://registry.hub.docker.com', 'mdjohnson-docker-hub-credentials') {
-            app.push("${env.BUILD_NUMBER}")
+            app.push("v${env.BUILD_NUMBER}")
             app.push("latest")
         }
     }
 
     stage('Deploy on kubernetes') {
         /* Finally, we'll deploy latest build on kubernetes */
-        sh "kubectl set image deployment/desdm-dash desdm-dash=docker.io/mdjohnson/desdm-dash:${env.BUILD_NUMBER}" 
+        sh "kubectl set image deployment/desdm-dash desdm-dash=docker.io/mdjohnson/desdm-dash:v${env.BUILD_NUMBER}" 
         }
 }
