@@ -11,7 +11,6 @@ templates = os.path.join(os.getenv("STATIC_PATH"),'reports')
 
 def processing_archive():
     reqnums = [r.strip() for r in os.listdir(templates)]
-    reqnums.remove('processing.csv')
     return reqnums
 
 def processing_summary(db,project,df=None):
