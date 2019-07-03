@@ -21,8 +21,7 @@ RUN chown -R dashuser:dashuser /desdm-dash
 EXPOSE 5000
 
 RUN pip install --upgrade pip
-#RUN pip install --trusted-host pypi.python.org -r requirements.txt
-RUN pip install -r requirements.txt
+RUN pip install --trusted-host pypi.python.org -r requirements.txt
 
 RUN apt-get update
 RUN apt-get -y install vim
