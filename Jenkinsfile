@@ -14,23 +14,15 @@ node {
         app = docker.build("mdjohnson/desdm-dash")
     }
 
+    ws("/var/jenkins_home/workspaces/docker_container_test"){
     stage('Test image') {
         /* Ideally, we would run a test framework against our image.
          * For this example, we're using a Volkswagen-type approach ;-) */
-        agent {
-            docker {
-                label 'docker-host'
-                image 'docker:18-dind'
-                args '-v /des004/deslabs/jenkins_home:/var/jenkins_home'
-            }
-        }
-        steps {
         app.inside {
             sh 'echo "Tests passed"'
         }
-        }
     }
-
+    }
     stage('Push image') {
         /* We'll push the image with two tags:
          * First, the incremental build number from Jenkins
