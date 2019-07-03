@@ -18,7 +18,7 @@ node {
     stage('Test image') {
         /* Ideally, we would run a test framework against our image.
          * For this example, we're using a Volkswagen-type approach ;-) */
-        app.inside("-u 1000:1000") {
+        app.inside("-v /des004/deslabs/jenkins_home:/var/jenkins_home") {
             sh 'echo "Tests passed"'
         }
     }
