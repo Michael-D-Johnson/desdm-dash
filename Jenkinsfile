@@ -21,7 +21,7 @@ node {
             docker {
                 label 'docker-host'
                 image 'docker:18-dind'
-                args '-v /des004/deslabs/jenkins_home:/var/jenkins_home
+                args '-v /des004/deslabs/jenkins_home:/var/jenkins_home'
             }
         }
         steps {
