@@ -35,10 +35,6 @@ node {
 
     stage('Deploy on kubernetes') {
         /* Finally, we'll deploy latest build on kubernetes */
-        withKubeConfig([credentialsId: 'jenkins-serviceaccount-credentials',
-                        serverUrl: '141.142.161.55:6443'
-                    ]) {
         sh "kubectl set image -n deslabs deployment/desdm-dash desdm-dash=docker.io/mdjohnson/desdm-dash:v${env.BUILD_NUMBER}" 
-        }
         }
 }
