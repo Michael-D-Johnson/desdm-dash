@@ -22,6 +22,7 @@ EXPOSE 5000
 
 #CONDA
 RUN apt-get -qq update && apt-get -qq -y install curl bzip2 \
+    && apt-get -qq -y install vim && apt-get install -qq -y supervisor \
     && curl -sSL https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -o /tmp/miniconda.sh \
     && bash /tmp/miniconda.sh -bfp /usr/local \
     && rm -rf /tmp/miniconda.sh \
@@ -42,9 +43,6 @@ RUN conda install -y pip
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-RUN apt-get update
-RUN apt-get -y install vim
-RUN apt-get install -y supervisor
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Define environment variable
