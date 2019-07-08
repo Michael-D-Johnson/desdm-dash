@@ -252,7 +252,7 @@ def create_last4_html(reqnums):
     with open(last4path,'w') as fh:
         fh.write('<h3>Reports in the last 4 days</h3>\n<div id=\'sidebarResults\'>')
         for reqnum in last:
-            fh.write('  <button onclick="requestDoc(\'main\',\'/static/reports/{req}/report_{req}.html\')">Report {req}</button><br>\n'.format(req=reqnum[1]))
+            fh.write('  <button onclick="requestDoc(\'main\',\'/desdm-dash-static/reports/{req}/report_{req}.html\')">Report {req}</button><br>\n'.format(req=reqnum[1]))
         fh.write('</div>')
 
 def create_main_html(reqnums):
@@ -287,7 +287,7 @@ def create_main_html(reqnums):
             else:
                 fh.write("</div><br>\n<div id='month'><h3>{month}</h3>\n".format(month=month_data[month][0][0].strftime('%B %Y')))
             for row in month_data[month]:
-                fh.write("  <button onclick=\"requestDoc('main','/static/reports/{rq}/report_{rq}.html')\">Report {rq}</button>\n".format(rq=row[1]))
+                fh.write("  <button onclick=\"requestDoc('main','/desdm-dash-static/reports/{rq}/report_{rq}.html')\">Report {rq}</button>\n".format(rq=row[1]))
         fh.write('</div>')
 
 if __name__ =='__main__':
