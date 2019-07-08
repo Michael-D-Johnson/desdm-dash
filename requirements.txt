@@ -1,11 +1,10 @@
 flask 
-cx_oracle
+cx_oracle==5.3
 pandas
 jinja2
 configparser
 configargparse 
 jira
-easyaccess
 tornado
 bokeh
 gevent

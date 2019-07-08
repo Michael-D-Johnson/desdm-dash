@@ -20,8 +20,26 @@ RUN chown -R dashuser:dashuser /desdm-dash
 # Make port available to the world outside this container
 EXPOSE 5000
 
+#CONDA
+RUN apt-get -qq update && apt-get -qq -y install curl bzip2 \
+    && curl -sSL https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -o /tmp/miniconda.sh \
+    && bash /tmp/miniconda.sh -bfp /usr/local \
+    && rm -rf /tmp/miniconda.sh \
+    && conda install -y python=3 \
+    && conda update conda \
+    && apt-get -qq -y remove curl bzip2 \
+    && apt-get -qq -y autoremove \
+    && apt-get autoclean \
+    && rm -rf /var/lib/apt/lists/* /var/log/dpkg.log \
+    && conda clean --all --yes
+
+ENV PATH /opt/conda/bin:$PATH
+
+RUN conda install -c anaconda oracle-instantclient
+RUN conda install easyaccess -c mgckind 
+RUN conda install -y pip 
+
 RUN pip install --upgrade pip
-#RUN pip install --trusted-host pypi.python.org -r requirements.txt
 RUN pip install -r requirements.txt
 
 RUN apt-get update
