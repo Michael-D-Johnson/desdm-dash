@@ -37,4 +37,11 @@ node {
         /* Finally, we'll deploy latest build on kubernetes */
         sh "kubectl set image -n deslabs deployment/desdm-dash desdm-dash=docker.io/mdjohnson/desdm-dash:v${env.BUILD_NUMBER}" 
         }
+
+    stage('Clean up unused docker builds') {
+        steps {
+            sh "docker rm $(docker ps -a -q)"
+            sh "docker rmi $(docker images -q -f dangling=true)"
+        }
+    }
 }
