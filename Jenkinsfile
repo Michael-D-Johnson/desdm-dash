@@ -39,7 +39,6 @@ node {
         }
 
     stage('Clean up unused docker builds') {
-        sh 'docker rm $(docker ps -a -q)'
-        sh 'docker rmi $(docker images -q -f dangling=true)'
+        sh "docker image prune -f"
     }
 }
