@@ -37,4 +37,10 @@ node {
         /* Finally, we'll deploy latest build on kubernetes */
         sh "kubectl set image -n deslabs deployment/desdm-dash desdm-dash=docker.io/mdjohnson/desdm-dash:v${env.BUILD_NUMBER}" 
         }
+
+    post {
+        always {
+            cleanWS()
+            }
+    }        
 }
