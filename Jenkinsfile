@@ -39,6 +39,6 @@ node {
         }
 
     stage('Clean up unused docker builds') {
-        sh "docker image prune -f"
+        sh "docker system prune -a -f"
     }
 }
