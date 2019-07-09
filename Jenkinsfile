@@ -1,7 +1,9 @@
 node {
     try {
         def app
-
+        stage('Clean WS before build'){
+            deleteDir()
+        }
         stage('Clone repository') {
             /* Let's make sure we have the repository cloned to our workspace */
 
@@ -43,8 +45,6 @@ node {
         throw e
     }
     finally {
-        stage('WS clean') {
-            cleanWS()
-        }   
+        step([$class: 'WsCleanup'])
     }   
 }
