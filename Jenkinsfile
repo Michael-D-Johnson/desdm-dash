@@ -1,5 +1,7 @@
 node {
     def app
+    def BUILD_VERSION = divide_build_number()
+    env.BUILD_VERSION = String.format("%.2f",BUILD_VERSION)
 
     stage('Clone repository') {
         /* Let's make sure we have the repository cloned to our workspace */
@@ -28,17 +30,24 @@ node {
          * Second, the 'latest' tag.
          * Pushing multiple tags is cheap, as all the layers are reused. */
         docker.withRegistry('https://registry.hub.docker.com', 'mdjohnson-docker-hub-credentials') {
-            app.push("v${env.BUILD_NUMBER}")
+            app.push("v${env.BUILD_VERSION}")
             app.push("latest")
         }
     }
 
     stage('Deploy on kubernetes') {
         /* Finally, we'll deploy latest build on kubernetes */
-        sh "kubectl set image -n deslabs deployment/desdm-dash desdm-dash=docker.io/mdjohnson/desdm-dash:v${env.BUILD_NUMBER}" 
+        sh "kubectl set image -n deslabs deployment/desdm-dash desdm-dash=docker.io/mdjohnson/desdm-dash:v${env.BUILD_VERSION}" 
         }
 
     stage('Clean up unused docker builds') {
         sh "docker system prune -a -f"
+    }
+}
+
+def divide_build_number(){
+    node {
+        build_version = env.BUILD_NUMBER.toLong() / 100.0
+        return build_version.toFloat()
     }
 }
