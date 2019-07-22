@@ -1,7 +1,6 @@
 node {
     def app
-    def BUILD_VERSION = divide_build_number()
-    env.BUILD_VERSION = String.format("%.2f",BUILD_VERSION)
+    env.BUILD_VERSION = divide_build_number()
 
     stage('Clone repository') {
         /* Let's make sure we have the repository cloned to our workspace */
@@ -48,6 +47,7 @@ node {
 def divide_build_number(){
     node {
         build_version = env.BUILD_NUMBER.toLong() / 100.0
-        return build_version.toFloat()
+        build_version_float = build_version.toFloat()
+        return String.format("%.2f",build_version_float)
     }
 }
