@@ -208,9 +208,9 @@ def make_reports(db=None,reqnums=None):
         includepath = 'reports/{reqnum}/{file}'.format(reqnum=reqnum,file=filename)
         filepath = os.path.join(path,filename)
         with open(filepath,'wb') as h:
-            h.write('<center>\n')
+            h.write('<center>\n'.encode('utf-8'))
             h.write(html.encode('utf-8'))
-            h.write('</center>\n')
+            h.write('</center>\n'.encode('utf-8'))
 
         # Writing reports to HTML
         print("Writing reports to HTML")
