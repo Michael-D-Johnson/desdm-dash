@@ -207,7 +207,7 @@ def make_reports(db=None,reqnums=None):
         filename = 'plots_{reqnum}.html'.format(reqnum=reqnum)
         includepath = 'reports/{reqnum}/{file}'.format(reqnum=reqnum,file=filename)
         filepath = os.path.join(path,filename)
-        with open(filepath,'w') as h:
+        with open(filepath,'wb') as h:
             h.write('<center>\n')
             h.write(html.encode('utf-8'))
             h.write('</center>\n')
