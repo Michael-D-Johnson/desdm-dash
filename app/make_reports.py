@@ -209,7 +209,7 @@ def make_reports(db=None,reqnums=None):
         filepath = os.path.join(path,filename)
         with open(filepath,'w') as h:
             h.write('<center>\n')
-            h.write(html)
+            h.write(html.encode('utf-8'))
             h.write('</center>\n')
 
         # Writing reports to HTML
