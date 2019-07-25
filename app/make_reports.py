@@ -221,7 +221,7 @@ def make_reports(db=None,reqnums=None):
         reportfile = "report_{reqnum}.html".format(reqnum=reqnum)
         reportpath = os.path.join(path,reportfile)
         with open(reportpath, "wb") as fh:
-            fh.write(bytes(output_from_parsed_template,'utf-8'))
+            fh.write(bytes(output_from_parsed_template,'utf-8').strip())
         update_report_archive()
         print("All Done: %s" % reqnum)
     print("All reports complete")
