@@ -36,7 +36,7 @@ RUN apt-get -qq update && apt-get -qq -y install curl bzip2 \
 
 ENV PATH /opt/conda/bin:$PATH
 
-RUN conda install -c anaconda oracle-instantclient
+RUN conda install -c mgckind oracle-instantclient
 RUN conda install easyaccess -c mgckind 
 RUN conda install -y pip 
 
