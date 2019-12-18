@@ -1,53 +1,78 @@
-node {
-    def app
-    env.BUILD_VERSION = divide_build_number()
-
-    stage('Clone repository') {
-        /* Let's make sure we have the repository cloned to our workspace */
-
-        checkout scm
-    }
-
-    stage('Build image') {
-        /* This builds the actual image; synonymous to
-         * docker build on the command line */
-
-        app = docker.build("mdjohnson/desdm-dash")
-    }
-
-    stage('Test image') {
-        /* Ideally, we would run a test framework against our image.
-         * For this example, we're using a Volkswagen-type approach ;-) */
-        app.inside {
-            sh 'echo "Tests passed"'
+pipeline {
+  agent {
+    label "jenkins-python"
+  }
+  environment {
+    ORG = 'bitbucket'
+    APP_NAME = 'desdm-dash'
+    CHARTMUSEUM_CREDS = credentials('jenkins-x-chartmuseum')
+    DOCKER_REGISTRY_ORG = 'bitbucket'
+  }
+  stages {
+    stage('CI Build and push snapshot') {
+      when {
+        branch 'PR-*'
+      }
+      environment {
+        PREVIEW_VERSION = "0.0.0-SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER"
+        PREVIEW_NAMESPACE = "$APP_NAME-$BRANCH_NAME".toLowerCase()
+        HELM_RELEASE = "$PREVIEW_NAMESPACE".toLowerCase()
+      }
+      steps {
+        container('python') {
+          sh "python -m unittest"
+          sh "export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml"
+          sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:$PREVIEW_VERSION"
+          dir('./charts/preview') {
+            sh "make preview"
+            sh "jx preview --app $APP_NAME --dir ../.."
+          }
         }
+      }
     }
+    stage('Build Release') {
+      when {
+        branch 'master'
+      }
+      steps {
+        container('python') {
 
-    stage('Push image') {
-        /* We'll push the image with two tags:
-         * First, the incremental build number from Jenkins
-         * Second, the 'latest' tag.
-         * Pushing multiple tags is cheap, as all the layers are reused. */
-        docker.withRegistry('https://registry.hub.docker.com', 'mdjohnson-docker-hub-credentials') {
-            app.push("v${env.BUILD_VERSION}")
-            app.push("latest")
+          // ensure we're not on a detached head
+          sh "git checkout master"
+          sh "git config --global credential.helper store"
+          sh "jx step git credentials"
+
+          // so we can retrieve the version in later steps
+          sh "echo \$(jx-release-version) > VERSION"
+          sh "jx step tag --version \$(cat VERSION)"
+          sh "python -m unittest"
+          sh "export VERSION=`cat VERSION` && skaffold build -f skaffold.yaml"
+          sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:\$(cat VERSION)"
         }
+      }
     }
+    stage('Promote to Environments') {
+      when {
+        branch 'master'
+      }
+      steps {
+        container('python') {
+          dir('./charts/desdm-dash') {
+            sh "jx step changelog --version v\$(cat ../../VERSION)"
 
-    stage('Deploy on kubernetes') {
-        /* Finally, we'll deploy latest build on kubernetes */
-        sh "kubectl set image -n deslabs deployment/desdm-dash desdm-dash=docker.io/mdjohnson/desdm-dash:v${env.BUILD_VERSION}" 
+            // release the helm chart
+            sh "jx step helm release"
+
+            // promote through all 'Auto' promotion Environments
+            sh "jx promote -b --all-auto --timeout 1h --version \$(cat ../../VERSION)"
+          }
         }
-
-    stage('Clean up unused docker builds') {
-        sh "docker system prune -a -f"
+      }
     }
-}
-
-def divide_build_number(){
-    node {
-        build_version = env.BUILD_NUMBER.toLong() / 100.0
-        build_version_float = build_version.toFloat()
-        return String.format("%.2f",build_version_float)
-    }
+  }
+  post {
+        always {
+          cleanWs()
+        }
+  }
 }

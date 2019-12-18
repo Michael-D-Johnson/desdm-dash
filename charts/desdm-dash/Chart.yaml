@@ -1,0 +1,4 @@
+apiVersion: v1
+description: A Helm chart for Kubernetes
+name: desdm-dash
+version: v0.1.0
